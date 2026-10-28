@@ -1,0 +1,3 @@
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', system-ui, sans-serif; }
+#modal { transition: opacity 0.2s ease; }
