@@ -1,5 +1,5 @@
-// Leemos la clave desde la memoria del navegador para mantener el código seguro en GitHub
-const OPENROUTER_KEY = localStorage.getItem('openrouter_key') || ''; 
+// Esta clave será reemplazada automáticamente por GitHub Actions antes de publicar
+const OPENROUTER_KEY = 'MI_CLAVE_SECRETA';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
 A partir del siguiente texto, genera material de estudio de ALTA CALIDAD.
@@ -36,8 +36,8 @@ async function generarMaterial(texto) {
   }
 
   // Si no hay clave -> modo demo
-  if (!OPENROUTER_KEY) {
-    console.warn('Sin API key: usando modo demo. Configura tu clave en la consola.');
+  if (!OPENROUTER_KEY || OPENROUTER_KEY === 'MI_CLAVE_SECRETA') {
+    console.warn('Sin API key: usando modo demo.');
     const demo = demoMaterial();
     localStorage.setItem('materialGenerado', JSON.stringify(demo));
     return demo;
