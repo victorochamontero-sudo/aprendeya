@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aprendeya | Tu compañero de estudio</title>
+  <title>AprendeYa | Tu compañero de estudio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
       <div class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center">
         <span class="text-white text-sm font-bold">A</span>
       </div>
-      <span class="font-bold text-lg">Aprendeya</span>
+      <span class="font-bold text-lg">AprendeYa</span>
     </div>
     <div class="hidden md:flex items-center gap-8 text-sm font-medium">
       <a href="#" class="hover:opacity-60">Sobre nosotros</a>
@@ -41,7 +41,8 @@
       Sube tus apuntes, PDFs o videos y deja que la IA convierta tu material en tarjetas, tests y guías de estudio adaptativas.
     </p>
     <div class="flex flex-col sm:flex-row gap-3">
-      <button onclick="document.getElementById('fileInput').click()" class="bg-[#1A1A1A] text-white font-semibold px-8 py-4 rounded-full text-base hover:bg-opacity-80 transition">
+      <!-- Botón corregido: ahora abre el Modal en vez de buscar archivos -->
+      <button onclick="abrirModal()" class="bg-[#1A1A1A] text-white font-semibold px-8 py-4 rounded-full text-base hover:bg-opacity-80 transition">
         Crear cuenta gratis
       </button>
       <button onclick="abrirModal()" class="border border-[#1A1A1A] font-semibold px-8 py-4 rounded-full text-base hover:bg-[#1A1A1A] hover:text-white transition">
@@ -70,7 +71,7 @@
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
       <button onclick="cerrarModal()" class="absolute top-4 right-4 text-2xl text-[#8A8580] hover:text-black">×</button>
 
-      <h2 class="text-2xl font-bold text-center mb-1">Bienvenido de nuevo</h2>
+      <h2 class="text-2xl font-bold text-center mb-1">Bienvenido a AprendeYa</h2>
       <p class="text-sm text-[#8A8580] text-center mb-6">El compañero de estudio que realmente necesitas</p>
 
       <button class="w-full flex items-center justify-center gap-3 border border-[#E5E1DA] rounded-xl py-3 mb-3 hover:bg-[#F7F5F2] transition font-medium text-sm">
@@ -88,8 +89,8 @@
         <div class="flex-1 h-px bg-[#E5E1DA]"></div>
       </div>
 
-      <form onsubmit="event.preventDefault(); alert('Fase 3: aquí conectamos Supabase 🔐')">
-        <input type="email" placeholder="Correo electrónico" required
+      <form onsubmit="event.preventDefault(); alert('¡Bienvenido a AprendeYa! (El sistema de usuarios real se conectará en la siguiente fase)'); cerrarModal();">
+        <input type="email" id="emailInput" placeholder="Correo electrónico" required
           class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
         <input type="password" placeholder="Contraseña" required
           class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-4 text-sm focus:outline-none focus:border-[#1A1A1A]" />
