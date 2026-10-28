@@ -1,63 +1,41 @@
 // ---------- MODAL ----------
 const modal = document.getElementById('modal');
+function abrirModal() { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+function cerrarModal() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+modal.addEventListener('click', (e) => { if (e.target === modal) cerrarModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarModal(); });
 
-function abrirModal() {
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-}
-
-function cerrarModal() {
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-}
-
-modal.addEventListener('click', (e) => {
-  if (e.target === modal) cerrarModal();
-});
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') cerrarModal();
-});
-
-// ---------- SUBIDA DE ARCHIVOS ----------
+// ---------- LECTURA DE ARCHIVOS ----------
 async function handleFile(e) {
   const file = e.target.files[0];
   if (!file) return;
-  await procesarArchivo(file);
-}
 
-async function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('dropZone').classList.remove('border-[#1A1A1A]');
-  const file = e.dataTransfer.files[0];
-  if (file) await procesarArchivo(file);
-}
-
-async function procesarArchivo(file) {
   const status = document.getElementById('status');
-  status.textContent = '⏳ Extrayendo texto...';
+  const textarea = document.getElementById('textInput');
+  status.textContent = '⏳ Extrayendo texto del archivo...';
 
-  let texto = '';
   try {
-    if (file.name.toLowerCase().endsWith('.pdf')) {
+    let texto = '';
+    const fileName = file.name.toLowerCase();
+
+    if (fileName.endsWith('.pdf')) {
       texto = await extraerTextoPDF(file);
+    } else if (fileName.endsWith('.docx')) {
+      texto = await extraerTextoWord(file);
     } else {
-      texto = await file.text();
+      texto = await file.text(); // .txt
     }
+
+    if (!texto.trim()) {
+      status.textContent = '⚠️ No se encontró texto legible en el archivo.';
+      return;
+    }
+
+    textarea.value = texto.slice(0, 8000); // Límite para la IA
+    status.textContent = '✅ Texto cargado. Puedes editarlo o hacer clic en "Generar con IA".';
   } catch (err) {
     status.textContent = '❌ Error al leer el archivo: ' + err.message;
-    return;
   }
-
-  if (!texto.trim()) {
-    status.textContent = '⚠️ El archivo no contiene texto legible.';
-    return;
-  }
-
-  localStorage.setItem('material', texto.slice(0, 8000));
-  localStorage.removeItem('materialGenerado'); // limpia cache anterior
-  status.textContent = '✅ Texto listo. Generando material...';
-  window.location.href = 'study.html';
 }
 
 async function extraerTextoPDF(file) {
@@ -70,4 +48,28 @@ async function extraerTextoPDF(file) {
     texto += content.items.map(item => item.str).join(' ') + '\n';
   }
   return texto;
+}
+
+async function extraerTextoWord(file) {
+  const buffer = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+  return result.value;
+}
+
+// ---------- PROCESAR E IR A ESTUDIAR ----------
+function procesarEntrada() {
+  const textarea = document.getElementById('textInput');
+  const texto = textarea.value.trim();
+  const status = document.getElementById('status');
+
+  if (!texto) {
+    status.textContent = '⚠️ Por favor, sube un archivo o escribe algo primero.';
+    return;
+  }
+
+  localStorage.setItem('material', texto.slice(0, 8000));
+  localStorage.removeItem('materialGenerado'); // Limpia la caché anterior
+  
+  status.textContent = '🚀 Generando material...';
+  window.location.href = 'study.html';
 }

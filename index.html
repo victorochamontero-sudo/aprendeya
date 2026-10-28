@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
+  <!-- Librerías para leer PDF y Word -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body class="bg-[#F7F5F2] font-[Inter] text-[#1A1A1A] antialiased">
 
@@ -30,7 +33,7 @@
   </nav>
 
   <!-- HERO -->
-  <main class="flex flex-col items-center justify-center text-center px-6 pt-16 pb-24 md:pt-24">
+  <main class="flex flex-col items-center justify-center text-center px-6 pt-12 pb-24 md:pt-16">
     <span class="text-xs font-semibold tracking-widest uppercase text-[#8A8580] mb-4">
       El compañero de estudio que realmente necesitas
     </span>
@@ -38,31 +41,33 @@
       Estudia menos.<br/>Aprende <span class="italic">mucho más</span>.
     </h1>
     <p class="text-base md:text-lg text-[#5A5550] max-w-xl mb-10">
-      Sube tus apuntes, PDFs o videos y deja que la IA convierta tu material en tarjetas, tests y guías de estudio adaptativas.
+      Sube tus apuntes, PDFs, Word o escribe directamente y deja que la IA convierta tu material en tarjetas y tests.
     </p>
-    <div class="flex flex-col sm:flex-row gap-3">
-      <!-- Botón corregido: ahora abre el Modal en vez de buscar archivos -->
-      <button onclick="abrirModal()" class="bg-[#1A1A1A] text-white font-semibold px-8 py-4 rounded-full text-base hover:bg-opacity-80 transition">
-        Crear cuenta gratis
-      </button>
-      <button onclick="abrirModal()" class="border border-[#1A1A1A] font-semibold px-8 py-4 rounded-full text-base hover:bg-[#1A1A1A] hover:text-white transition">
-        Ver cómo funciona
-      </button>
-    </div>
 
-    <!-- Zona de subida -->
-    <div class="mt-16 w-full max-w-2xl border-2 border-dashed border-[#D6D1CA] rounded-3xl p-10 bg-white/60"
-         id="dropZone"
-         ondragover="event.preventDefault(); this.classList.add('border-[#1A1A1A]')"
-         ondragleave="this.classList.remove('border-[#1A1A1A]')"
-         ondrop="handleDrop(event)">
-      <p class="text-sm text-[#8A8580] mb-3">Arrastra aquí tu PDF o nota (.txt)</p>
-      <input type="file" id="fileInput" accept=".pdf,.txt" class="hidden" onchange="handleFile(event)" />
-      <button onclick="document.getElementById('fileInput').click()"
-              class="bg-[#1A1A1A] text-white text-sm font-semibold px-5 py-2.5 rounded-full">
-        Subir material
-      </button>
-      <p id="status" class="text-xs text-[#8A8580] mt-3"></p>
+    <!-- ZONA DE CREACIÓN (Subir o Escribir) -->
+    <div class="w-full max-w-3xl bg-white p-6 rounded-3xl shadow-sm border border-[#E5E1DA] text-left">
+      
+      <div class="flex justify-between items-center mb-4">
+        <label class="font-semibold text-lg text-[#1A1A1A]">Crea tu kit de estudio</label>
+        <div>
+          <input type="file" id="fileInput" accept=".pdf,.txt,.docx" class="hidden" onchange="handleFile(event)" />
+          <button onclick="document.getElementById('fileInput').click()" 
+                  class="text-sm bg-[#F7F5F2] text-[#1A1A1A] border border-[#D6D1CA] px-4 py-2 rounded-xl hover:bg-[#E5E1DA] transition font-medium flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            Subir Archivo
+          </button>
+        </div>
+      </div>
+
+      <textarea id="textInput" rows="6" placeholder="O pega/escribe tu texto o apuntes aquí..." 
+                class="w-full bg-[#F7F5F2] border border-[#E5E1DA] rounded-xl p-4 text-sm focus:outline-none focus:border-[#1A1A1A] resize-none mb-4"></textarea>
+      
+      <div class="flex justify-between items-center">
+        <p id="status" class="text-xs text-[#8A8580]"></p>
+        <button onclick="procesarEntrada()" id="btnGenerar" class="bg-[#1A1A1A] text-white font-semibold px-8 py-3 rounded-full hover:bg-opacity-80 transition">
+          Generar con IA
+        </button>
+      </div>
     </div>
   </main>
 
@@ -89,8 +94,8 @@
         <div class="flex-1 h-px bg-[#E5E1DA]"></div>
       </div>
 
-      <form onsubmit="event.preventDefault(); alert('¡Bienvenido a AprendeYa! (El sistema de usuarios real se conectará en la siguiente fase)'); cerrarModal();">
-        <input type="email" id="emailInput" placeholder="Correo electrónico" required
+      <form onsubmit="event.preventDefault(); alert('¡Bienvenido a AprendeYa!'); cerrarModal();">
+        <input type="email" placeholder="Correo electrónico" required
           class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
         <input type="password" placeholder="Contraseña" required
           class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-4 text-sm focus:outline-none focus:border-[#1A1A1A]" />
@@ -98,17 +103,11 @@
           Iniciar sesión
         </button>
       </form>
-
-      <p class="text-xs text-[#8A8580] text-center mt-4">
-        Al continuar aceptas los <a href="#" class="underline">Términos</a> y la <a href="#" class="underline">Privacidad</a>.
-      </p>
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   </script>
   <script src="app.js"></script>
 </body>
