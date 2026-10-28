@@ -1,5 +1,5 @@
-// Esta clave será reemplazada automáticamente por GitHub Actions antes de publicar
-const OPENROUTER_KEY = 'MI_CLAVE_SECRETA';
+// ⚠️ PEGA AQUÍ TU CLAVE REAL DE OPENROUTER (reemplaza el texto de abajo)
+const OPENROUTER_KEY = 'sk-or-v1-TU_CLAVE_AQUI';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
 A partir del siguiente texto, genera material de estudio de ALTA CALIDAD.
@@ -31,15 +31,18 @@ TEXTO:
 async function generarMaterial(texto) {
   // Cache: si ya generamos material para este texto, lo reutilizamos
   const cache = localStorage.getItem('materialGenerado');
-  if (cache) {
+  const textoAnterior = localStorage.getItem('textoGenerado');
+
+  if (cache && textoAnterior === texto) {
     try { return JSON.parse(cache); } catch (e) { /* ignora cache corrupta */ }
   }
 
   // Si no hay clave -> modo demo
-  if (!OPENROUTER_KEY || OPENROUTER_KEY === 'MI_CLAVE_SECRETA') {
+  if (!OPENROUTER_KEY || OPENROUTER_KEY === 'sk-or-v1-TU_CLAVE_AQUI') {
     console.warn('Sin API key: usando modo demo.');
     const demo = demoMaterial();
     localStorage.setItem('materialGenerado', JSON.stringify(demo));
+    localStorage.setItem('textoGenerado', texto);
     return demo;
   }
 
@@ -72,6 +75,7 @@ async function generarMaterial(texto) {
   const material = JSON.parse(contenido);
   
   localStorage.setItem('materialGenerado', JSON.stringify(material));
+  localStorage.setItem('textoGenerado', texto);
   return material;
 }
 
