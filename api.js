@@ -73,6 +73,39 @@ async function generarMaterial(texto) {
   }
 }
 
+// --- NUEVA FUNCIÓN PARA GENERAR PREGUNTAS EXTRA EN EL QUIZ ---
+async function generarPreguntasExtra(texto, cantidadFaltante) {
+  if (cantidadFaltante <= 0) return [];
+
+  const PROMPT_EXTRA = `A partir del siguiente texto, genera ${cantidadFaltante} preguntas de opción múltiple ADICIONALES.
+Devuelve SOLO un JSON válido con esta estructura, sin texto extra:
+{
+  "quiz": [ { "pregunta": "...", "opciones": ["A", "B", "C", "D"], "correcta": 0, "explicacion": "..." } ]
+}
+En español. TEXTO: ${texto}`;
+
+  const url = 'https://api.groq.com/openai/v1/chat/completions';
+  const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` };
+
+  const res = await fetch(url, {
+    method: 'POST', headers: headers,
+    body: JSON.stringify({
+      model: 'openai/gpt-oss-20b',
+      messages: [{ role: 'user', content: PROMPT_EXTRA }],
+      temperature: 0.5, response_format: { type: 'json_object' }
+    })
+  });
+
+  if (!res.ok) throw new Error('Error generando preguntas extra');
+  const data = await res.json();
+  let jsonLimpio = data.choices[0].message.content.trim();
+  const p1 = jsonLimpio.indexOf('{'), p2 = jsonLimpio.lastIndexOf('}');
+  if (p1 !== -1 && p2 !== -1) jsonLimpio = jsonLimpio.substring(p1, p2 + 1);
+  
+  const result = JSON.parse(jsonLimpio);
+  return result.quiz || [];
+}
+
 function demoMaterial() {
   return {
     flashcards: [{ pregunta: '¿Qué es la repetición espaciada?', respuesta: 'Una técnica.' }],
