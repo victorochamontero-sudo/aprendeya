@@ -1,6 +1,5 @@
 const GROQ_KEY = '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';
 
-// Subimos a 8 flashcards y 5 preguntas para que tengas buen material desde el inicio
 const PROMPT_MATERIAL = `Eres un experto en ciencias cognitivas del aprendizaje.
 A partir del siguiente texto, genera material de estudio.
 Devuelve SOLO un JSON válido con esta estructura, sin texto extra:
@@ -34,7 +33,7 @@ async function generarMaterial(texto) {
         temperature: 0.5, response_format: { type: 'json_object' }
       })
     });
-    if (!res1.ok) throw new Error('Error en tarjetas: ' + await res1.text());
+    if (!res1.ok) throw new Error('Error de red');
     const data1 = await res1.json();
     
     let jsonLimpio = data1.choices[0].message.content.trim();
@@ -49,7 +48,7 @@ async function generarMaterial(texto) {
     return material;
   } catch (error) {
     console.error(error);
-    return { flashcards: [{ pregunta: "Error", respuesta: "Intenta de nuevo." }], quiz: [], guia: "Error." };
+    throw new Error("No se pudo conectar con la IA. Revisa tu conexión o recarga la página.");
   }
 }
 
@@ -77,12 +76,12 @@ ${texto}`;
   return data.choices[0].message.content;
 }
 
-async function generarPreguntasExtra(texto, cantidadFaltante) {
-  if (cantidadFaltante <= 0) return [];
-  
-  const PROMPT_EXTRA = `A partir del siguiente texto, genera ${cantidadFaltante} preguntas de opción múltiple ADICIONALES.
-Devuelve SOLO un JSON válido: { "quiz": [ { "pregunta": "...", "opciones": ["A", "B", "C", "D"], "correcta": 0, "explicacion": "..." } ] }
-En español. TEXTO: ${texto}`;
+async function generarMasMaterial(texto, actualFlashcards, actualQuiz) {
+  const PROMPT_EXTRA = `A partir del siguiente texto, genera MÁS material de estudio ADICIONAL.
+Devuelve SOLO un JSON válido: { "flashcards": [ { "pregunta": "...", "respuesta": "..." } ], "quiz": [ { "pregunta": "...", "opciones": ["A", "B", "C", "D"], "correcta": 0, "explicacion": "..." } ] }
+Genera 4 flashcards y 3 preguntas de quiz NUEVAS. No repitas estas:
+Flashcards actuales: ${JSON.stringify(actualFlashcards)}
+TEXTO: ${texto}`;
 
   const url = 'https://api.groq.com/openai/v1/chat/completions';
   const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` };
@@ -92,16 +91,16 @@ En español. TEXTO: ${texto}`;
     body: JSON.stringify({
       model: 'openai/gpt-oss-20b',
       messages: [{ role: 'user', content: PROMPT_EXTRA }],
-      temperature: 0.5, response_format: { type: 'json_object' }
+      temperature: 0.7, response_format: { type: 'json_object' }
     })
   });
   
-  if (!res.ok) throw new Error('Error extra');
+  if (!res.ok) throw new Error('Error generando extra');
   const data = await res.json();
   let jsonLimpio = data.choices[0].message.content.trim();
   const p1 = jsonLimpio.indexOf('{'), p2 = jsonLimpio.lastIndexOf('}');
   if (p1 !== -1 && p2 !== -1) jsonLimpio = jsonLimpio.substring(p1, p2 + 1);
-  return JSON.parse(jsonLimpio).quiz || [];
+  return JSON.parse(jsonLimpio);
 }
 
 function demoMaterial() {
