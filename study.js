@@ -109,7 +109,6 @@ async function cambiarTab(tab) {
     document.getElementById('guiaContainer').classList.remove('hidden');
     const guiaHTML = document.getElementById('guiaTexto');
     
-    // Si la guía no se ha generado, la generamos aquí mismo
     if (!material.guia || material.guia.includes("Haz clic")) {
       guiaHTML.innerHTML = '<div class="text-center py-12"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-[#8A8580]">Generando tu guía de estudio...</p></div>';
       try {
@@ -143,18 +142,29 @@ async function iniciarQuiz() {
   const setup = document.getElementById('quizSetup');
 
   setup.classList.add('hidden'); 
-  contenedor.innerHTML = '<p class="text-center text-[#8A8580]">Preparando tu examen...</p>';
+  contenedor.innerHTML = '<div class="text-center py-8"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-center text-[#8A8580]">Preparando tu examen...</p></div>';
 
+  // Si faltan preguntas, las generamos aquí
   if (material.quiz.length < cantidad) {
     try {
       const textoOriginal = localStorage.getItem('material');
       const cantidadFaltante = cantidad - material.quiz.length;
       const nuevasPreguntas = await generarPreguntasExtra(textoOriginal, cantidadFaltante);
-      material.quiz = [...material.quiz, ...nuevasPreguntas];
-      localStorage.setItem('materialGenerado', JSON.stringify(material)); 
+      
+      if (nuevasPreguntas && nuevasPreguntas.length > 0) {
+        material.quiz = [...material.quiz, ...nuevasPreguntas];
+        localStorage.setItem('materialGenerado', JSON.stringify(material)); 
+      }
     } catch (error) {
       console.error("No se pudieron generar preguntas extra", error);
+      // Si falla, seguimos con las que ya tenemos
     }
+  }
+
+  // Si por alguna razón no hay preguntas, mostramos error
+  if (material.quiz.length === 0) {
+    contenedor.innerHTML = '<p class="text-center text-red-500">No se pudieron generar preguntas para este texto. Intenta con un texto más largo.</p>';
+    return;
   }
 
   const preguntasFinales = material.quiz.slice(0, cantidad);
