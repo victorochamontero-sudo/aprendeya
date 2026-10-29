@@ -20,7 +20,7 @@ Devuelve SOLO un JSON válido con esta estructura exacta, sin markdown, sin text
 }
 
 Reglas:
-- 8 flashcards y 5 preguntas de quiz.
+- 4 flashcards y 3 preguntas de quiz.
 - Las preguntas deben evaluar comprensión, NO memorización literal.
 - Incluye siempre la explicación pedagógica en cada pregunta del quiz.
 - En español.
