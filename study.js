@@ -349,7 +349,7 @@ async function pedirMasMaterial() {
   }
 }
 
-// --- NUEVA FUNCIÓN DE IMPRESIÓN (SIRVE PARA WORD Y PDF) ---
+// --- FUNCIÓN DE IMPRESIÓN Y DESCARGA (SIRVE PARA WORD Y PDF) ---
 function imprimirGuia(tipo) {
   if (!material || !material.guia) {
     alert("Primero debes generar la guía de estudio.");
@@ -362,4 +362,47 @@ function imprimirGuia(tipo) {
   // Convertimos el markdown a HTML
   const guiaHTML = material.guia
     .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
+    .replace(/\n/g, '<br>');
+
+  const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Guía';
+  
+  // Definimos el título del documento según el botón que se presionó
+  const tituloDocumento = tipo === 'Word' ? 'Guia_AprendeYa_Word' : 'Guia_AprendeYa_PDF';
+
+  // Escribimos el HTML dentro de la nueva ventana
+  ventana.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>${tituloDocumento}</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 40px; max-width: 800px; margin: 0 auto; }
+        h1 { color: #1a1a1a; font-size: 28px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        h2 { color: #1a1a1a; font-size: 22px; margin-top: 30px; }
+        li { margin-bottom: 10px; }
+        strong { color: #000; }
+        .header { text-align: center; margin-bottom: 40px; color: #888; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h3>Guía de Estudio generada por AprendeYa</h3>
+        <p>Kit: ${nombreKit}</p>
+      </div>
+      ${guiaHTML}
+    </body>
+    </html>
+  `);
+
+  // Esperamos a que cargue y abrimos la ventana de impresión
+  ventana.document.close();
+  ventana.focus();
+  
+  setTimeout(() => {
+    ventana.print();
+  }, 500);
+}
