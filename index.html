@@ -36,7 +36,6 @@
       </a>
     </div>
 
-    <!-- FRASE MOTIVADORA DIARIA -->
     <div class="p-4 m-4 bg-[#F7F5F2] rounded-2xl border border-[#E5E1DA]">
       <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2">Frase del día</p>
       <p id="fraseDiaria" class="text-sm font-medium text-[#1A1A1A] italic leading-relaxed">Cargando...</p>
@@ -46,7 +45,6 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 md:ml-64 flex flex-col relative pb-20 md:pb-0">
     
-    <!-- BARRA SUPERIOR -->
     <header class="flex items-center justify-between px-6 py-4 bg-white border-b border-[#E5E1DA]">
       <div class="flex items-center gap-2 md:hidden">
         <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-white font-bold">A</div>
@@ -59,24 +57,34 @@
         <button onclick="abrirModalInfo('recomendaciones')" class="hidden md:block hover:text-blue-600 transition">Recomendaciones</button>
         <button onclick="abrirModalInfo('contacto')" class="hidden md:block hover:text-blue-600 transition">Contacto</button>
         
-        <button onclick="abrirModalRegistro()" class="bg-[#1A1A1A] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-opacity-80 transition shadow-md">
+        <!-- Botón dinámico: Registro o Perfil -->
+        <button id="btnHeaderUser" onclick="abrirModalRegistro()" class="bg-[#1A1A1A] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-opacity-80 transition shadow-md">
           Registrar usuario
         </button>
       </div>
     </header>
 
     <div class="flex-1 flex flex-col items-center justify-center text-center px-6 pt-8 pb-24 relative overflow-hidden">
+      
+      <!-- CONTADOR DE USUARIOS (SIMULADO) -->
+      <div class="mb-6 flex items-center gap-2 text-xs font-bold text-green-700 bg-green-100 px-4 py-1.5 rounded-full">
+        <span class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+        </span>
+        <span id="contadorUsuarios">1.204</span> estudiantes ya están aprendiendo
+      </div>
+
       <span class="inline-block bg-white text-xs font-bold tracking-widest uppercase text-[#8A8580] mb-6 px-4 py-1.5 rounded-full shadow-sm border border-[#E5E1DA]">✨ El compañero de estudio que necesitas</span>
       <h1 class="text-4xl md:text-6xl font-extrabold leading-tight max-w-4xl mb-6">Estudia menos.<br/>Aprende <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 italic">mucho más</span>.</h1>
       
-      <!-- FRASE FIJA DE EINSTEIN -->
       <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-8 max-w-2xl">
         <p class="text-sm text-blue-800 italic font-medium">"Todo el mundo es un genio. Pero si juzgas a un pez por su capacidad para trepar a un árbol, vivirá toda su vida creyendo que es estúpido." — Albert Einstein</p>
       </div>
 
       <div class="w-full max-w-3xl bg-white p-5 md:p-8 rounded-3xl shadow-xl border border-[#E5E1DA] text-left relative z-10">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-          <label class="font-bold text-lg md:text-xl text-[#1A1A1A] flex items-center gap-2"><span class="text-2xl">📚</span> Crea tu kit</label>
+          <label class="font-bold text-lg md:text-xl text-[#1A1A1A] flex items-center gap-2"><span class="text-2xl">📚</span> Crea tu kit de prueba</label>
           <div>
             <input type="file" id="fileInput" accept=".pdf,.txt,.docx" class="hidden" onchange="handleFile(event)" />
             <button onclick="document.getElementById('fileInput').click()" class="text-sm bg-white text-[#1A1A1A] border-2 border-[#1A1A1A] px-4 py-2 rounded-xl hover:bg-[#F7F5F2] transition font-semibold flex items-center gap-2">
@@ -93,7 +101,7 @@
     </div>
   </main>
 
-  <!-- MODAL DE INFORMACIÓN (Sobre nosotros, etc.) -->
+  <!-- MODAL DE INFORMACIÓN -->
   <div id="modalInfo" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 relative">
       <button onclick="cerrarModalInfo()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black transition">×</button>
@@ -107,18 +115,18 @@
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
       <button onclick="cerrarModalRegistro()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black transition">×</button>
 
-      <h2 class="text-2xl font-bold text-center mb-1">Crea tu cuenta</h2>
-      <p class="text-sm text-[#8A8580] text-center mb-6">Únete a AprendeYa y empieza a estudiar mejor</p>
+      <h2 class="text-2xl font-bold text-center mb-1">Crea tu cuenta gratis</h2>
+      <p class="text-sm text-[#8A8580] text-center mb-6">Regístrate para crear kits ilimitados</p>
 
-      <form onsubmit="event.preventDefault(); alert('¡Registro exitoso! Bienvenido a AprendeYa.'); cerrarModalRegistro();">
-        <input type="text" placeholder="Nombre completo" required
+      <form onsubmit="event.preventDefault(); registrarUsuario();">
+        <input type="text" id="regNombre" placeholder="Nombre completo" required
           class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
-        <input type="email" placeholder="Correo electrónico" required
+        <input type="email" id="regEmail" placeholder="Correo electrónico" required
           class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
         <input type="password" placeholder="Contraseña" required
           class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-4 text-sm focus:outline-none focus:border-[#1A1A1A]" />
         <button type="submit" class="w-full bg-[#1A1A1A] text-white font-semibold py-3 rounded-xl hover:bg-opacity-80 transition">
-          Registrarse
+          Crear cuenta y empezar
         </button>
       </form>
     </div>
@@ -134,7 +142,7 @@
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     
-    // FRASES MOTIVADORAS
+    // Frases motivadoras
     const frases = [
       "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
       "No te preocupes por los fracasos, preocúpate por las oportunidades que pierdes cuando no lo intentas.",
@@ -152,44 +160,51 @@
     }
     cargarFraseDelDia();
 
-    // LÓGICA DE LOS MODALES
+    // Lógica de Usuario
+    function actualizarInterfazUsuario() {
+      const usuario = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
+      const btn = document.getElementById('btnHeaderUser');
+      
+      // Simulamos que el contador sube si alguien se registra
+      let contadorBase = 1204;
+      if (usuario) contadorBase++;
+      document.getElementById('contadorUsuarios').textContent = contadorBase;
+
+      if (usuario) {
+        btn.textContent = `Hola, ${usuario.nombre.split(' ')[0]}`;
+        btn.onclick = () => window.location.href = 'perfil.html';
+        btn.classList.remove('bg-[#1A1A1A]');
+        btn.classList.add('bg-blue-600');
+      }
+    }
+    actualizarInterfazUsuario();
+
+    function registrarUsuario() {
+      const nombre = document.getElementById('regNombre').value;
+      const email = document.getElementById('regEmail').value;
+      
+      const usuario = { nombre, email };
+      localStorage.setItem('usuarioAprendeYa', JSON.stringify(usuario));
+      
+      alert('¡Registro exitoso! Ya puedes crear kits ilimitados.');
+      cerrarModalRegistro();
+      actualizarInterfazUsuario();
+    }
+
+    // Modales
+    function abrirModalRegistro() { document.getElementById('modalRegistro').classList.remove('hidden'); document.getElementById('modalRegistro').classList.add('flex'); }
+    function cerrarModalRegistro() { document.getElementById('modalRegistro').classList.add('hidden'); document.getElementById('modalRegistro').classList.remove('flex'); }
+    
     function abrirModalInfo(tipo) {
       const modal = document.getElementById('modalInfo');
       const titulo = document.getElementById('infoTitulo');
       const contenido = document.getElementById('infoContenido');
-
-      if (tipo === 'sobre') {
-        titulo.textContent = 'Sobre AprendeYa 🚀';
-        contenido.innerHTML = '<p>Somos una plataforma diseñada para revolucionar la forma en que estudias. Utilizamos inteligencia artificial para transformar tus apuntes aburridos en herramientas dinámicas de aprendizaje.</p><p>Nuestra misión es que apruebes con menos esfuerzo y más retención.</p>';
-      } else if (tipo === 'recomendaciones') {
-        titulo.textContent = 'Consejos de Estudio 💡';
-        contenido.innerHTML = '<ul class="list-disc pl-5 space-y-2"><li>Estudia en bloques de 25 minutos (Técnica Pomodoro).</li><li>Usa nuestras tarjetas todos los días, la constancia es clave.</li><li>No solo memorices, usa el Quiz para entender los conceptos.</li><li>Explícale a alguien más lo que aprendiste (Técnica Feynman).</li></ul>';
-      } else if (tipo === 'contacto') {
-        titulo.textContent = 'Contacto ✉️';
-        contenido.innerHTML = '<p>¿Tienes dudas, sugerencias o encontraste un error?</p><p>Escríbenos a: <strong>soporte@aprendeya.com</strong></p>';
-      }
-
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+      if (tipo === 'sobre') { titulo.textContent = 'Sobre AprendeYa 🚀'; contenido.innerHTML = '<p>Transformamos tus apuntes aburridos en herramientas dinámicas de aprendizaje. Nuestra misión es que apruebes con menos esfuerzo.</p>'; }
+      else if (tipo === 'recomendaciones') { titulo.textContent = 'Consejos de Estudio 💡'; contenido.innerHTML = '<ul class="list-disc pl-5 space-y-2"><li>Estudia en bloques de 25 minutos (Técnica Pomodoro).</li><li>Usa nuestras tarjetas a diario.</li><li>Explícale a alguien más lo que aprendiste (Técnica Feynman).</li></ul>'; }
+      else if (tipo === 'contacto') { titulo.textContent = 'Contacto ✉️'; contenido.innerHTML = '<p>Escríbenos a: <strong>soporte@aprendeya.com</strong></p>'; }
+      modal.classList.remove('hidden'); modal.classList.add('flex');
     }
-
-    function cerrarModalInfo() {
-      const modal = document.getElementById('modalInfo');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    function abrirModalRegistro() {
-      const modal = document.getElementById('modalRegistro');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-    
-    function cerrarModalRegistro() {
-      const modal = document.getElementById('modalRegistro');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
+    function cerrarModalInfo() { document.getElementById('modalInfo').classList.add('hidden'); document.getElementById('modalInfo').classList.remove('flex'); }
   </script>
   <script src="app.js"></script>
 </body>
