@@ -90,7 +90,7 @@ function calificar(nivel) {
 async function cambiarTab(tab) {
   if (!material) return;
   
-  detenerLectura(); // Detiene el audio si se cambia de pestaña
+  detenerLectura(); // Detiene cualquier audio al cambiar de pestaña
 
   const clasesNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]";
   const activoNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition";
@@ -150,7 +150,11 @@ async function cambiarTab(tab) {
           </button>
           <div id="respuesta-${i}" class="hidden px-4 pb-4 pt-1 border-t border-[#F7F5F2]">
             <p class="text-sm text-[#5A5550] mb-3">${f.respuesta}</p>
-            <button onclick="editarTarjeta(${i})" class="text-xs font-semibold text-blue-500 hover:text-blue-700">✏️ Editar tarjeta</button>
+            <div class="flex gap-2">
+              <button onclick="editarTarjeta(${i})" class="text-xs font-semibold text-blue-500 hover:text-blue-700">✏️ Editar</button>
+              <button onclick="leerTarjetaLista(${i})" class="text-xs font-semibold text-[#1A1A1A] bg-[#E8E6ED] px-2 py-1 rounded">🔊 Escuchar</button>
+              <button onclick="detenerLectura()" class="text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded">⏹️ Detener</button>
+            </div>
           </div>
         </div>
       `).join('');
@@ -166,7 +170,6 @@ async function cambiarTab(tab) {
         const nuevaGuia = await generarGuia(textoOriginal);
         material.guia = nuevaGuia;
         
-        // GUARDAMOS LA GUÍA EN EL HISTORIAL
         localStorage.setItem('materialGenerado', JSON.stringify(material));
         const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
         let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
@@ -376,7 +379,7 @@ async function pedirMasMaterial() {
   }
 }
 
-// --- FUNCIÓN DE IMPRESIÓN Y DESCARGA (SIRVE PARA WORD Y PDF) ---
+// --- FUNCIÓN DE IMPRESIÓN Y DESCARGA ---
 function imprimirGuia(tipo) {
   if (!material || !material.guia) {
     alert("Primero debes generar la guía de estudio.");
@@ -430,29 +433,45 @@ function imprimirGuia(tipo) {
 
 // --- LECTURA POR VOZ (TEXT TO SPEECH) ---
 
-// Leer la tarjeta actual del mazo
 function leerTextoActual() {
   if (!mazo || indiceActual >= mazo.length) return;
-  
-  detenerLectura(); // Detiene cualquier lectura previa
+  detenerLectura(); 
   
   const tarjeta = mazo[indiceActual];
   const textoALeer = mostrandoRespuesta ? tarjeta.respuesta : tarjeta.pregunta;
   
   const utterance = new SpeechSynthesisUtterance(textoALeer);
-  utterance.lang = 'es-ES'; // Configura el idioma en español
-  utterance.rate = 0.9; // Velocidad ligeramente más lenta para entender mejor
+  utterance.lang = 'es-ES';
+  utterance.rate = 0.9;
+  
+  const btnDetener = document.getElementById('btnDetenerMazo');
+  if (btnDetener) btnDetener.classList.remove('hidden');
+  
+  utterance.onend = () => {
+    if (btnDetener) btnDetener.classList.add('hidden');
+  };
   
   sintetizador.speak(utterance);
 }
 
-// Leer la guía completa
-function leerGuiaCompleta() {
-  if (!material || !material.guia) return;
-  
+function leerTarjetaLista(index) {
+  if (!material || !material.flashcards || !material.flashcards[index]) return;
   detenerLectura();
   
-  // Limpiamos el texto de la guía quitando los símbolos de markdown
+  const tarjeta = material.flashcards[index];
+  const textoALeer = `Pregunta: ${tarjeta.pregunta}. Respuesta: ${tarjeta.respuesta}`;
+  
+  const utterance = new SpeechSynthesisUtterance(textoALeer);
+  utterance.lang = 'es-ES';
+  utterance.rate = 0.9;
+  
+  sintetizador.speak(utterance);
+}
+
+function leerGuiaCompleta() {
+  if (!material || !material.guia) return;
+  detenerLectura();
+  
   const textoLimpio = material.guia
     .replace(/[#*]/g, '')
     .replace(/\n/g, ' ');
@@ -461,7 +480,6 @@ function leerGuiaCompleta() {
   utterance.lang = 'es-ES';
   utterance.rate = 0.9;
   
-  // Mostrar botón de detener mientras habla
   const btnDetener = document.getElementById('btnDetenerAudio');
   if (btnDetener) btnDetener.classList.remove('hidden');
   
@@ -472,11 +490,13 @@ function leerGuiaCompleta() {
   sintetizador.speak(utterance);
 }
 
-// Detener la lectura
 function detenerLectura() {
   if (sintetizador.speaking) {
     sintetizador.cancel();
   }
-  const btnDetener = document.getElementById('btnDetenerAudio');
-  if (btnDetener) btnDetener.classList.add('hidden');
+  const btnDetenerMazo = document.getElementById('btnDetenerMazo');
+  if (btnDetenerMazo) btnDetenerMazo.classList.add('hidden');
+  
+  const btnDetenerAudio = document.getElementById('btnDetenerAudio');
+  if (btnDetenerAudio) btnDetenerAudio.classList.add('hidden');
 }
