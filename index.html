@@ -46,22 +46,18 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 md:ml-64 flex flex-col relative pb-20 md:pb-0">
     
-    <!-- BARRA SUPERIOR (Menú y Registro) -->
+    <!-- BARRA SUPERIOR -->
     <header class="flex items-center justify-between px-6 py-4 bg-white border-b border-[#E5E1DA]">
-      <!-- Logo solo visible en móvil -->
       <div class="flex items-center gap-2 md:hidden">
         <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-white font-bold">A</div>
         <span class="font-extrabold text-lg">AprendeYa</span>
       </div>
-      
-      <!-- Espacio vacío para empujar los botones a la derecha en PC -->
       <div class="hidden md:block"></div>
 
-      <!-- Botones de la barra superior -->
       <div class="flex items-center gap-4 md:gap-6 text-sm font-medium">
-        <a href="#" onclick="alert('Sección en construcción')" class="hidden md:block hover:text-blue-600 transition">Sobre nosotros</a>
-        <a href="#" onclick="alert('Sección en construcción')" class="hidden md:block hover:text-blue-600 transition">Recomendaciones</a>
-        <a href="#" onclick="alert('Sección en construcción')" class="hidden md:block hover:text-blue-600 transition">Contacto</a>
+        <button onclick="abrirModalInfo('sobre')" class="hidden md:block hover:text-blue-600 transition">Sobre nosotros</button>
+        <button onclick="abrirModalInfo('recomendaciones')" class="hidden md:block hover:text-blue-600 transition">Recomendaciones</button>
+        <button onclick="abrirModalInfo('contacto')" class="hidden md:block hover:text-blue-600 transition">Contacto</button>
         
         <button onclick="abrirModalRegistro()" class="bg-[#1A1A1A] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-opacity-80 transition shadow-md">
           Registrar usuario
@@ -97,6 +93,15 @@
     </div>
   </main>
 
+  <!-- MODAL DE INFORMACIÓN (Sobre nosotros, etc.) -->
+  <div id="modalInfo" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 relative">
+      <button onclick="cerrarModalInfo()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black transition">×</button>
+      <h2 id="infoTitulo" class="text-2xl font-bold mb-4 text-[#1A1A1A]"></h2>
+      <div id="infoContenido" class="text-[#5A5550] text-sm leading-relaxed space-y-3"></div>
+    </div>
+  </div>
+
   <!-- MODAL DE REGISTRO -->
   <div id="modalRegistro" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
@@ -129,7 +134,7 @@
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     
-    // Frases motivadoras
+    // FRASES MOTIVADORAS
     const frases = [
       "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
       "No te preocupes por los fracasos, preocúpate por las oportunidades que pierdes cuando no lo intentas.",
@@ -147,7 +152,33 @@
     }
     cargarFraseDelDia();
 
-    // Modal de registro
+    // LÓGICA DE LOS MODALES
+    function abrirModalInfo(tipo) {
+      const modal = document.getElementById('modalInfo');
+      const titulo = document.getElementById('infoTitulo');
+      const contenido = document.getElementById('infoContenido');
+
+      if (tipo === 'sobre') {
+        titulo.textContent = 'Sobre AprendeYa 🚀';
+        contenido.innerHTML = '<p>Somos una plataforma diseñada para revolucionar la forma en que estudias. Utilizamos inteligencia artificial para transformar tus apuntes aburridos en herramientas dinámicas de aprendizaje.</p><p>Nuestra misión es que apruebes con menos esfuerzo y más retención.</p>';
+      } else if (tipo === 'recomendaciones') {
+        titulo.textContent = 'Consejos de Estudio 💡';
+        contenido.innerHTML = '<ul class="list-disc pl-5 space-y-2"><li>Estudia en bloques de 25 minutos (Técnica Pomodoro).</li><li>Usa nuestras tarjetas todos los días, la constancia es clave.</li><li>No solo memorices, usa el Quiz para entender los conceptos.</li><li>Explícale a alguien más lo que aprendiste (Técnica Feynman).</li></ul>';
+      } else if (tipo === 'contacto') {
+        titulo.textContent = 'Contacto ✉️';
+        contenido.innerHTML = '<p>¿Tienes dudas, sugerencias o encontraste un error?</p><p>Escríbenos a: <strong>soporte@aprendeya.com</strong></p>';
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function cerrarModalInfo() {
+      const modal = document.getElementById('modalInfo');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
     function abrirModalRegistro() {
       const modal = document.getElementById('modalRegistro');
       modal.classList.remove('hidden');
