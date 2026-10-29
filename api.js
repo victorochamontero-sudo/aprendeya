@@ -1,5 +1,5 @@
-// ⚠️ CLAVE DE GOOGLE AI STUDIO CONFIGURADA
-const GEMINI_KEY = 'AQ.Ab8RN6JMNPRvz8eThyImnU311vUt-EPIVeWvOWA_4g8vHFMjUg';
+// ⚠️ CLAVE DE GROQ CONFIGURADA
+const GROQ_KEY = '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';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
 A partir del siguiente texto, genera material de estudio de ALTA CALIDAD.
@@ -36,28 +36,35 @@ async function generarMaterial(texto) {
     try { return JSON.parse(cache); } catch (e) { }
   }
 
-  // Llamada a Google Gemini (ACTUALIZADO A LA VERSIÓN 3.8)
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_KEY}`;
+  if (!GROQ_KEY || GROQ_KEY.includes('pon_aqui')) {
+    console.warn('Sin API key: usando modo demo.');
+    return demoMaterial();
+  }
+
+  // Llamada a Groq (Modelo Llama 3, gratuito y rapidísimo)
+  const url = 'https://api.groq.com/openai/v1/chat/completions';
   
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_KEY}`
+    },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: PROMPT + texto }] }],
-      generationConfig: {
-        temperature: 0.7,
-        responseMimeType: "application/json"
-      }
+      model: 'llama3-8b-8192', 
+      messages: [{ role: 'user', content: PROMPT + texto }],
+      temperature: 0.7,
+      response_format: { type: 'json_object' }
     })
   });
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error('Error API Gemini: ' + err);
+    throw new Error('Error API Groq: ' + err);
   }
 
   const data = await res.json();
-  const contenido = data.candidates[0].content.parts[0].text;
+  const contenido = data.choices[0].message.content;
   const material = JSON.parse(contenido);
   
   localStorage.setItem('materialGenerado', JSON.stringify(material));
