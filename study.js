@@ -94,7 +94,6 @@ function cambiarTab(tab) {
   } else if (tab === 'lista') {
     document.getElementById('listaContainer').classList.remove('hidden');
     const cont = document.getElementById('listaTarjetas');
-    // Diseño de lista estilo Thea
     cont.innerHTML = material.flashcards.map((f, i) => `
       <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-4 rounded-xl border border-[#E5E1DA] hover:border-[#1A1A1A] transition group">
         <div class="flex-1 mb-2 sm:mb-0">
@@ -120,21 +119,35 @@ function cambiarTab(tab) {
     }
   } else if (tab === 'quiz') {
     document.getElementById('quizContainer').classList.remove('hidden');
+    document.getElementById('quizSetup').classList.remove('hidden');
+    document.getElementById('preguntasQuiz').innerHTML = '';
   }
 }
 
-// --- LÓGICA DEL QUIZ ---
-function iniciarQuiz() {
+// --- LÓGICA DEL QUIZ ACTUALIZADA ---
+async function iniciarQuiz() {
+  const cantidad = parseInt(document.getElementById('selectCantidad').value);
   const contenedor = document.getElementById('preguntasQuiz');
-  if (!material.quiz || material.quiz.length === 0) {
-    contenedor.innerHTML = '<p class="text-center text-red-500">No hay preguntas generadas.</p>';
-    return;
+  const setup = document.getElementById('quizSetup');
+
+  setup.classList.add('hidden'); 
+  contenedor.innerHTML = '<p class="text-center text-[#8A8580]">Preparando tu examen...</p>';
+
+  if (material.quiz.length < cantidad) {
+    try {
+      const textoOriginal = localStorage.getItem('material');
+      const cantidadFaltante = cantidad - material.quiz.length;
+      const nuevasPreguntas = await generarPreguntasExtra(textoOriginal, cantidadFaltante);
+      material.quiz = [...material.quiz, ...nuevasPreguntas];
+    } catch (error) {
+      console.error("No se pudieron generar preguntas extra", error);
+    }
   }
 
-  document.querySelector('#quizContainer > div:first-child').classList.add('hidden'); // Ocultar botón de crear
+  const preguntasFinales = material.quiz.slice(0, cantidad);
   contenedor.innerHTML = '';
 
-  material.quiz.forEach((q, i) => {
+  preguntasFinales.forEach((q, i) => {
     const div = document.createElement('div');
     div.className = 'bg-white p-6 rounded-2xl shadow-sm border border-[#E5E1DA] mb-4';
     div.innerHTML = `
@@ -151,6 +164,8 @@ function iniciarQuiz() {
     `;
     contenedor.appendChild(div);
   });
+
+  material.quiz = preguntasFinales; 
 }
 
 function responderQuiz(qIdx, opIdx) {
