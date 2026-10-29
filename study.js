@@ -6,6 +6,8 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
 
 (async function init() {
   const texto = localStorage.getItem('material');
+  const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
+  
   if (!texto) {
     document.getElementById('loading').innerHTML = '<p class="text-sm text-[#8A8580]">No hay material. <a href="index.html" class="underline">Sube un archivo</a>.</p>';
     return;
@@ -16,6 +18,12 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
     material = data;
     mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
     stats.aprendiendo = mazo.length;
+
+    // Guardar automáticamente en el historial
+    let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+    historial = historial.filter(k => k.nombre !== nombreKit);
+    historial.unshift({ id: Date.now(), nombre: nombreKit, material: material });
+    localStorage.setItem('historialKits', JSON.stringify(historial));
 
     document.getElementById('loading').classList.add('hidden');
     document.getElementById('mazoContainer').classList.remove('hidden');
@@ -36,45 +44,34 @@ function actualizarUI() {
     document.getElementById('texto-pregunta').textContent = "¡Mazo terminado!";
     document.getElementById('texto-respuesta').textContent = "Has repasado todas las tarjetas.";
     document.getElementById('botones-calificacion').classList.add('opacity-0', 'pointer-events-none');
-    document.getElementById('instruccion').classList.add('hidden');
+    document.getElementById('btnMostrar').classList.add('hidden');
     return;
   }
-
   const tarjeta = mazo[indiceActual];
   document.getElementById('texto-pregunta').textContent = tarjeta.pregunta;
   document.getElementById('texto-respuesta').textContent = tarjeta.respuesta;
-  
   mostrandoRespuesta = false;
   document.getElementById('tarjeta').classList.remove('flipped');
   document.getElementById('botones-calificacion').classList.add('opacity-0', 'pointer-events-none');
-  document.getElementById('instruccion').classList.remove('hidden');
-  
+  document.getElementById('btnMostrar').classList.remove('hidden');
   actualizarStatsUI();
 }
 
 function voltearTarjeta() {
   if (mostrandoRespuesta || indiceActual >= mazo.length) return;
-  
   mostrandoRespuesta = true;
   document.getElementById('tarjeta').classList.add('flipped');
-  
+  document.getElementById('btnMostrar').classList.add('hidden');
   setTimeout(() => {
     document.getElementById('botones-calificacion').classList.remove('opacity-0', 'pointer-events-none');
-    document.getElementById('instruccion').classList.add('hidden');
   }, 300);
 }
 
 function calificar(nivel) {
   stats.aprendiendo--;
-  if (nivel === 0) {
-    stats.aprendiendo++;
-    mazo.push(mazo[indiceActual]);
-  } else if (nivel === 1) {
-    stats.revisando++;
-  } else if (nivel === 2) {
-    stats.dominado++;
-  }
-
+  if (nivel === 0) { stats.aprendiendo++; mazo.push(mazo[indiceActual]); }
+  else if (nivel === 1) { stats.revisando++; }
+  else if (nivel === 2) { stats.dominado++; }
   indiceActual++;
   setTimeout(() => { actualizarUI(); }, 300);
 }
@@ -83,26 +80,27 @@ function cambiarTab(tab) {
   const activo = 'px-4 py-1.5 rounded-full text-sm font-semibold bg-[#1A1A1A] text-white';
   const inactivo = 'px-4 py-1.5 rounded-full text-sm font-semibold border border-[#D6D1CA] hover:bg-gray-50';
   
-  document.getElementById('tab-lista').className = tab === 'lista' ? activo : inactivo;
   document.getElementById('tab-mazo').className = tab === 'mazo' ? activo : inactivo;
-  document.getElementById('tab-juegos').className = tab === 'juegos' ? activo : inactivo;
+  document.getElementById('tab-guia').className = tab === 'guia' ? activo : inactivo;
+
+  document.getElementById('mazoContainer').classList.add('hidden');
+  document.getElementById('guiaContainer').classList.add('hidden');
 
   if (tab === 'mazo') {
     document.getElementById('mazoContainer').classList.remove('hidden');
-    document.getElementById('listaContainer').classList.add('hidden');
-  } else if (tab === 'lista') {
-    document.getElementById('mazoContainer').classList.add('hidden');
-    document.getElementById('listaContainer').classList.remove('hidden');
-    
-    const cont = document.getElementById('listaTarjetas');
-    cont.innerHTML = material.flashcards.map((f, i) => `
-      <div class="bg-white p-5 rounded-xl shadow-sm border border-[#E5E1DA] mb-3">
-        <p class="text-xs text-[#8A8580] mb-1 font-bold">TARJETA ${i + 1}</p>
-        <p class="font-bold text-[#1A1A1A] mb-2">${f.pregunta}</p>
-        <p class="text-sm text-[#5A5550] border-t border-[#E5E1DA] pt-2 mt-2">${f.respuesta}</p>
-      </div>
-    `).join('');
-  } else {
-    alert("¡Los juegos están en mantenimiento! 🚧 Vuelve pronto.");
+  } else if (tab === 'guia') {
+    document.getElementById('guiaContainer').classList.remove('hidden');
+    const guiaHTML = document.getElementById('guiaTexto');
+    if (material.guia) {
+      guiaHTML.innerHTML = material.guia
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
+        .replace(/\n/g, '<br>');
+    } else {
+      guiaHTML.innerHTML = '<p>La guía de estudio no se generó.</p>';
+    }
   }
 }
