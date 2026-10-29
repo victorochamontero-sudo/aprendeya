@@ -3,7 +3,7 @@ let mazo = [];
 let indiceActual = 0;
 let mostrandoRespuesta = false;
 let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
-let generacionesExtra = 0; // Límite de 2 veces para generar más material
+let generacionesExtra = 0; 
 
 (async function init() {
   const texto = localStorage.getItem('material');
@@ -19,6 +19,12 @@ let generacionesExtra = 0; // Límite de 2 veces para generar más material
 
   try {
     const data = await generarMaterial(texto);
+    
+    // BLINDAJE: Verificamos que la IA devolvió los datos correctos
+    if (!data || !data.flashcards || data.flashcards.length === 0) {
+      throw new Error("La IA no devolvió tarjetas válidas.");
+    }
+
     material = data;
     if (!material.quiz) material.quiz = []; 
     mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
@@ -37,6 +43,7 @@ let generacionesExtra = 0; // Límite de 2 veces para generar más material
     loadingText.classList.add('text-red-500');
     if(spinner) spinner.classList.add('hidden');
     if(btnError) btnError.classList.remove('hidden');
+    console.error(e);
   }
 })();
 
@@ -47,6 +54,8 @@ function actualizarStatsUI() {
 }
 
 function actualizarUI() {
+  if (!material || !mazo || mazo.length === 0) return;
+  
   if (indiceActual >= mazo.length) {
     document.getElementById('texto-pregunta').textContent = "¡Mazo terminado!";
     document.getElementById('texto-respuesta').textContent = "Has repasado todas las tarjetas.";
@@ -84,6 +93,9 @@ function calificar(nivel) {
 }
 
 async function cambiarTab(tab) {
+  // BLINDAJE: Si no hay material, no hace nada
+  if (!material) return;
+
   const clasesNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]";
   const activoNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition";
   
@@ -135,16 +147,18 @@ async function cambiarTab(tab) {
   } else if (tab === 'lista') {
     document.getElementById('listaContainer').classList.remove('hidden');
     const cont = document.getElementById('listaTarjetas');
-    cont.innerHTML = material.flashcards.map((f, i) => `
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-4 rounded-xl border border-[#E5E1DA] hover:border-[#1A1A1A] transition group">
-        <div class="flex-1 mb-2 sm:mb-0">
-          <span class="font-bold text-[#1A1A1A] mr-2 text-sm md:text-base">${f.pregunta}</span>
-          <span class="text-[#8A8580] hidden sm:inline">|</span>
-          <span class="text-xs md:text-sm text-[#5A5550] block sm:inline mt-1 sm:mt-0">${f.respuesta}</span>
+    if (material && material.flashcards) {
+      cont.innerHTML = material.flashcards.map((f, i) => `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-4 rounded-xl border border-[#E5E1DA] hover:border-[#1A1A1A] transition group">
+          <div class="flex-1 mb-2 sm:mb-0">
+            <span class="font-bold text-[#1A1A1A] mr-2 text-sm md:text-base">${f.pregunta}</span>
+            <span class="text-[#8A8580] hidden sm:inline">|</span>
+            <span class="text-xs md:text-sm text-[#5A5550] block sm:inline mt-1 sm:mt-0">${f.respuesta}</span>
+          </div>
+          <button onclick="editarTarjeta(${i})" class="text-[#8A8580] hover:text-blue-500 transition p-2" title="Editar tarjeta">✏️</button>
         </div>
-        <button onclick="editarTarjeta(${i})" class="text-[#8A8580] hover:text-blue-500 transition p-2" title="Editar tarjeta">✏️</button>
-      </div>
-    `).join('');
+      `).join('');
+    }
   } else if (tab === 'guia') {
     document.getElementById('guiaContainer').classList.remove('hidden');
     const guiaHTML = document.getElementById('guiaTexto');
@@ -176,6 +190,7 @@ async function cambiarTab(tab) {
 }
 
 async function iniciarQuiz() {
+  if (!material) return;
   const cantidad = parseInt(document.getElementById('selectCantidad').value);
   const contenedor = document.getElementById('preguntasQuiz');
   const setup = document.getElementById('quizSetup');
@@ -245,6 +260,7 @@ function responderQuiz(qIdx, opIdx) {
 }
 
 function editarTarjeta(index) {
+  if (!material || !material.flashcards) return;
   const tarjeta = material.flashcards[index];
   const nuevaPregunta = prompt("Edita la pregunta:", tarjeta.pregunta);
   if (nuevaPregunta === null) return;
@@ -268,12 +284,11 @@ function editarTarjeta(index) {
   cambiarTab('lista');
 }
 
-// --- GENERAR MÁS TARJETAS (Límite: 2 veces) ---
 async function pedirMasMaterial() {
   const btnMas = document.getElementById('btnMas');
   const textoOriginal = localStorage.getItem('material');
   
-  if (!textoOriginal) return;
+  if (!textoOriginal || !material) return;
 
   if (generacionesExtra >= 2) {
     alert('Límite alcanzado: solo puedes generar material extra 2 veces por kit.');
@@ -329,7 +344,7 @@ async function pedirMasMaterial() {
     if (document.getElementById('listaContainer').classList.contains('hidden')) {
       alert('¡Se han añadido 8 tarjetas y 4 preguntas nuevas a tu kit!');
     } else {
-      cambiarTab('lista'); // Refrescar lista
+      cambiarTab('lista');
     }
 
   } catch (error) {
@@ -342,14 +357,12 @@ async function pedirMasMaterial() {
   }
 }
 
-// --- DESCARGAR GUÍA EN WORD ---
 function descargarGuiaWord() {
-  if (!material.guia) {
+  if (!material || !material.guia) {
     alert("Primero debes generar la guía de estudio.");
     return;
   }
   
-  // Convertimos el markdown de la guía a HTML para el documento Word
   const guiaHTML = material.guia
     .replace(/^# (.*$)/gim, '<h1>$1</h1>')
     .replace(/^## (.*$)/gim, '<h2>$1</h2>')
@@ -357,7 +370,6 @@ function descargarGuiaWord() {
     .replace(/^\* (.*$)/gim, '<li>$1</li>')
     .replace(/\n/g, '<br>');
 
-  // Usamos la librería html-docx-js para generar el archivo
   const htmlString = `
     <!DOCTYPE html>
     <html>
@@ -379,7 +391,6 @@ function descargarGuiaWord() {
 
   const converted = htmlDocx.asBlob(htmlString);
   
-  // Forzamos la descarga
   const url = window.URL.createObjectURL(converted);
   const a = document.createElement('a');
   a.href = url;
