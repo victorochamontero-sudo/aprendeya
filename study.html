@@ -6,6 +6,8 @@
   <title>Estudiar | AprendeYa</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Librería para descargar en Word -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.4.1/html-docx.min.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
     .card-flip { perspective: 1000px; }
@@ -104,20 +106,34 @@
           <button onclick="calificar(2)" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center text-lg md:text-xl shadow-lg">😊</button>
         </div>
 
-        <!-- BOTÓN GENERAR MÁS -->
-        <button onclick="pedirMasMaterial()" id="btnMas" class="mt-8 text-sm font-semibold text-[#8A8580] hover:text-[#1A1A1A] flex items-center gap-2 transition border-b border-transparent hover:border-[#1A1A1A] pb-1">
+        <!-- BOTÓN GENERAR MÁS (AZUL) -->
+        <button onclick="pedirMasMaterial()" id="btnMas" class="mt-8 w-full max-w-sm bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm md:text-base">
           ✨ Generar 8 tarjetas más con IA
         </button>
       </div>
 
       <!-- 2. LISTA -->
       <div id="listaContainer" class="hidden w-full max-w-4xl bg-white p-4 md:p-10 rounded-3xl shadow-sm border border-[#E5E1DA]">
-        <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#1A1A1A]">Tarjetas de memoria</h2>
+        <div class="flex justify-between items-center mb-4 md:mb-6">
+          <h2 class="text-xl md:text-2xl font-bold text-[#1A1A1A]">Tarjetas de memoria</h2>
+          <button onclick="pedirMasMaterial()" class="text-xs md:text-sm bg-blue-100 text-blue-700 font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-blue-200 transition">+ Añadir más</button>
+        </div>
         <div id="listaTarjetas" class="space-y-3"></div>
       </div>
 
       <!-- 3. GUÍA -->
       <div id="guiaContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA]">
+        
+        <!-- BOTONES DE DESCARGA -->
+        <div class="flex gap-2 mb-6 border-b border-[#E5E1DA] pb-4">
+          <button onclick="descargarGuiaWord()" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">
+            📄 Descargar Word
+          </button>
+          <button onclick="window.print()" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">
+            🖨️ Guardar PDF
+          </button>
+        </div>
+
         <div id="guiaTexto" class="guia-content text-[#5A5550] text-sm md:text-base"></div>
       </div>
 
