@@ -53,13 +53,11 @@
   </main>
 
   <script>
-    // Cargar nombre de usuario
     const usuario = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
     if (usuario) {
       document.getElementById('nombreUsuario').textContent = `¡Hola, ${usuario.nombre}!`;
     }
 
-    // Cargar estadísticas
     const historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
     let totalTarjetas = 0;
     historial.forEach(kit => {
@@ -68,7 +66,6 @@
     document.getElementById('statKits').textContent = historial.length;
     document.getElementById('statTarjetas').textContent = totalTarjetas;
 
-    // Foto
     const fotoGuardada = localStorage.getItem('fotoPerfil');
     if (fotoGuardada) {
       document.getElementById('fotoPerfil').innerHTML = `<img src="${fotoGuardada}" class="w-full h-full object-cover">`;
@@ -85,10 +82,8 @@
       reader.readAsDataURL(file);
     }
 
-    // Cerrar sesión
     function cerrarSesion() {
       localStorage.removeItem('usuarioAprendeYa');
-      // No borramos los kits, pero cerramos sesión
       alert('Sesión cerrada. Vuelves a ser un usuario invitado.');
       window.location.href = 'index.html';
     }
