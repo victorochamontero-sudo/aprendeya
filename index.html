@@ -34,6 +34,19 @@
       <a href="perfil.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition">
         <span class="text-lg">🏆</span> Mi Perfil
       </a>
+      
+      <div class="h-px bg-[#E5E1DA] my-4"></div>
+      
+      <!-- ENLACES MOVIDOS AQUÍ -->
+      <button onclick="abrirModalInfo('sobre')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left">
+        <span class="text-lg">ℹ️</span> Sobre nosotros
+      </button>
+      <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left">
+        <span class="text-lg">💡</span> Recomendaciones
+      </button>
+      <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left">
+        <span class="text-lg">✉️</span> Contacto
+      </button>
     </div>
 
     <div class="p-4 m-4 bg-[#F7F5F2] rounded-2xl border border-[#E5E1DA]">
@@ -51,22 +64,15 @@
         <span class="font-extrabold text-lg">AprendeYa</span>
       </div>
       <div class="hidden md:block"></div>
-
-      <div class="flex items-center gap-4 md:gap-6 text-sm font-medium">
-        <button onclick="abrirModalInfo('sobre')" class="hidden md:block hover:text-blue-600 transition">Sobre nosotros</button>
-        <button onclick="abrirModalInfo('recomendaciones')" class="hidden md:block hover:text-blue-600 transition">Recomendaciones</button>
-        <button onclick="abrirModalInfo('contacto')" class="hidden md:block hover:text-blue-600 transition">Contacto</button>
-        
-        <!-- Botón dinámico: Registro o Perfil -->
-        <button id="btnHeaderUser" onclick="abrirModalRegistro()" class="bg-[#1A1A1A] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-opacity-80 transition shadow-md">
-          Registrar usuario
-        </button>
-      </div>
+      
+      <!-- Botón dinámico: Registro o Perfil -->
+      <button id="btnHeaderUser" onclick="abrirModalRegistro()" class="bg-[#1A1A1A] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-opacity-80 transition shadow-md">
+        Registrar usuario
+      </button>
     </header>
 
     <div class="flex-1 flex flex-col items-center justify-center text-center px-6 pt-8 pb-24 relative overflow-hidden">
       
-      <!-- CONTADOR DE USUARIOS (SIMULADO) -->
       <div class="mb-6 flex items-center gap-2 text-xs font-bold text-green-700 bg-green-100 px-4 py-1.5 rounded-full">
         <span class="relative flex h-3 w-3">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -83,17 +89,35 @@
       </div>
 
       <div class="w-full max-w-3xl bg-white p-5 md:p-8 rounded-3xl shadow-xl border border-[#E5E1DA] text-left relative z-10">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-          <label class="font-bold text-lg md:text-xl text-[#1A1A1A] flex items-center gap-2"><span class="text-2xl">📚</span> Crea tu kit de prueba</label>
-          <div>
-            <input type="file" id="fileInput" accept=".pdf,.txt,.docx" class="hidden" onchange="handleFile(event)" />
-            <button onclick="document.getElementById('fileInput').click()" class="text-sm bg-white text-[#1A1A1A] border-2 border-[#1A1A1A] px-4 py-2 rounded-xl hover:bg-[#F7F5F2] transition font-semibold flex items-center gap-2">
-              Subir Archivo
-            </button>
-          </div>
+        
+        <!-- SELECTOR DE OPCIONES (SUBIR, TEXTO, YOUTUBE) -->
+        <div class="flex gap-2 mb-4 border-b border-[#E5E1DA] pb-2 text-sm font-semibold text-[#8A8580]">
+          <button onclick="mostrarOpcion('texto')" id="tab-texto" class="text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition">Escribir Texto</button>
+          <button onclick="mostrarOpcion('youtube')" id="tab-youtube" class="hover:text-[#1A1A1A] pb-2 px-2 transition">Link de YouTube</button>
         </div>
-        <textarea id="textInput" rows="4" placeholder="O pega/escribe tu texto aquí..." class="w-full bg-[#F7F5F2] border border-[#E5E1DA] rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition resize-none mb-4"></textarea>
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+
+        <!-- OPCIÓN 1: TEXTO / ARCHIVO -->
+        <div id="opcionTexto">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <label class="font-bold text-lg md:text-xl text-[#1A1A1A] flex items-center gap-2"><span class="text-2xl">📚</span> Crea tu kit</label>
+            <div>
+              <input type="file" id="fileInput" accept=".pdf,.txt,.docx" class="hidden" onchange="handleFile(event)" />
+              <button onclick="document.getElementById('fileInput').click()" class="text-sm bg-white text-[#1A1A1A] border-2 border-[#1A1A1A] px-4 py-2 rounded-xl hover:bg-[#F7F5F2] transition font-semibold flex items-center gap-2">
+                Subir Archivo (PDF/Word)
+              </button>
+            </div>
+          </div>
+          <textarea id="textInput" rows="4" placeholder="O pega/escribe tu texto aquí..." class="w-full bg-[#F7F5F2] border border-[#E5E1DA] rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition resize-none mb-4"></textarea>
+        </div>
+
+        <!-- OPCIÓN 2: YOUTUBE -->
+        <div id="opcionYoutube" class="hidden">
+          <label class="font-bold text-lg md:text-xl text-[#1A1A1A] flex items-center gap-2 mb-4"><span class="text-2xl">📺</span> Pega el link de YouTube</label>
+          <input type="url" id="youtubeInput" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-[#F7F5F2] border border-[#E5E1DA] rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition mb-2">
+          <p class="text-xs text-[#8A8580] mb-4">La IA extraerá los subtítulos automáticos del video para crear tus tarjetas.</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
           <p id="status" class="text-sm font-medium text-[#8A8580] text-center sm:text-left w-full sm:w-auto"></p>
           <button onclick="procesarEntrada()" id="btnGenerar" class="w-full sm:w-auto bg-gradient-to-r from-[#1A1A1A] to-[#333] text-white font-bold px-8 py-3 rounded-full hover:shadow-lg transition flex items-center justify-center gap-2">Generar con IA</button>
         </div>
@@ -165,7 +189,6 @@
       const usuario = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
       const btn = document.getElementById('btnHeaderUser');
       
-      // Simulamos que el contador sube si alguien se registra
       let contadorBase = 1204;
       if (usuario) contadorBase++;
       document.getElementById('contadorUsuarios').textContent = contadorBase;
@@ -189,6 +212,26 @@
       alert('¡Registro exitoso! Ya puedes crear kits ilimitados.');
       cerrarModalRegistro();
       actualizarInterfazUsuario();
+    }
+
+    // Interfaz de Pestañas (Texto vs YouTube)
+    function mostrarOpcion(tipo) {
+      const tabTexto = document.getElementById('tab-texto');
+      const tabYoutube = document.getElementById('tab-youtube');
+      const opcionTexto = document.getElementById('opcionTexto');
+      const opcionYoutube = document.getElementById('opcionYoutube');
+
+      if (tipo === 'texto') {
+        tabTexto.className = 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition';
+        tabYoutube.className = 'hover:text-[#1A1A1A] pb-2 px-2 transition';
+        opcionTexto.classList.remove('hidden');
+        opcionYoutube.classList.add('hidden');
+      } else {
+        tabTexto.className = 'hover:text-[#1A1A1A] pb-2 px-2 transition';
+        tabYoutube.className = 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition';
+        opcionTexto.classList.add('hidden');
+        opcionYoutube.classList.remove('hidden');
+      }
     }
 
     // Modales
