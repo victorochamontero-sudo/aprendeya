@@ -1,105 +1,94 @@
 let material = null;
-let flashIdx = 0;
+let mazo = []; // Aquí guardaremos las tarjetas barajadas
+let indiceActual = 0;
 let mostrandoRespuesta = false;
+
+// Estadísticas
+let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
 
 (async function init() {
   const texto = localStorage.getItem('material');
   if (!texto) {
-    document.getElementById('loading').innerHTML =
-      '<p class="text-sm text-[#8A8580]">No hay material. <a href="index.html" class="underline">Sube un archivo</a>.</p>';
+    document.getElementById('loading').innerHTML = '<p class="text-sm text-[#8A8580]">No hay material. <a href="index.html" class="underline">Sube un archivo</a>.</p>';
     return;
   }
 
   try {
-    material = await generarMaterial(texto);
+    const data = await generarMaterial(texto);
+    material = data;
+    
+    // Mezclamos las flashcards
+    mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
+    stats.aprendiendo = mazo.length;
+
     document.getElementById('loading').classList.add('hidden');
-    cambiarTab('flash');
+    document.getElementById('mazoContainer').classList.remove('hidden');
+    actualizarUI();
   } catch (e) {
-    document.getElementById('loading').innerHTML =
-      `<p class="text-sm text-red-600">Error: ${e.message}</p>`;
+    document.getElementById('loading').innerHTML = `<p class="text-sm text-red-600">Error: ${e.message}</p>`;
   }
 })();
 
-function cambiarTab(tab) {
-  const flash = document.getElementById('flashContainer');
-  const quiz = document.getElementById('quizContainer');
-  const tabFlash = document.getElementById('tab-flash');
-  const tabQuiz = document.getElementById('tab-quiz');
+function actualizarStatsUI() {
+  document.getElementById('stat-aprendiendo').textContent = stats.aprendiendo;
+  document.getElementById('stat-revisando').textContent = stats.revisando;
+  document.getElementById('stat-dominado').textContent = stats.dominado;
+}
 
-  const activo = 'px-5 py-2.5 rounded-full text-sm font-semibold bg-[#1A1A1A] text-white';
-  const inactivo = 'px-5 py-2.5 rounded-full text-sm font-semibold border border-[#D6D1CA]';
-
-  if (tab === 'flash') {
-    flash.classList.remove('hidden');
-    quiz.classList.add('hidden');
-    tabFlash.className = activo;
-    tabQuiz.className = inactivo;
-    renderFlash();
-  } else {
-    flash.classList.add('hidden');
-    quiz.classList.remove('hidden');
-    tabFlash.className = inactivo;
-    tabQuiz.className = activo;
-    renderQuiz();
+function actualizarUI() {
+  if (indiceActual >= mazo.length) {
+    // Terminamos el mazo
+    document.getElementById('texto-pregunta').textContent = "¡Mazo terminado!";
+    document.getElementById('texto-respuesta').textContent = "Has repasado todas las tarjetas.";
+    document.getElementById('botones-calificacion').classList.add('opacity-0', 'pointer-events-none');
+    return;
   }
+
+  const tarjeta = mazo[indiceActual];
+  document.getElementById('texto-pregunta').textContent = tarjeta.pregunta;
+  document.getElementById('texto-respuesta').textContent = tarjeta.respuesta;
+  
+  // Reiniciar estado visual
+  mostrandoRespuesta = false;
+  document.getElementById('tarjeta').classList.remove('flipped');
+  document.getElementById('botones-calificacion').classList.add('opacity-0', 'pointer-events-none');
+  document.getElementById('instruccion').classList.remove('hidden');
+  
+  actualizarStatsUI();
 }
 
-function renderFlash() {
-  if (!material) return;
-  const card = material.flashcards[flashIdx];
-  document.getElementById('cardText').textContent =
-    mostrandoRespuesta ? card.respuesta : card.pregunta;
-  document.getElementById('contador').textContent =
-    `${flashIdx + 1} / ${material.flashcards.length}`;
+function voltearTarjeta() {
+  if (mostrandoRespuesta || indiceActual >= mazo.length) return;
+  
+  mostrandoRespuesta = true;
+  document.getElementById('tarjeta').classList.add('flipped');
+  
+  // Mostrar botones de calificación
+  setTimeout(() => {
+    document.getElementById('botones-calificacion').classList.remove('opacity-0', 'pointer-events-none');
+    document.getElementById('instruccion').classList.add('hidden');
+  }, 300);
 }
 
-function voltear() { mostrandoRespuesta = !mostrandoRespuesta; renderFlash(); }
-
-function siguiente() {
-  if (flashIdx < material.flashcards.length - 1) {
-    flashIdx++; mostrandoRespuesta = false; renderFlash();
+function calificar(nivel) {
+  // nivel: 0 = Difícil, 1 = Bien, 2 = Fácil
+  
+  // Actualizar estadísticas
+  stats.aprendiendo--;
+  if (nivel === 0) {
+    stats.aprendiendo++;
+    mazo.push(mazo[indiceActual]); // Lo volvemos a meter al final del mazo
+  } else if (nivel === 1) {
+    stats.revisando++;
+  } else if (nivel === 2) {
+    stats.dominado++;
   }
-}
-function anterior() {
-  if (flashIdx > 0) { flashIdx--; mostrandoRespuesta = false; renderFlash(); }
-}
 
-function renderQuiz() {
-  if (!material) return;
-  const cont = document.getElementById('quizContainer');
-  cont.innerHTML = '';
-
-  material.quiz.forEach((q, i) => {
-    const div = document.createElement('div');
-    div.className = 'bg-white rounded-3xl shadow-sm p-6 mb-4';
-    div.innerHTML = `
-      <p class="font-semibold mb-4">${i + 1}. ${q.pregunta}</p>
-      <div class="space-y-2" id="opciones-${i}">
-        ${q.opciones.map((op, j) => `
-          <button onclick="responder(${i}, ${j})"
-            class="w-full text-left px-4 py-3 rounded-xl border border-[#E5E1DA] text-sm hover:bg-[#F7F5F2] transition">
-            ${op}
-          </button>
-        `).join('')}
-      </div>
-      <p id="exp-${i}" class="hidden mt-4 text-sm text-[#5A5550] bg-[#F7F5F2] p-4 rounded-xl"></p>
-    `;
-    cont.appendChild(div);
-  });
-}
-
-function responder(qIdx, opIdx) {
-  const q = material.quiz[qIdx];
-  const botones = document.querySelectorAll(`#opciones-${qIdx} button`);
-  const exp = document.getElementById(`exp-${qIdx}`);
-
-  botones.forEach((b, i) => {
-    b.disabled = true;
-    if (i === q.correcta) b.className = 'w-full text-left px-4 py-3 rounded-xl border-2 border-green-500 bg-green-50 text-sm';
-    else if (i === opIdx) b.className = 'w-full text-left px-4 py-3 rounded-xl border-2 border-red-400 bg-red-50 text-sm';
-    else b.className = 'w-full text-left px-4 py-3 rounded-xl border border-[#E5E1DA] text-sm opacity-60';
-  });
-
-  exp.textContent = '💡 ' + q.explicacion;
-  exp.classList.remove('hidden');
+  // Pasar a la siguiente tarjeta
+  indiceActual++;
+  
+  // Pequeño delay para que se vea la transición
+  setTimeout(() => {
+    actualizarUI();
+  }, 300);
 }
