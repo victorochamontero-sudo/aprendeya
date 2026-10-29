@@ -25,7 +25,7 @@ async function handleFile(e) {
 
     textarea.value = texto.slice(0, 8000);
     localStorage.setItem('borradorTexto', textarea.value);
-    status.textContent = '✅ Texto cargado. Puedes editarlo o hacer clic en "Generar con IA".';
+    status.textContent = '✅ Texto cargado. Haz clic en "Generar con IA".';
   } catch (err) {
     status.textContent = '❌ Error al leer el archivo: ' + err.message;
   }
@@ -59,8 +59,25 @@ function procesarEntrada() {
     return;
   }
 
-  const nombreKit = prompt("Ponle un nombre a este kit de estudio (Ej: Contabilidad Básica):", "Mi Kit");
+  // LÓGICA FREEMIUM: Validar si el usuario ya usó su prueba gratis
+  const usuarioLogueado = localStorage.getItem('usuarioAprendeYa');
+  const yaProbo = localStorage.getItem('pruebaGratisUsada');
+
+  if (!usuarioLogueado && yaProbo) {
+    // Si no está logueado y ya usó la prueba, lo frenamos
+    status.textContent = '⛔ Has alcanzado el límite de prueba.';
+    alert('¡Has creado tu kit de prueba! Para crear más kits ilimitados y guardar tu progreso, por favor regístrate.');
+    abrirModalRegistro();
+    return;
+  }
+
+  const nombreKit = prompt("Ponle un nombre a este kit de estudio (Ej: Contabilidad Básica):", "Mi Kit de Prueba");
   if (!nombreKit) return;
+
+  // Si no está logueado, marcamos que ya usó su prueba
+  if (!usuarioLogueado) {
+    localStorage.setItem('pruebaGratisUsada', 'true');
+  }
 
   localStorage.setItem('material', texto.slice(0, 8000));
   localStorage.setItem('nombreMaterial', nombreKit);
