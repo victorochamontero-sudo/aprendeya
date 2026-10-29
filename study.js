@@ -1,9 +1,7 @@
 let material = null;
-let mazo = []; // Aquí guardaremos las tarjetas barajadas
+let mazo = [];
 let indiceActual = 0;
 let mostrandoRespuesta = false;
-
-// Estadísticas
 let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
 
 (async function init() {
@@ -16,8 +14,6 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
   try {
     const data = await generarMaterial(texto);
     material = data;
-    
-    // Mezclamos las flashcards
     mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
     stats.aprendiendo = mazo.length;
 
@@ -37,10 +33,10 @@ function actualizarStatsUI() {
 
 function actualizarUI() {
   if (indiceActual >= mazo.length) {
-    // Terminamos el mazo
     document.getElementById('texto-pregunta').textContent = "¡Mazo terminado!";
     document.getElementById('texto-respuesta').textContent = "Has repasado todas las tarjetas.";
     document.getElementById('botones-calificacion').classList.add('opacity-0', 'pointer-events-none');
+    document.getElementById('instruccion').classList.add('hidden');
     return;
   }
 
@@ -48,7 +44,6 @@ function actualizarUI() {
   document.getElementById('texto-pregunta').textContent = tarjeta.pregunta;
   document.getElementById('texto-respuesta').textContent = tarjeta.respuesta;
   
-  // Reiniciar estado visual
   mostrandoRespuesta = false;
   document.getElementById('tarjeta').classList.remove('flipped');
   document.getElementById('botones-calificacion').classList.add('opacity-0', 'pointer-events-none');
@@ -63,7 +58,6 @@ function voltearTarjeta() {
   mostrandoRespuesta = true;
   document.getElementById('tarjeta').classList.add('flipped');
   
-  // Mostrar botones de calificación
   setTimeout(() => {
     document.getElementById('botones-calificacion').classList.remove('opacity-0', 'pointer-events-none');
     document.getElementById('instruccion').classList.add('hidden');
@@ -71,24 +65,43 @@ function voltearTarjeta() {
 }
 
 function calificar(nivel) {
-  // nivel: 0 = Difícil, 1 = Bien, 2 = Fácil
-  
-  // Actualizar estadísticas
   stats.aprendiendo--;
   if (nivel === 0) {
     stats.aprendiendo++;
-    mazo.push(mazo[indiceActual]); // Lo volvemos a meter al final del mazo
+    mazo.push(mazo[indiceActual]);
   } else if (nivel === 1) {
     stats.revisando++;
   } else if (nivel === 2) {
     stats.dominado++;
   }
 
-  // Pasar a la siguiente tarjeta
   indiceActual++;
+  setTimeout(() => { actualizarUI(); }, 300);
+}
+
+function cambiarTab(tab) {
+  const activo = 'px-4 py-1.5 rounded-full text-sm font-semibold bg-[#1A1A1A] text-white';
+  const inactivo = 'px-4 py-1.5 rounded-full text-sm font-semibold border border-[#D6D1CA] hover:bg-gray-50';
   
-  // Pequeño delay para que se vea la transición
-  setTimeout(() => {
-    actualizarUI();
-  }, 300);
+  document.getElementById('tab-lista').className = tab === 'lista' ? activo : inactivo;
+  document.getElementById('tab-mazo').className = tab === 'mazo' ? activo : inactivo;
+  document.getElementById('tab-juegos').className = tab === 'juegos' ? activo : inactivo;
+
+  if (tab === 'mazo') {
+    document.getElementById('mazoContainer').classList.remove('hidden');
+    document.getElementById('listaContainer').classList.add('hidden');
+  } else if (tab === 'lista') {
+    document.getElementById('mazoContainer').classList.add('hidden');
+    document.getElementById('listaContainer').classList.remove('hidden');
+    
+    const cont = document.getElementById('listaTarjetas');
+    cont.innerHTML = material.flashcards.map(f => `
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-[#E5E1DA]">
+        <p class="font-bold text-[#1A1A1A] mb-2">${f.pregunta}</p>
+        <p class="text-sm text-[#5A5550]">${f.respuesta}</p>
+      </div>
+    `).join('');
+  } else {
+    alert("¡Los juegos están en mantenimiento! 🚧 Vuelve pronto.");
+  }
 }
