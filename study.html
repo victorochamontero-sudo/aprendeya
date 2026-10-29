@@ -6,7 +6,6 @@
   <title>Estudiar | AprendeYa</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.4.1/html-docx.min.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
     .card-flip { perspective: 1000px; }
@@ -22,6 +21,7 @@
 </head>
 <body class="bg-[#F7F5F2] min-h-screen flex">
 
+  <!-- SIDEBAR (PC) -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
     <div class="p-6 flex items-center gap-2 border-b border-[#E5E1DA]">
       <a href="index.html" class="flex items-center gap-2">
@@ -76,13 +76,8 @@
           </div>
         </div>
 
-        <!-- Cambiamos mb-6 por mb-2 -->
         <button id="btnMostrar" onclick="voltearTarjeta()" class="w-full max-w-sm bg-[#1A1A1A] text-white font-bold py-3 md:py-4 rounded-xl shadow-lg hover:bg-opacity-80 transition mb-2 text-base md:text-lg">Mostrar Respuesta</button>
-
-        <!-- Cambiamos mt-8 por mt-2 -->
-        <button onclick="pedirMasMaterial()" id="btnMas" class="w-full max-w-sm mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm md:text-base">
-          ✨ Generar 8 tarjetas más con IA
-        </button>
+        <button onclick="pedirMasMaterial()" id="btnMas" class="w-full max-w-sm mt-0 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm md:text-base">✨ Generar 8 tarjetas más con IA</button>
 
         <div id="botones-calificacion" class="flex gap-3 md:gap-4 items-center opacity-0 pointer-events-none transition-opacity duration-300 mt-6">
           <button onclick="calificar(0)" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center text-lg md:text-xl shadow-lg">😞</button>
@@ -103,8 +98,8 @@
       <!-- 3. GUÍA -->
       <div id="guiaContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA]">
         <div class="flex gap-2 mb-6 border-b border-[#E5E1DA] pb-4">
-          <button onclick="descargarGuiaWord()" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">📄 Descargar Word</button>
-          <button onclick="window.print()" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">🖨️ Guardar PDF</button>
+          <button onclick="imprimirGuia('Word')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">📄 Descargar Word</button>
+          <button onclick="imprimirGuia('PDF')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">🖨️ Guardar PDF</button>
         </div>
         <div id="guiaTexto" class="guia-content text-[#5A5550] text-sm md:text-base"></div>
       </div>
