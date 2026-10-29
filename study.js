@@ -4,6 +4,7 @@ let indiceActual = 0;
 let mostrandoRespuesta = false;
 let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
 let generacionesExtra = 0; 
+let guiaGenerada = false; // Bandera para evitar recargar la guía si ya existe
 
 (async function init() {
   const texto = localStorage.getItem('material');
@@ -88,6 +89,10 @@ function calificar(nivel) {
 
 async function cambiarTab(tab) {
   if (!material) return;
+  
+  // Detener cualquier audio que esté sonando al cambiar de pestaña
+  detenerLectura();
+
   const clasesNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]";
   const activoNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition";
   
@@ -138,7 +143,6 @@ async function cambiarTab(tab) {
     document.getElementById('listaContainer').classList.remove('hidden');
     const cont = document.getElementById('listaTarjetas');
     if (material && material.flashcards) {
-      // DISEÑO ACORDEÓN: Respuesta oculta
       cont.innerHTML = material.flashcards.map((f, i) => `
         <div class="bg-white rounded-xl border border-[#E5E1DA] overflow-hidden transition-all duration-300 mb-3">
           <button onclick="toggleRespuesta(${i})" class="w-full text-left p-4 flex justify-between items-center hover:bg-[#F7F5F2] transition">
@@ -156,13 +160,23 @@ async function cambiarTab(tab) {
     document.getElementById('guiaContainer').classList.remove('hidden');
     const guiaHTML = document.getElementById('guiaTexto');
     
+    // Si la guía no existe o es el texto por defecto, la generamos
     if (!material.guia || material.guia.includes("Haz clic")) {
       guiaHTML.innerHTML = '<div class="text-center py-12"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-[#8A8580]">Generando tu guía de estudio...</p></div>';
       try {
         const textoOriginal = localStorage.getItem('material');
         const nuevaGuia = await generarGuia(textoOriginal);
         material.guia = nuevaGuia;
+        
+        // GUARDAMOS LA GUÍA EN EL HISTORIAL PARA QUE NO SE BORRE
         localStorage.setItem('materialGenerado', JSON.stringify(material));
+        const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
+        let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+        const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
+        if (kitIndex !== -1) {
+          historial[kitIndex].material = material;
+          localStorage.setItem('historialKits', JSON.stringify(historial));
+        }
       } catch (e) {
         guiaHTML.innerHTML = '<p class="text-red-500">Hubo un error generando la guía. Por favor, recarga la página.</p>';
         return;
@@ -182,11 +196,9 @@ async function cambiarTab(tab) {
   }
 }
 
-// --- FUNCIÓN PARA EL ACORDEÓN DE LA LISTA ---
 function toggleRespuesta(index) {
   const respuesta = document.getElementById(`respuesta-${index}`);
   const icono = document.getElementById(`icono-${index}`);
-  
   if (respuesta.classList.contains('hidden')) {
     respuesta.classList.remove('hidden');
     icono.textContent = '−';
@@ -224,7 +236,7 @@ async function iniciarQuiz() {
   }
 
   if (material.quiz.length === 0) {
-    contenedor.innerHTML = '<p class="text-center text-red-500">No se pudieron generar preguntas. Intenta generando un texto más largo.</p>';
+    contenedor.innerHTML = '<p class="text-center text-red-500">No se pudieron generar preguntas. Intenta con un texto más largo.</p>';
     return;
   }
 
@@ -314,106 +326,4 @@ async function pedirMasMaterial() {
     const extra = await generarMasMaterial(textoOriginal, material.flashcards, material.quiz);
     
     if (extra.flashcards) {
-      material.flashcards = [...material.flashcards, ...extra.flashcards];
-      mazo = [...mazo, ...extra.flashcards].sort(() => Math.random() - 0.5);
-      stats.aprendiendo += extra.flashcards.length;
-    }
-    
-    if (extra.quiz) {
-      material.quiz = [...(material.quiz || []), ...extra.quiz];
-    }
-
-    localStorage.setItem('materialGenerado', JSON.stringify(material));
-    const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
-    let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
-    const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
-    if (kitIndex !== -1) {
-      historial[kitIndex].material = material;
-      localStorage.setItem('historialKits', JSON.stringify(historial));
-    }
-
-    generacionesExtra++;
-    
-    if (generacionesExtra >= 2) {
-      if(btnMas) {
-        btnMas.innerHTML = '✨ Límite de generación alcanzado';
-        btnMas.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-        btnMas.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
-      }
-    } else {
-      if(btnMas) {
-        btnMas.innerHTML = '✨ Generar 8 tarjetas más con IA';
-        btnMas.disabled = false;
-      }
-    }
-
-    indiceActual = 0; 
-    actualizarUI();
-    
-    if (document.getElementById('listaContainer').classList.contains('hidden')) {
-      alert('¡Se han añadido 8 tarjetas y 4 preguntas nuevas a tu kit!');
-    } else {
-      cambiarTab('lista');
-    }
-
-  } catch (error) {
-    console.error(error);
-    alert('Hubo un error al generar más material. Por favor, recarga la página.');
-    if(btnMas) {
-      btnMas.innerHTML = '✨ Generar 8 tarjetas más con IA';
-      btnMas.disabled = false;
-    }
-  }
-}
-
-// --- FUNCIÓN DE IMPRESIÓN Y DESCARGA (SIRVE PARA WORD Y PDF) ---
-function imprimirGuia(tipo) {
-  if (!material || !material.guia) {
-    alert("Primero debes generar la guía de estudio.");
-    return;
-  }
-  
-  const ventana = window.open('', '_blank');
-  
-  const guiaHTML = material.guia
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
-    .replace(/\n/g, '<br>');
-
-  const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Guía';
-  const tituloDocumento = tipo === 'Word' ? 'Guia_AprendeYa_Word' : 'Guia_AprendeYa_PDF';
-
-  ventana.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>${tituloDocumento}</title>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 40px; max-width: 800px; margin: 0 auto; }
-        h1 { color: #1a1a1a; font-size: 28px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
-        h2 { color: #1a1a1a; font-size: 22px; margin-top: 30px; }
-        li { margin-bottom: 10px; }
-        strong { color: #000; }
-        .header { text-align: center; margin-bottom: 40px; color: #888; font-size: 14px; }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h3>Guía de Estudio generada por AprendeYa</h3>
-        <p>Kit: ${nombreKit}</p>
-      </div>
-      ${guiaHTML}
-    </body>
-    </html>
-  `);
-
-  ventana.document.close();
-  ventana.focus();
-  
-  setTimeout(() => {
-    ventana.print();
-  }, 500);
-}
+      material.flashcards = [...material.flashcards, ...extra
