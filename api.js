@@ -64,7 +64,7 @@ TEXTO: ${texto}`;
   return data.choices[0].message.content;
 }
 
-// --- NUEVA FUNCIÓN PARA GENERAR MÁS MATERIAL (8 Tarjetas y 4 Quiz) ---
+// --- GENERAR 8 TARJETAS Y 4 PREGUNTAS EXTRA ---
 async function generarMasMaterial(texto, actualFlashcards, actualQuiz) {
   const PROMPT_EXTRA = `A partir del siguiente texto, genera MÁS material de estudio ADICIONAL.
 Devuelve SOLO un JSON válido: { "flashcards": [ { "pregunta": "...", "respuesta": "..." } ], "quiz": [ { "pregunta": "...", "opciones": ["A", "B", "C", "D"], "correcta": 0, "explicacion": "..." } ] }
