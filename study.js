@@ -95,10 +95,11 @@ function cambiarTab(tab) {
     document.getElementById('listaContainer').classList.remove('hidden');
     
     const cont = document.getElementById('listaTarjetas');
-    cont.innerHTML = material.flashcards.map(f => `
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-[#E5E1DA]">
+    cont.innerHTML = material.flashcards.map((f, i) => `
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-[#E5E1DA] mb-3">
+        <p class="text-xs text-[#8A8580] mb-1 font-bold">TARJETA ${i + 1}</p>
         <p class="font-bold text-[#1A1A1A] mb-2">${f.pregunta}</p>
-        <p class="text-sm text-[#5A5550]">${f.respuesta}</p>
+        <p class="text-sm text-[#5A5550] border-t border-[#E5E1DA] pt-2 mt-2">${f.respuesta}</p>
       </div>
     `).join('');
   } else {
