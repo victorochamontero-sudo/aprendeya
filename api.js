@@ -1,5 +1,5 @@
-// ⚠️ CLAVE DE OPENROUTER CONFIGURADA
-const OPENROUTER_KEY = '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';
+// ⚠️ CLAVE DE OPENROUTER CONFIGURADA DIRECTAMENTE
+const OPENROUTER_KEY = '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';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
 A partir del siguiente texto, genera material de estudio de ALTA CALIDAD.
@@ -79,21 +79,18 @@ async function generarMaterial(texto) {
   return material;
 }
 
-// ---------- MODO DEMO ----------
+// ---------- MODO DEMO (por si falla la clave) ----------
 function demoMaterial() {
   return {
     flashcards: [
-      { pregunta: '¿Qué es la repetición espaciada?', respuesta: 'Una técnica que repite la información en intervalos crecientes para mejorar la retención a largo plazo.' },
-      { pregunta: '¿Por qué el feedback explicativo mejora el aprendizaje?', respuesta: 'Porque corrige el modelo mental del estudiante, no solo indica si acertó.' },
-      { pregunta: '¿Qué diferencia hay entre memorizar y comprender?', respuesta: 'Memorizar es retener datos; comprender es conectarlos y aplicarlos en contextos nuevos.' },
-      { pregunta: '¿Qué es la carga cognitiva?', respuesta: 'La cantidad de esfuerzo mental que exige una tarea; si es excesiva, el aprendizaje se bloquea.' }
+      { pregunta: '¿Qué es la repetición espaciada?', respuesta: 'Una técnica que repite la información en intervalos crecientes para mejorar la retención a largo plazo.' }
     ],
     quiz: [
       {
         pregunta: '¿Cuál es el objetivo principal de la repetición espaciada?',
         opciones: ['Memorizar todo en una noche', 'Retener a largo plazo con menos esfuerzo', 'Leer más rápido', 'Evitar el olvido por completo'],
         correcta: 1,
-        explicacion: 'La repetición espaciada distribuye el repaso en intervalos crecientes. No evita el olvido del todo, pero lo combate eficientemente.'
+        explicacion: 'La repetición espaciada distribuye el repaso en intervalos crecientes.'
       }
     ]
   };
