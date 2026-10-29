@@ -17,22 +17,18 @@
 
   <!-- SIDEBAR IZQUIERDO (PC) -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
-    <div class="p-6 flex items-center gap-3 border-b border-[#E5E1DA]">
-      <a href="index.html" class="flex items-center gap-3">
-        <!-- LOGO NUEVO -->
-        <div class="w-10 h-10 rounded-xl bg-[#1A1A1A] flex items-center justify-center shadow-lg">
-          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="gradienteLogo" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#3B82F6" />
-                <stop offset="100%" stop-color="#9333EA" />
-              </linearGradient>
-            </defs>
-            <path d="M12 4L4 20H8L9.5 16H14.5L16 20H20L12 4ZM10.5 13L12 8.5L13.5 13H10.5Z" fill="url(#gradienteLogo)" />
-          </svg>
+    <div class="p-5 flex items-center border-b border-[#E5E1DA]">
+      
+      <!-- LOGO FUSIONADO: A BLANCA + prendeYa -->
+      <a href="index.html" class="flex items-center group">
+        <div class="w-9 h-9 rounded-xl bg-[#1A1A1A] flex items-center justify-center shadow-md z-10">
+          <span class="text-white font-extrabold text-xl leading-none">A</span>
         </div>
-        <span class="font-extrabold text-xl tracking-tight">AprendeYa</span>
+        <span class="font-extrabold text-xl tracking-tighter text-[#1A1A1A] -ml-0.5 z-0 group-hover:text-blue-600 transition-colors">
+          prendeYa
+        </span>
       </a>
+
     </div>
     
     <!-- FRASE DEL DÍA -->
@@ -73,22 +69,18 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 md:ml-64 flex flex-col relative pb-20 md:pb-0">
     
-    <!-- HEADER MÓVIL CON LOGO NUEVO -->
-    <header class="flex items-center justify-between px-6 py-4 bg-white border-b border-[#E5E1DA] md:hidden">
-      <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-xl bg-[#1A1A1A] flex items-center justify-center shadow-md">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="gradienteLogoMovil" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#3B82F6" />
-                <stop offset="100%" stop-color="#9333EA" />
-              </linearGradient>
-            </defs>
-            <path d="M12 4L4 20H8L9.5 16H14.5L16 20H20L12 4ZM10.5 13L12 8.5L13.5 13H10.5Z" fill="url(#gradienteLogoMovil)" />
-          </svg>
+    <!-- HEADER MÓVIL CON LOGO FUSIONADO -->
+    <header class="flex items-center justify-between px-5 py-4 bg-white border-b border-[#E5E1DA] md:hidden">
+      
+      <a href="index.html" class="flex items-center">
+        <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center shadow-md z-10">
+          <span class="text-white font-extrabold text-base leading-none">A</span>
         </div>
-        <span class="font-extrabold text-lg">AprendeYa</span>
-      </div>
+        <span class="font-extrabold text-lg tracking-tighter text-[#1A1A1A] -ml-0.5 z-0">
+          prendeYa
+        </span>
+      </a>
+
       <button onclick="abrirModalLogin()" class="bg-[#1A1A1A] text-white text-xs font-semibold px-4 py-2 rounded-full">Ingresar</button>
     </header>
 
