@@ -1,4 +1,4 @@
-// ⚠️ PEGA AQUÍ TU CLAVE REAL DE OPENROUTER (reemplaza el texto de abajo)
+// ⚠️ CLAVE DE OPENROUTER CONFIGURADA
 const OPENROUTER_KEY = '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';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
@@ -38,7 +38,7 @@ async function generarMaterial(texto) {
   }
 
   // Si no hay clave -> modo demo
-  if (!OPENROUTER_KEY || OPENROUTER_KEY === 'sk-or-v1-TU_CLAVE_AQUI') {
+  if (!OPENROUTER_KEY || OPENROUTER_KEY === '') {
     console.warn('Sin API key: usando modo demo.');
     const demo = demoMaterial();
     localStorage.setItem('materialGenerado', JSON.stringify(demo));
@@ -79,49 +79,21 @@ async function generarMaterial(texto) {
   return material;
 }
 
-// ---------- MODO DEMO (por si algo falla) ----------
+// ---------- MODO DEMO ----------
 function demoMaterial() {
   return {
     flashcards: [
       { pregunta: '¿Qué es la repetición espaciada?', respuesta: 'Una técnica que repite la información en intervalos crecientes para mejorar la retención a largo plazo.' },
       { pregunta: '¿Por qué el feedback explicativo mejora el aprendizaje?', respuesta: 'Porque corrige el modelo mental del estudiante, no solo indica si acertó.' },
       { pregunta: '¿Qué diferencia hay entre memorizar y comprender?', respuesta: 'Memorizar es retener datos; comprender es conectarlos y aplicarlos en contextos nuevos.' },
-      { pregunta: '¿Qué es la carga cognitiva?', respuesta: 'La cantidad de esfuerzo mental que exige una tarea; si es excesiva, el aprendizaje se bloquea.' },
-      { pregunta: '¿Qué hace efectiva una flashcard?', respuesta: 'Una sola idea por tarjeta, pregunta clara y respuesta breve.' },
-      { pregunta: '¿Qué es el aprendizaje activo?', respuesta: 'Aprender haciendo (recuperar, aplicar, explicar) en lugar de solo leer o escuchar.' },
-      { pregunta: '¿Por qué es útil el "testing effect"?', respuesta: 'Porque recuperar información de la memoria refuerza la huella mnémica más que releer.' },
-      { pregunta: '¿Qué es el olvido?', respuesta: 'La pérdida progresiva de acceso a la información si no se recupera periódicamente.' }
+      { pregunta: '¿Qué es la carga cognitiva?', respuesta: 'La cantidad de esfuerzo mental que exige una tarea; si es excesiva, el aprendizaje se bloquea.' }
     ],
     quiz: [
       {
         pregunta: '¿Cuál es el objetivo principal de la repetición espaciada?',
         opciones: ['Memorizar todo en una noche', 'Retener a largo plazo con menos esfuerzo', 'Leer más rápido', 'Evitar el olvido por completo'],
         correcta: 1,
-        explicacion: 'La repetición espaciada distribuye el repaso en intervalos crecientes. No evita el olvido del todo (opción D), pero lo combate eficientemente.'
-      },
-      {
-        pregunta: 'El "testing effect" se refiere a...',
-        opciones: ['Hacer exámenes solo para aprobar', 'Que recuperar información refuerza la memoria', 'Que los tests son aburridos', 'Que solo importa la nota'],
-        correcta: 1,
-        explicacion: 'Recuperar activamente (no solo releer) refuerza la memoria. Un examen no es solo evaluación: es una herramienta de aprendizaje.'
-      },
-      {
-        pregunta: 'Una buena flashcard debe...',
-        opciones: ['Contener un párrafo completo', 'Tener una sola idea por tarjeta', 'Incluir toda la unidad', 'Ser copiada literal del libro'],
-        correcta: 1,
-        explicacion: 'Una idea por tarjeta reduce la carga cognitiva y facilita la recuperación. Los párrafos completos generan interferencia.'
-      },
-      {
-        pregunta: 'El feedback explicativo es valioso porque...',
-        opciones: ['Solo dice "bien" o "mal"', 'Corrige el modelo mental del estudiante', 'Asusta al alumno', 'Ahorra tiempo'],
-        correcta: 1,
-        explicacion: 'Saber por qué algo está mal (y por qué las otras opciones no sirven) reestructura el conocimiento, no solo la respuesta.'
-      },
-      {
-        pregunta: 'Si la carga cognitiva es excesiva...',
-        opciones: ['Se aprende más rápido', 'El aprendizaje se bloquea', 'No pasa nada', 'El alumno se motiva'],
-        correcta: 1,
-        explicacion: 'La memoria de trabajo es limitada. Si la tarea exige más de lo que puede procesar, la información no se consolida.'
+        explicacion: 'La repetición espaciada distribuye el repaso en intervalos crecientes. No evita el olvido del todo, pero lo combate eficientemente.'
       }
     ]
   };
