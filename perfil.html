@@ -19,14 +19,30 @@
   </header>
 
   <main class="max-w-4xl mx-auto space-y-6">
-    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 text-white shadow-lg flex items-center gap-6">
-      <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-4xl">🧑‍🎓</div>
-      <div>
+    
+    <!-- CABECERA CON FOTO DE PERFIL -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 text-white shadow-lg flex flex-col md:flex-row items-center gap-6">
+      
+      <!-- FOTO DE PERFIL -->
+      <div class="relative group cursor-pointer" onclick="document.getElementById('fotoInput').click()">
+        <div id="fotoPerfil" class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-4xl overflow-hidden border-4 border-white shadow-inner">
+          🧑‍🎓
+        </div>
+        <!-- Icono de cámara al pasar el mouse -->
+        <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+          <span class="text-2xl">📷</span>
+        </div>
+      </div>
+      <input type="file" id="fotoInput" class="hidden" accept="image/*" onchange="cambiarFoto(event)" />
+
+      <div class="text-center md:text-left">
         <h2 class="text-2xl font-bold">¡Hola, Estudiante!</h2>
         <p class="text-white/80 text-sm">Sigue así, cada día estás más cerca de dominar tus materias.</p>
+        <p class="text-xs text-white/60 mt-2">Haz clic en la foto para cambiarla</p>
       </div>
     </div>
 
+    <!-- ESTADÍSTICAS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="bg-white p-6 rounded-3xl shadow-sm border border-[#E5E1DA] text-center">
         <p class="text-4xl mb-2">📚</p>
@@ -47,6 +63,7 @@
   </main>
 
   <script>
+    // Cargar estadísticas
     const historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
     let totalTarjetas = 0;
     historial.forEach(kit => {
@@ -54,6 +71,25 @@
     });
     document.getElementById('statKits').textContent = historial.length;
     document.getElementById('statTarjetas').textContent = totalTarjetas;
+
+    // Cargar foto guardada
+    const fotoGuardada = localStorage.getItem('fotoPerfil');
+    if (fotoGuardada) {
+      document.getElementById('fotoPerfil').innerHTML = `<img src="${fotoGuardada}" class="w-full h-full object-cover">`;
+    }
+
+    function cambiarFoto(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const base64 = event.target.result;
+        localStorage.setItem('fotoPerfil', base64); // Guardamos la imagen
+        document.getElementById('fotoPerfil').innerHTML = `<img src="${base64}" class="w-full h-full object-cover">`;
+      };
+      reader.readAsDataURL(file);
+    }
 
     function compartirProgreso() {
       const texto = `¡Estoy estudiando con AprendeYa! 🚀 Ya he creado ${historial.length} kits y repasado ${totalTarjetas} tarjetas.`;
