@@ -7,6 +7,8 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
 (async function init() {
   const texto = localStorage.getItem('material');
   const loadingDiv = document.getElementById('loading');
+  const loadingText = document.getElementById('loadingText');
+  const btnError = document.getElementById('btnError');
   
   if (!texto) {
     loadingDiv.innerHTML = '<p class="text-sm text-[#8A8580]">No hay material. <a href="index.html" class="underline">Sube un archivo</a>.</p>';
@@ -29,7 +31,11 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
     loadingDiv.classList.add('hidden');
     cambiarTab('mazo');
   } catch (e) {
-    loadingDiv.innerHTML = `<p class="text-sm text-red-600">Error: ${e.message}</p>`;
+    // ADVERTENCIA DE ERROR
+    loadingText.textContent = "¡Ups! Algo salió mal al conectar con la IA.";
+    loadingText.classList.add('text-red-500');
+    document.querySelector('#loading .animate-spin').classList.add('hidden');
+    btnError.classList.remove('hidden');
   }
 })();
 
@@ -77,7 +83,6 @@ function calificar(nivel) {
 }
 
 async function cambiarTab(tab) {
-  // --- ESTILOS BARRA LATERAL (PC) ---
   const clasesNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]";
   const activoNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition";
   
@@ -93,7 +98,6 @@ async function cambiarTab(tab) {
     if (tab === 'quiz') document.getElementById('nav-quiz').className = activoNav;
   }
 
-  // --- ESTILOS BARRA INFERIOR (MÓVIL) ---
   const clasesMob = "flex flex-col items-center p-2 text-[#8A8580]";
   const activoMob = "flex flex-col items-center p-2 text-[#1A1A1A]";
   
@@ -109,7 +113,6 @@ async function cambiarTab(tab) {
     if (tab === 'quiz') document.getElementById('mob-quiz').className = activoMob;
   }
 
-  // Actualizar título del header móvil
   const headerTitle = document.getElementById('headerTitle');
   if(headerTitle) {
     if(tab === 'mazo') headerTitle.textContent = "Mazo";
@@ -118,14 +121,12 @@ async function cambiarTab(tab) {
     if(tab === 'quiz') headerTitle.textContent = "Prueba";
   }
 
-  // Ocultar todo
   document.getElementById('mazoContainer').classList.add('hidden');
   document.getElementById('mazoContainer').classList.remove('flex');
   document.getElementById('listaContainer').classList.add('hidden');
   document.getElementById('guiaContainer').classList.add('hidden');
   document.getElementById('quizContainer').classList.add('hidden');
 
-  // Mostrar el seleccionado
   if (tab === 'mazo') {
     document.getElementById('mazoContainer').classList.remove('hidden');
     document.getElementById('mazoContainer').classList.add('flex');
@@ -155,7 +156,7 @@ async function cambiarTab(tab) {
         material.guia = nuevaGuia;
         localStorage.setItem('materialGenerado', JSON.stringify(material));
       } catch (e) {
-        guiaHTML.innerHTML = '<p class="text-red-500">Hubo un error generando la guía. Intenta de nuevo.</p>';
+        guiaHTML.innerHTML = '<p class="text-red-500">Hubo un error generando la guía. Por favor, recarga la página.</p>';
         return;
       }
     }
@@ -228,40 +229,4 @@ async function iniciarQuiz() {
 
 function responderQuiz(qIdx, opIdx) {
   const q = material.quiz[qIdx];
-  const botones = document.querySelectorAll(`#opciones-${qIdx} button`);
-  const exp = document.getElementById(`exp-${qIdx}`);
-
-  botones.forEach((b, i) => {
-    b.disabled = true;
-    if (i === q.correcta) b.className = 'w-full text-left px-5 py-3 rounded-xl border-2 border-green-500 bg-green-50 text-sm font-medium';
-    else if (i === opIdx) b.className = 'w-full text-left px-5 py-3 rounded-xl border-2 border-red-400 bg-red-50 text-sm';
-    else b.className = 'w-full text-left px-5 py-3 rounded-xl border border-[#E5E1DA] text-sm opacity-50';
-  });
-
-  exp.textContent = '💡 ' + q.explicacion;
-  exp.classList.remove('hidden');
-}
-
-function editarTarjeta(index) {
-  const tarjeta = material.flashcards[index];
-  const nuevaPregunta = prompt("Edita la pregunta:", tarjeta.pregunta);
-  if (nuevaPregunta === null) return;
-  
-  const nuevaRespuesta = prompt("Edita la respuesta:", tarjeta.respuesta);
-  if (nuevaRespuesta === null) return;
-
-  material.flashcards[index].pregunta = nuevaPregunta;
-  material.flashcards[index].respuesta = nuevaRespuesta;
-  
-  localStorage.setItem('materialGenerado', JSON.stringify(material));
-  
-  const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
-  let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
-  const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
-  if (kitIndex !== -1) {
-    historial[kitIndex].material = material;
-    localStorage.setItem('historialKits', JSON.stringify(historial));
-  }
-
-  cambiarTab('lista');
-}
+  const botones = document.querySelectorAll
