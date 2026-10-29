@@ -37,7 +37,7 @@
       
       <div class="h-px bg-[#E5E1DA] my-4"></div>
       
-      <!-- ENLACES MOVIDOS AQUÍ -->
+      <!-- ENLACES INFORMATIVOS -->
       <button onclick="abrirModalInfo('sobre')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left">
         <span class="text-lg">ℹ️</span> Sobre nosotros
       </button>
@@ -47,6 +47,13 @@
       <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left">
         <span class="text-lg">✉️</span> Contacto
       </button>
+
+      <!-- BOTÓN DE REGISTRO EN LA BARRA LATERAL -->
+      <div class="mt-6">
+        <button id="btnSidebarUser" onclick="abrirModalRegistro()" class="w-full bg-[#1A1A1A] text-white text-sm font-semibold px-4 py-3 rounded-xl hover:bg-opacity-80 transition shadow-md flex items-center justify-center gap-2">
+          <span class="text-lg">✨</span> Registrar usuario
+        </button>
+      </div>
     </div>
 
     <div class="p-4 m-4 bg-[#F7F5F2] rounded-2xl border border-[#E5E1DA]">
@@ -58,16 +65,15 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 md:ml-64 flex flex-col relative pb-20 md:pb-0">
     
-    <header class="flex items-center justify-between px-6 py-4 bg-white border-b border-[#E5E1DA]">
-      <div class="flex items-center gap-2 md:hidden">
+    <!-- HEADER (Solo móvil, sin botones extra) -->
+    <header class="flex items-center justify-between px-6 py-4 bg-white border-b border-[#E5E1DA] md:hidden">
+      <div class="flex items-center gap-2">
         <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-white font-bold">A</div>
         <span class="font-extrabold text-lg">AprendeYa</span>
       </div>
-      <div class="hidden md:block"></div>
-      
-      <!-- Botón dinámico: Registro o Perfil -->
-      <button id="btnHeaderUser" onclick="abrirModalRegistro()" class="bg-[#1A1A1A] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-opacity-80 transition shadow-md">
-        Registrar usuario
+      <!-- En móvil, el botón de registro va aquí -->
+      <button onclick="abrirModalRegistro()" class="bg-[#1A1A1A] text-white text-xs font-semibold px-4 py-2 rounded-full">
+        Registrar
       </button>
     </header>
 
@@ -90,13 +96,11 @@
 
       <div class="w-full max-w-3xl bg-white p-5 md:p-8 rounded-3xl shadow-xl border border-[#E5E1DA] text-left relative z-10">
         
-        <!-- SELECTOR DE OPCIONES (SUBIR, TEXTO, YOUTUBE) -->
         <div class="flex gap-2 mb-4 border-b border-[#E5E1DA] pb-2 text-sm font-semibold text-[#8A8580]">
           <button onclick="mostrarOpcion('texto')" id="tab-texto" class="text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition">Escribir Texto</button>
           <button onclick="mostrarOpcion('youtube')" id="tab-youtube" class="hover:text-[#1A1A1A] pb-2 px-2 transition">Link de YouTube</button>
         </div>
 
-        <!-- OPCIÓN 1: TEXTO / ARCHIVO -->
         <div id="opcionTexto">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
             <label class="font-bold text-lg md:text-xl text-[#1A1A1A] flex items-center gap-2"><span class="text-2xl">📚</span> Crea tu kit</label>
@@ -110,7 +114,6 @@
           <textarea id="textInput" rows="4" placeholder="O pega/escribe tu texto aquí..." class="w-full bg-[#F7F5F2] border border-[#E5E1DA] rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition resize-none mb-4"></textarea>
         </div>
 
-        <!-- OPCIÓN 2: YOUTUBE -->
         <div id="opcionYoutube" class="hidden">
           <label class="font-bold text-lg md:text-xl text-[#1A1A1A] flex items-center gap-2 mb-4"><span class="text-2xl">📺</span> Pega el link de YouTube</label>
           <input type="url" id="youtubeInput" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-[#F7F5F2] border border-[#E5E1DA] rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition mb-2">
@@ -166,7 +169,6 @@
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     
-    // Frases motivadoras
     const frases = [
       "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
       "No te preocupes por los fracasos, preocúpate por las oportunidades que pierdes cuando no lo intentas.",
@@ -187,17 +189,17 @@
     // Lógica de Usuario
     function actualizarInterfazUsuario() {
       const usuario = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
-      const btn = document.getElementById('btnHeaderUser');
+      const btnSidebar = document.getElementById('btnSidebarUser');
       
       let contadorBase = 1204;
       if (usuario) contadorBase++;
       document.getElementById('contadorUsuarios').textContent = contadorBase;
 
-      if (usuario) {
-        btn.textContent = `Hola, ${usuario.nombre.split(' ')[0]}`;
-        btn.onclick = () => window.location.href = 'perfil.html';
-        btn.classList.remove('bg-[#1A1A1A]');
-        btn.classList.add('bg-blue-600');
+      if (usuario && btnSidebar) {
+        btnSidebar.textContent = `Hola, ${usuario.nombre.split(' ')[0]}`;
+        btnSidebar.onclick = () => window.location.href = 'perfil.html';
+        btnSidebar.classList.remove('bg-[#1A1A1A]');
+        btnSidebar.classList.add('bg-blue-600');
       }
     }
     actualizarInterfazUsuario();
@@ -214,7 +216,7 @@
       actualizarInterfazUsuario();
     }
 
-    // Interfaz de Pestañas (Texto vs YouTube)
+    // Interfaz de Pestañas
     function mostrarOpcion(tipo) {
       const tabTexto = document.getElementById('tab-texto');
       const tabYoutube = document.getElementById('tab-youtube');
