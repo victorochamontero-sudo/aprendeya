@@ -41,7 +41,6 @@ async function generarMaterial(texto) {
     return demoMaterial();
   }
 
-  // Llamada a Groq (Modelo ACTUALIZADO a openai/gpt-oss-20b)
   const url = 'https://api.groq.com/openai/v1/chat/completions';
   
   const res = await fetch(url, {
@@ -64,15 +63,23 @@ async function generarMaterial(texto) {
   }
 
   const data = await res.json();
+  
+  // 🛠️ ARREGLO: Limpiamos el JSON por si Groq añade texto extra
   const contenido = data.choices[0].message.content;
-  const material = JSON.parse(contenido);
+  let jsonLimpio = contenido.trim();
+  const primerLlave = jsonLimpio.indexOf('{');
+  const ultimaLlave = jsonLimpio.lastIndexOf('}');
+  if (primerLlave !== -1 && ultimaLlave !== -1) {
+      jsonLimpio = jsonLimpio.substring(primerLlave, ultimaLlave + 1);
+  }
+  
+  const material = JSON.parse(jsonLimpio);
   
   localStorage.setItem('materialGenerado', JSON.stringify(material));
   localStorage.setItem('textoGenerado', texto);
   return material;
 }
 
-// ---------- MODO DEMO ----------
 function demoMaterial() {
   return {
     flashcards: [
