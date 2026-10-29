@@ -29,16 +29,15 @@ TEXTO:
 `;
 
 async function generarMaterial(texto) {
-  // Cache: si ya generamos material para este texto, lo reutilizamos
   const cache = localStorage.getItem('materialGenerado');
   const textoAnterior = localStorage.getItem('textoGenerado');
 
   if (cache && textoAnterior === texto) {
-    try { return JSON.parse(cache); } catch (e) { /* ignora cache corrupta */ }
+    try { return JSON.parse(cache); } catch (e) { }
   }
 
-  // Llamada a Google Gemini
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+  // Llamada a Google Gemini (ACTUALIZADO A LA VERSIÓN 3.8)
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_KEY}`;
   
   const res = await fetch(url, {
     method: 'POST',
@@ -66,7 +65,7 @@ async function generarMaterial(texto) {
   return material;
 }
 
-// ---------- MODO DEMO (por si falla la clave) ----------
+// ---------- MODO DEMO ----------
 function demoMaterial() {
   return {
     flashcards: [
