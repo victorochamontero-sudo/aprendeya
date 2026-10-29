@@ -1,5 +1,6 @@
 const GROQ_KEY = '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';
 
+// Subimos a 8 flashcards y 5 preguntas para que tengas buen material desde el inicio
 const PROMPT_MATERIAL = `Eres un experto en ciencias cognitivas del aprendizaje.
 A partir del siguiente texto, genera material de estudio.
 Devuelve SOLO un JSON válido con esta estructura, sin texto extra:
@@ -7,7 +8,7 @@ Devuelve SOLO un JSON válido con esta estructura, sin texto extra:
   "flashcards": [ { "pregunta": "...", "respuesta": "..." } ],
   "quiz": [ { "pregunta": "...", "opciones": ["A", "B", "C", "D"], "correcta": 0, "explicacion": "..." } ]
 }
-Reglas: 5 flashcards y 3 preguntas de quiz. Evalúa comprensión. En español.
+Reglas: 8 flashcards y 5 preguntas de quiz. Evalúa comprensión. En español.
 
 TEXTO:
 `;
@@ -41,7 +42,6 @@ async function generarMaterial(texto) {
     if (p1 !== -1 && p2 !== -1) jsonLimpio = jsonLimpio.substring(p1, p2 + 1);
     const material = JSON.parse(jsonLimpio);
 
-    // La guía se generará después, pero ponemos un texto por defecto
     material.guia = "Haz clic en el botón para generar tu guía de estudio personalizada.";
 
     localStorage.setItem('materialGenerado', JSON.stringify(material));
@@ -79,9 +79,10 @@ ${texto}`;
 
 async function generarPreguntasExtra(texto, cantidadFaltante) {
   if (cantidadFaltante <= 0) return [];
+  
   const PROMPT_EXTRA = `A partir del siguiente texto, genera ${cantidadFaltante} preguntas de opción múltiple ADICIONALES.
 Devuelve SOLO un JSON válido: { "quiz": [ { "pregunta": "...", "opciones": ["A", "B", "C", "D"], "correcta": 0, "explicacion": "..." } ] }
-TEXTO: ${texto}`;
+En español. TEXTO: ${texto}`;
 
   const url = 'https://api.groq.com/openai/v1/chat/completions';
   const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` };
@@ -94,6 +95,7 @@ TEXTO: ${texto}`;
       temperature: 0.5, response_format: { type: 'json_object' }
     })
   });
+  
   if (!res.ok) throw new Error('Error extra');
   const data = await res.json();
   let jsonLimpio = data.choices[0].message.content.trim();
