@@ -37,55 +37,39 @@
       
       <div class="h-px bg-[#E5E1DA] my-4"></div>
       
-      <button onclick="abrirModalInfo('sobre')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left">
-        <span class="text-lg">ℹ️</span> Sobre nosotros
-      </button>
-      <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left">
-        <span class="text-lg">💡</span> Recomendaciones
-      </button>
-      <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left">
-        <span class="text-lg">✉️</span> Contacto
-      </button>
+      <button onclick="abrirModalInfo('sobre')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">ℹ️</span> Sobre nosotros</button>
+      <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">💡</span> Recomendaciones</button>
+      <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">✉️</span> Contacto</button>
 
       <div class="mt-6">
-        <button id="btnSidebarUser" onclick="abrirModalRegistro()" class="w-full bg-[#1A1A1A] text-white text-sm font-semibold px-4 py-3 rounded-xl hover:bg-opacity-80 transition shadow-md flex items-center justify-center gap-2">
-          <span class="text-lg">✨</span> Registrar usuario
+        <button id="btnSidebarUser" onclick="abrirModalLogin()" class="w-full bg-[#1A1A1A] text-white text-sm font-semibold px-4 py-3 rounded-xl hover:bg-opacity-80 transition shadow-md flex items-center justify-center gap-2">
+          <span class="text-lg">✨</span> Ingresar / Registrarse
         </button>
       </div>
     </div>
 
-    <!-- BOTÓN COMPARTIR Y FRASE DEL DÍA -->
     <div class="p-4 m-4 bg-[#F7F5F2] rounded-2xl border border-[#E5E1DA]">
       <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2">Frase del día</p>
       <p id="fraseDiaria" class="text-sm font-medium text-[#1A1A1A] italic leading-relaxed mb-4">Cargando...</p>
-      
       <button onclick="compartirApp()" class="w-full flex items-center justify-center gap-2 bg-white border border-[#D6D1CA] text-[#1A1A1A] text-sm font-semibold px-3 py-2 rounded-lg hover:bg-[#E5E1DA] transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-        Compartir App
+        🔗 Compartir App
       </button>
     </div>
   </aside>
 
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 md:ml-64 flex flex-col relative pb-20 md:pb-0">
-    
     <header class="flex items-center justify-between px-6 py-4 bg-white border-b border-[#E5E1DA] md:hidden">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-white font-bold">A</div>
         <span class="font-extrabold text-lg">AprendeYa</span>
       </div>
-      <button onclick="abrirModalRegistro()" class="bg-[#1A1A1A] text-white text-xs font-semibold px-4 py-2 rounded-full">
-        Registrar
-      </button>
+      <button onclick="abrirModalLogin()" class="bg-[#1A1A1A] text-white text-xs font-semibold px-4 py-2 rounded-full">Ingresar</button>
     </header>
 
     <div class="flex-1 flex flex-col items-center justify-center text-center px-6 pt-8 pb-24 relative overflow-hidden">
-      
       <div class="mb-6 flex items-center gap-2 text-xs font-bold text-green-700 bg-green-100 px-4 py-1.5 rounded-full">
-        <span class="relative flex h-3 w-3">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-        </span>
+        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
         <span id="contadorUsuarios">1.204</span> estudiantes ya están aprendiendo
       </div>
 
@@ -97,7 +81,6 @@
       </div>
 
       <div class="w-full max-w-3xl bg-white p-5 md:p-8 rounded-3xl shadow-xl border border-[#E5E1DA] text-left relative z-10">
-        
         <div class="flex gap-2 mb-4 border-b border-[#E5E1DA] pb-2 text-sm font-semibold text-[#8A8580]">
           <button onclick="mostrarOpcion('texto')" id="tab-texto" class="text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition">Escribir Texto</button>
           <button onclick="mostrarOpcion('youtube')" id="tab-youtube" class="hover:text-[#1A1A1A] pb-2 px-2 transition">Link de YouTube</button>
@@ -108,9 +91,7 @@
             <label class="font-bold text-lg md:text-xl text-[#1A1A1A] flex items-center gap-2"><span class="text-2xl">📚</span> Crea tu kit</label>
             <div>
               <input type="file" id="fileInput" accept=".pdf,.txt,.docx" class="hidden" onchange="handleFile(event)" />
-              <button onclick="document.getElementById('fileInput').click()" class="text-sm bg-white text-[#1A1A1A] border-2 border-[#1A1A1A] px-4 py-2 rounded-xl hover:bg-[#F7F5F2] transition font-semibold flex items-center gap-2">
-                Subir Archivo (PDF/Word)
-              </button>
+              <button onclick="document.getElementById('fileInput').click()" class="text-sm bg-white text-[#1A1A1A] border-2 border-[#1A1A1A] px-4 py-2 rounded-xl hover:bg-[#F7F5F2] transition font-semibold flex items-center gap-2">Subir Archivo (PDF/Word)</button>
             </div>
           </div>
           <textarea id="textInput" rows="4" placeholder="O pega/escribe tu texto aquí..." class="w-full bg-[#F7F5F2] border border-[#E5E1DA] rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition resize-none mb-4"></textarea>
@@ -139,24 +120,33 @@
     </div>
   </div>
 
-  <!-- MODAL DE REGISTRO -->
-  <div id="modalRegistro" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
+  <!-- MODAL DE LOGIN / REGISTRO -->
+  <div id="modalLogin" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
-      <button onclick="cerrarModalRegistro()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black transition">×</button>
+      <button onclick="cerrarModalLogin()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black transition">×</button>
 
-      <h2 class="text-2xl font-bold text-center mb-1">Crea tu cuenta gratis</h2>
-      <p class="text-sm text-[#8A8580] text-center mb-6">Regístrate para crear kits ilimitados</p>
+      <!-- Pestañas para alternar -->
+      <div class="flex border-b border-[#E5E1DA] mb-6">
+        <button onclick="cambiarAuthTab('login')" id="tab-login" class="flex-1 pb-3 text-sm font-bold text-[#1A1A1A] border-b-2 border-[#1A1A1A] transition">Ingresar</button>
+        <button onclick="cambiarAuthTab('registro')" id="tab-registro" class="flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition">Crear Cuenta</button>
+      </div>
 
-      <form onsubmit="event.preventDefault(); registrarUsuario();">
-        <input type="text" id="regNombre" placeholder="Nombre completo" required
-          class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
-        <input type="email" id="regEmail" placeholder="Correo electrónico" required
-          class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
-        <input type="password" placeholder="Contraseña" required
-          class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-4 text-sm focus:outline-none focus:border-[#1A1A1A]" />
-        <button type="submit" class="w-full bg-[#1A1A1A] text-white font-semibold py-3 rounded-xl hover:bg-opacity-80 transition">
-          Crear cuenta y empezar
-        </button>
+      <!-- Formulario Ingresar -->
+      <form id="form-login" onsubmit="event.preventDefault(); iniciarSesion();">
+        <input type="email" id="loginEmail" placeholder="Correo electrónico" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <input type="password" id="loginPassword" placeholder="Contraseña" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-2 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <div class="text-right mb-4">
+          <a href="#" onclick="recuperarPassword(event)" class="text-xs text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
+        </div>
+        <button type="submit" class="w-full bg-[#1A1A1A] text-white font-semibold py-3 rounded-xl hover:bg-opacity-80 transition">Ingresar</button>
+      </form>
+
+      <!-- Formulario Registro -->
+      <form id="form-registro" class="hidden" onsubmit="event.preventDefault(); registrarUsuario();">
+        <input type="text" id="regNombre" placeholder="Nombre completo" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <input type="email" id="regEmail" placeholder="Correo electrónico" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <input type="password" id="regPassword" placeholder="Contraseña" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-4 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <button type="submit" class="w-full bg-[#1A1A1A] text-white font-semibold py-3 rounded-xl hover:bg-opacity-80 transition">Crear cuenta</button>
       </form>
     </div>
   </div>
@@ -206,57 +196,69 @@
     }
     actualizarInterfazUsuario();
 
+    // --- AUTENTICACIÓN ---
+    function cambiarAuthTab(tab) {
+      const tabLogin = document.getElementById('tab-login');
+      const tabRegistro = document.getElementById('tab-registro');
+      const formLogin = document.getElementById('form-login');
+      const formRegistro = document.getElementById('form-registro');
+
+      if (tab === 'login') {
+        tabLogin.className = 'flex-1 pb-3 text-sm font-bold text-[#1A1A1A] border-b-2 border-[#1A1A1A] transition';
+        tabRegistro.className = 'flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition';
+        formLogin.classList.remove('hidden');
+        formRegistro.classList.add('hidden');
+      } else {
+        tabLogin.className = 'flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition';
+        tabRegistro.className = 'flex-1 pb-3 text-sm font-bold text-[#1A1A1A] border-b-2 border-[#1A1A1A] transition';
+        formLogin.classList.add('hidden');
+        formRegistro.classList.remove('hidden');
+      }
+    }
+
     function registrarUsuario() {
       const nombre = document.getElementById('regNombre').value;
       const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
       
-      const usuario = { nombre, email };
+      const usuario = { nombre, email, password };
       localStorage.setItem('usuarioAprendeYa', JSON.stringify(usuario));
       
-      alert('¡Registro exitoso! Ya puedes crear kits ilimitados.');
-      cerrarModalRegistro();
+      alert('¡Registro exitoso! Bienvenido a AprendeYa.');
+      cerrarModalLogin();
       actualizarInterfazUsuario();
     }
 
-    function mostrarOpcion(tipo) {
-      const tabTexto = document.getElementById('tab-texto');
-      const tabYoutube = document.getElementById('tab-youtube');
-      const opcionTexto = document.getElementById('opcionTexto');
-      const opcionYoutube = document.getElementById('opcionYoutube');
+    function iniciarSesion() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
 
-      if (tipo === 'texto') {
-        tabTexto.className = 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition';
-        tabYoutube.className = 'hover:text-[#1A1A1A] pb-2 px-2 transition';
-        opcionTexto.classList.remove('hidden');
-        opcionYoutube.classList.add('hidden');
+      if (usuarioGuardado && usuarioGuardado.email === email && usuarioGuardado.password === password) {
+        alert(`¡Hola de nuevo, ${usuarioGuardado.nombre}!`);
+        cerrarModalLogin();
+        actualizarInterfazUsuario();
       } else {
-        tabTexto.className = 'hover:text-[#1A1A1A] pb-2 px-2 transition';
-        tabYoutube.className = 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition';
-        opcionTexto.classList.add('hidden');
-        opcionYoutube.classList.remove('hidden');
+        alert('Correo o contraseña incorrectos. Intenta de nuevo.');
       }
     }
 
-    // --- FUNCIÓN PARA COMPARTIR LA APP ---
-    function compartirApp() {
-      const texto = "¡Estoy estudiando con AprendeYa! 🚀 Sube tus apuntes y deja que la IA te cree tarjetas y pruebas. Pruébalo gratis aquí:";
-      const url = "https://victorochamontero-sudo.github.io/aprendeya/";
-
-      if (navigator.share) {
-        navigator.share({
-          title: 'AprendeYa - Tu compañero de estudio',
-          text: texto,
-          url: url
-        }).catch(console.error);
+    function recuperarPassword(e) {
+      e.preventDefault();
+      const email = prompt("Ingresa el correo con el que te registraste:");
+      const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
+      
+      if (usuarioGuardado && usuarioGuardado.email === email) {
+        alert(`Tu contraseña es: ${usuarioGuardado.password}. (Por seguridad, en producción se enviaría un correo).`);
       } else {
-        // Si el navegador no soporta compartir (PC), copiamos al portapapeles
-        navigator.clipboard.writeText(`${texto} ${url}`);
-        alert('¡Enlace copiado al portapapeles! Compártelo con tus amigos.');
+        alert('No encontramos ninguna cuenta con ese correo.');
       }
     }
 
-    function abrirModalRegistro() { document.getElementById('modalRegistro').classList.remove('hidden'); document.getElementById('modalRegistro').classList.add('flex'); }
-    function cerrarModalRegistro() { document.getElementById('modalRegistro').classList.add('hidden'); document.getElementById('modalRegistro').classList.remove('flex'); }
+    // --- MODALES ---
+    function abrirModalLogin() { document.getElementById('modalLogin').classList.remove('hidden'); document.getElementById('modalLogin').classList.add('flex'); }
+    function cerrarModalLogin() { document.getElementById('modalLogin').classList.add('hidden'); document.getElementById('modalLogin').classList.remove('flex'); }
     
     function abrirModalInfo(tipo) {
       const modal = document.getElementById('modalInfo');
@@ -268,6 +270,29 @@
       modal.classList.remove('hidden'); modal.classList.add('flex');
     }
     function cerrarModalInfo() { document.getElementById('modalInfo').classList.add('hidden'); document.getElementById('modalInfo').classList.remove('flex'); }
+
+    function compartirApp() {
+      const texto = "¡Estoy estudiando con AprendeYa! 🚀 Sube tus apuntes y deja que la IA te cree tarjetas y pruebas. Pruébalo gratis aquí:";
+      const url = "https://victorochamontero-sudo.github.io/aprendeya/";
+      if (navigator.share) { navigator.share({ title: 'AprendeYa', text: texto, url: url }).catch(console.error); } 
+      else { navigator.clipboard.writeText(`${texto} ${url}`); alert('¡Enlace copiado al portapapeles!'); }
+    }
+
+    function mostrarOpcion(tipo) {
+      const tabTexto = document.getElementById('tab-texto');
+      const tabYoutube = document.getElementById('tab-youtube');
+      const opcionTexto = document.getElementById('opcionTexto');
+      const opcionYoutube = document.getElementById('opcionYoutube');
+      if (tipo === 'texto') {
+        tabTexto.className = 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition';
+        tabYoutube.className = 'hover:text-[#1A1A1A] pb-2 px-2 transition';
+        opcionTexto.classList.remove('hidden'); opcionYoutube.classList.add('hidden');
+      } else {
+        tabTexto.className = 'hover:text-[#1A1A1A] pb-2 px-2 transition';
+        tabYoutube.className = 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition';
+        opcionTexto.classList.add('hidden'); opcionYoutube.classList.remove('hidden');
+      }
+    }
   </script>
   <script src="app.js"></script>
 </body>
