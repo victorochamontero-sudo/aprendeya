@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Memorizar | AprendeYa</title>
+  <title>Estudiar | AprendeYa</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -13,60 +13,50 @@
     .card-inner.flipped { transform: rotateY(180deg); }
     .card-front, .card-back { backface-visibility: hidden; position: absolute; width: 100%; height: 100%; border-radius: 1.5rem; }
     .card-back { transform: rotateY(180deg); background-color: #F7F5F2; border: 2px solid #1A1A1A; }
+    
+    .guia-content h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #1A1A1A; }
+    .guia-content h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.5rem; color: #1A1A1A; }
+    .guia-content h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; margin-top: 1rem; color: #1A1A1A; }
+    .guia-content p { margin-bottom: 1rem; line-height: 1.6; }
+    .guia-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+    .guia-content li { margin-bottom: 0.5rem; }
+    .guia-content strong { font-weight: 700; color: #1A1A1A; }
   </style>
 </head>
 <body class="bg-[#F7F5F2] min-h-screen flex flex-col">
 
-  <!-- HEADER -->
   <header class="bg-white border-b border-[#E5E1DA] px-6 py-4 flex items-center justify-between">
     <a href="index.html" onclick="localStorage.removeItem('material'); localStorage.removeItem('materialGenerado');" class="text-sm font-medium hover:opacity-60 flex items-center gap-2">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
       Atrás
     </a>
-    <h1 class="text-lg font-bold">Memorizar</h1>
+    <h1 class="text-lg font-bold">Kit de Estudio</h1>
     <div class="flex gap-2">
-      <button onclick="cambiarTab('lista')" id="tab-lista" class="px-4 py-1.5 rounded-full text-sm font-semibold border border-[#D6D1CA] hover:bg-gray-50">Lista</button>
+      <button onclick="cambiarTab('guia')" id="tab-guia" class="px-4 py-1.5 rounded-full text-sm font-semibold border border-[#D6D1CA] hover:bg-gray-50">Guía</button>
       <button onclick="cambiarTab('mazo')" id="tab-mazo" class="px-4 py-1.5 rounded-full text-sm font-semibold bg-[#1A1A1A] text-white">Mazo</button>
-      <button onclick="cambiarTab('juegos')" id="tab-juegos" class="px-4 py-1.5 rounded-full text-sm font-semibold border border-[#D6D1CA] hover:bg-gray-50">Juegos</button>
     </div>
   </header>
 
-  <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 flex flex-col items-center justify-center p-6 relative">
-    
     <div id="loading" class="text-center py-24">
       <div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div>
-      <p class="text-sm text-[#8A8580]">Preparando tus tarjetas...</p>
+      <p class="text-sm text-[#8A8580]">Preparando tu material...</p>
     </div>
 
-    <!-- MAZO DE ESTUDIO -->
+    <!-- MAZO -->
     <div id="mazoContainer" class="hidden w-full max-w-3xl flex flex-col items-center">
-      
-      <!-- Barra de progreso -->
       <div class="w-full flex justify-between items-center mb-8 bg-white px-6 py-3 rounded-2xl shadow-sm border border-[#E5E1DA]">
-        <div class="text-center">
-          <p id="stat-aprendiendo" class="text-lg font-bold text-red-500">0</p>
-          <p class="text-xs text-[#8A8580]">Aprendiendo</p>
-        </div>
-        <div class="text-center border-l border-r border-[#E5E1DA] px-8">
-          <p id="stat-revisando" class="text-lg font-bold text-yellow-500">0</p>
-          <p class="text-xs text-[#8A8580]">Revisando</p>
-        </div>
-        <div class="text-center">
-          <p id="stat-dominado" class="text-lg font-bold text-green-500">0</p>
-          <p class="text-xs text-[#8A8580]">Dominado</p>
-        </div>
+        <div class="text-center"><p id="stat-aprendiendo" class="text-lg font-bold text-red-500">0</p><p class="text-xs text-[#8A8580]">Aprendiendo</p></div>
+        <div class="text-center border-l border-r border-[#E5E1DA] px-8"><p id="stat-revisando" class="text-lg font-bold text-yellow-500">0</p><p class="text-xs text-[#8A8580]">Revisando</p></div>
+        <div class="text-center"><p id="stat-dominado" class="text-lg font-bold text-green-500">0</p><p class="text-xs text-[#8A8580]">Dominado</p></div>
       </div>
 
-      <!-- Tarjeta Interactiva -->
-      <div class="card-flip w-full h-[300px] cursor-pointer mb-8" onclick="voltearTarjeta()">
+      <div class="card-flip w-full h-[300px] cursor-pointer mb-6" onclick="voltearTarjeta()">
         <div id="tarjeta" class="card-inner w-full h-full relative">
-          <!-- Frente -->
           <div class="card-front bg-[#E8E6ED] flex flex-col items-center justify-center p-8 text-center shadow-sm border border-[#D6D1CA]">
             <p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Pregunta</p>
             <p id="texto-pregunta" class="text-3xl font-semibold text-[#1A1A1A]"></p>
           </div>
-          <!-- Reverso -->
           <div class="card-back flex flex-col items-center justify-center p-8 text-center">
             <p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Respuesta</p>
             <p id="texto-respuesta" class="text-2xl font-medium text-[#1A1A1A]"></p>
@@ -74,21 +64,22 @@
         </div>
       </div>
 
-      <!-- Botones de Calificación (SRS) -->
-      <div id="botones-calificacion" class="flex gap-4 items-center opacity-0 pointer-events-none transition-opacity duration-300">
+      <button id="btnMostrar" onclick="voltearTarjeta()" class="w-full max-w-sm bg-[#1A1A1A] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-opacity-80 transition mb-6 text-lg flex items-center justify-center gap-2">
+        Mostrar Respuesta
+      </button>
+
+      <div id="botones-calificacion" class="flex gap-4 items-center opacity-0 pointer-events-none transition-opacity duration-300 mt-4">
+        <p class="text-sm font-semibold text-[#8A8580] mr-2">¿Qué tal te fue?</p>
         <button onclick="calificar(0)" class="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center text-2xl shadow-lg transition-transform hover:scale-110">😞</button>
         <button onclick="calificar(1)" class="w-16 h-16 rounded-full bg-yellow-400 hover:bg-yellow-500 text-white flex items-center justify-center text-2xl shadow-lg transition-transform hover:scale-110">😐</button>
         <button onclick="calificar(2)" class="w-16 h-16 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center text-2xl shadow-lg transition-transform hover:scale-110">😊</button>
       </div>
-      
-      <p id="instruccion" class="text-sm text-[#8A8580] mt-6">Haz clic en la tarjeta para ver la respuesta</p>
     </div>
 
-    <!-- VISTA DE LISTA (Oculta por defecto) -->
-    <div id="listaContainer" class="hidden w-full max-w-3xl">
-      <div id="listaTarjetas" class="space-y-4"></div>
+    <!-- GUÍA -->
+    <div id="guiaContainer" class="hidden w-full max-w-4xl bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA]">
+      <div id="guiaTexto" class="guia-content text-[#5A5550]"></div>
     </div>
-
   </main>
 
   <script src="api.js"></script>
