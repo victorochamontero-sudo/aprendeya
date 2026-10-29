@@ -69,7 +69,7 @@
       </div>
     </div>
 
-    <!-- 2. LISTA (Estilo Thea) -->
+    <!-- 2. LISTA -->
     <div id="listaContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-[#E5E1DA]">
       <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A]">Tarjetas de memoria</h2>
       <div id="listaTarjetas" class="space-y-3"></div>
@@ -82,9 +82,21 @@
 
     <!-- 4. QUIZ / PRUEBA -->
     <div id="quizContainer" class="hidden w-full max-w-3xl">
-      <div class="bg-white p-8 rounded-3xl shadow-sm border border-[#E5E1DA] text-center mb-6">
+      <div id="quizSetup" class="bg-white p-8 rounded-3xl shadow-sm border border-[#E5E1DA] text-center mb-6">
         <h2 class="text-2xl font-bold mb-2">Crear prueba</h2>
         <p class="text-sm text-[#8A8580] mb-6">Configura tu examen basado en este kit.</p>
+        
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+          <label class="font-semibold text-sm text-[#1A1A1A]">Número de preguntas:</label>
+          <select id="selectCantidad" class="border border-[#D6D1CA] rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-[#1A1A1A] bg-[#F7F5F2]">
+            <option value="5">5 preguntas</option>
+            <option value="10">10 preguntas</option>
+            <option value="15">15 preguntas</option>
+            <option value="20">20 preguntas</option>
+            <option value="25">25 preguntas</option>
+          </select>
+        </div>
+
         <button onclick="iniciarQuiz()" class="bg-[#1A1A1A] text-white px-8 py-3 rounded-full font-bold hover:bg-opacity-80 transition">Comenzar Prueba</button>
       </div>
       <div id="preguntasQuiz" class="space-y-6"></div>
