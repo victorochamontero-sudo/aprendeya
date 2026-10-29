@@ -230,3 +230,89 @@ async function iniciarQuiz() {
 function responderQuiz(qIdx, opIdx) {
   const q = material.quiz[qIdx];
   const botones = document.querySelectorAll
+function responderQuiz(qIdx, opIdx) {
+  const q = material.quiz[qIdx];
+  const botones = document.querySelectorAll(`#opciones-${qIdx} button`);
+  const exp = document.getElementById(`exp-${qIdx}`);
+
+  botones.forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.correcta) b.className = 'w-full text-left px-5 py-3 rounded-xl border-2 border-green-500 bg-green-50 text-sm font-medium';
+    else if (i === opIdx) b.className = 'w-full text-left px-5 py-3 rounded-xl border-2 border-red-400 bg-red-50 text-sm';
+    else b.className = 'w-full text-left px-5 py-3 rounded-xl border border-[#E5E1DA] text-sm opacity-50';
+  });
+
+  exp.textContent = '💡 ' + q.explicacion;
+  exp.classList.remove('hidden');
+}
+
+function editarTarjeta(index) {
+  const tarjeta = material.flashcards[index];
+  const nuevaPregunta = prompt("Edita la pregunta:", tarjeta.pregunta);
+  if (nuevaPregunta === null) return;
+  
+  const nuevaRespuesta = prompt("Edita la respuesta:", tarjeta.respuesta);
+  if (nuevaRespuesta === null) return;
+
+  material.flashcards[index].pregunta = nuevaPregunta;
+  material.flashcards[index].respuesta = nuevaRespuesta;
+  
+  localStorage.setItem('materialGenerado', JSON.stringify(material));
+  
+  const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
+  let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+  const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
+  if (kitIndex !== -1) {
+    historial[kitIndex].material = material;
+    localStorage.setItem('historialKits', JSON.stringify(historial));
+  }
+
+  cambiarTab('lista');
+}
+
+// --- NUEVA FUNCIÓN PARA GENERAR MÁS TARJETAS ---
+async function pedirMasMaterial() {
+  const btnMas = document.getElementById('btnMas');
+  const textoOriginal = localStorage.getItem('material');
+  
+  if (!textoOriginal) return;
+
+  btnMas.innerHTML = '<div class="inline-block w-4 h-4 border-2 border-[#1A1A1A] border-t-transparent rounded-full animate-spin"></div> Generando más...';
+  btnMas.disabled = true;
+
+  try {
+    const extra = await generarMasMaterial(textoOriginal, material.flashcards, material.quiz);
+    
+    // Añadimos las nuevas a los arrays existentes
+    if (extra.flashcards) {
+      material.flashcards = [...material.flashcards, ...extra.flashcards];
+      mazo = [...mazo, ...extra.flashcards].sort(() => Math.random() - 0.5); // Mezclamos de nuevo
+      stats.aprendiendo += extra.flashcards.length;
+    }
+    
+    if (extra.quiz) {
+      material.quiz = [...(material.quiz || []), ...extra.quiz];
+    }
+
+    // Guardamos en caché y en el historial
+    localStorage.setItem('materialGenerado', JSON.stringify(material));
+    const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
+    let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+    const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
+    if (kitIndex !== -1) {
+      historial[kitIndex].material = material;
+      localStorage.setItem('historialKits', JSON.stringify(historial));
+    }
+
+    // Actualizamos la UI para mostrar las nuevas tarjetas
+    indiceActual = 0; 
+    actualizarUI();
+    alert('¡Se han añadido nuevas tarjetas y preguntas a tu kit!');
+  } catch (error) {
+    console.error(error);
+    alert('Hubo un error al generar más material. Por favor, recarga la página e intenta de nuevo.');
+  } finally {
+    btnMas.innerHTML = '✨ Generar más tarjetas con IA';
+    btnMas.disabled = false;
+  }
+}
