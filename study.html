@@ -21,7 +21,6 @@
 </head>
 <body class="bg-[#F7F5F2] min-h-screen flex">
 
-  <!-- SIDEBAR (PC) -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
     <div class="p-6 flex items-center gap-2 border-b border-[#E5E1DA]">
       <a href="index.html" class="flex items-center gap-2">
@@ -63,6 +62,11 @@
           <div class="text-center"><p id="stat-dominado" class="text-lg font-bold text-green-500">0</p><p class="text-[10px] md:text-xs text-[#8A8580]">Dominado</p></div>
         </div>
 
+        <!-- BOTÓN ESCUCHAR EN EL MAZO -->
+        <button onclick="leerTextoActual()" class="mb-4 text-sm bg-[#E8E6ED] text-[#1A1A1A] font-semibold px-4 py-2 rounded-full hover:bg-[#D6D1CA] transition flex items-center gap-2">
+          🔊 Escuchar Pregunta
+        </button>
+
         <div class="card-flip w-full h-[250px] md:h-[300px] cursor-pointer mb-6" onclick="voltearTarjeta()">
           <div id="tarjeta" class="card-inner w-full h-full relative">
             <div class="card-front bg-[#E8E6ED] flex flex-col items-center justify-center p-6 md:p-8 text-center shadow-sm border border-[#D6D1CA]">
@@ -97,9 +101,12 @@
 
       <!-- 3. GUÍA -->
       <div id="guiaContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA]">
-        <div class="flex gap-2 mb-6 border-b border-[#E5E1DA] pb-4">
-          <button onclick="imprimirGuia('Word')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">📄 Descargar Word</button>
-          <button onclick="imprimirGuia('PDF')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">🖨️ Guardar PDF</button>
+        <div class="flex flex-wrap gap-2 mb-6 border-b border-[#E5E1DA] pb-4">
+          <button onclick="descargarGuiaWord()" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">📄 Descargar Word</button>
+          <button onclick="window.print()" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">🖨️ Guardar PDF</button>
+          <!-- BOTÓN ESCUCHAR GUÍA -->
+          <button onclick="leerGuiaCompleta()" class="text-sm bg-[#E8E6ED] border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#D6D1CA] transition flex items-center gap-2">🔊 Escuchar Guía</button>
+          <button onclick="detenerLectura()" class="text-sm bg-red-50 text-red-600 border border-red-200 font-semibold px-4 py-2 rounded-lg hover:bg-red-100 transition flex items-center gap-2 hidden" id="btnDetenerAudio">⏹️ Detener</button>
         </div>
         <div id="guiaTexto" class="guia-content text-[#5A5550] text-sm md:text-base"></div>
       </div>
