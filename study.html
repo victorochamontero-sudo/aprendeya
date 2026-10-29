@@ -19,89 +19,140 @@
     .guia-content p { margin-bottom: 1rem; line-height: 1.6; }
   </style>
 </head>
-<body class="bg-[#F7F5F2] min-h-screen flex flex-col">
+<body class="bg-[#F7F5F2] min-h-screen flex">
 
-  <header class="bg-white border-b border-[#E5E1DA] px-6 py-4 flex items-center justify-between">
-    <a href="index.html" class="text-sm font-medium hover:opacity-60 flex items-center gap-2">← Atrás</a>
-    <h1 class="text-lg font-bold">Kit de Estudio</h1>
-    <div class="flex gap-2 text-xs sm:text-sm">
-      <button onclick="cambiarTab('guia')" id="tab-guia" class="px-3 py-1.5 rounded-full font-semibold border border-[#D6D1CA] hover:bg-gray-50">Guía</button>
-      <button onclick="cambiarTab('lista')" id="tab-lista" class="px-3 py-1.5 rounded-full font-semibold border border-[#D6D1CA] hover:bg-gray-50">Lista</button>
-      <button onclick="cambiarTab('mazo')" id="tab-mazo" class="px-3 py-1.5 rounded-full font-semibold bg-[#1A1A1A] text-white">Mazo</button>
-      <button onclick="cambiarTab('quiz')" id="tab-quiz" class="px-3 py-1.5 rounded-full font-semibold border border-[#D6D1CA] hover:bg-gray-50">Prueba</button>
-    </div>
-  </header>
-
-  <main class="flex-1 flex flex-col items-center justify-center p-6 relative">
-    <div id="loading" class="text-center py-24">
-      <div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div>
-      <p class="text-sm text-[#8A8580]">Preparando tu material...</p>
+  <!-- SIDEBAR (PC) -->
+  <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
+    <div class="p-6 flex items-center gap-2 border-b border-[#E5E1DA]">
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-white font-bold">A</div>
+        <span class="font-extrabold text-lg">AprendeYa</span>
+      </a>
     </div>
 
-    <!-- 1. MAZO -->
-    <div id="mazoContainer" class="hidden w-full max-w-3xl flex flex-col items-center">
-      <div class="w-full flex justify-between items-center mb-8 bg-white px-6 py-3 rounded-2xl shadow-sm border border-[#E5E1DA]">
-        <div class="text-center"><p id="stat-aprendiendo" class="text-lg font-bold text-red-500">0</p><p class="text-xs text-[#8A8580]">Aprendiendo</p></div>
-        <div class="text-center border-l border-r border-[#E5E1DA] px-8"><p id="stat-revisando" class="text-lg font-bold text-yellow-500">0</p><p class="text-xs text-[#8A8580]">Revisando</p></div>
-        <div class="text-center"><p id="stat-dominado" class="text-lg font-bold text-green-500">0</p><p class="text-xs text-[#8A8580]">Dominado</p></div>
+    <div class="p-4 flex-1 space-y-1">
+      <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-3 mt-2 px-3">Mi Kit</p>
+      
+      <button onclick="cambiarTab('mazo')" id="nav-mazo" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition">
+        <span class="text-lg">🗂️</span> Mazo
+      </button>
+      <button onclick="cambiarTab('lista')" id="nav-lista" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition">
+        <span class="text-lg">📄</span> Lista
+      </button>
+      <button onclick="cambiarTab('guia')" id="nav-guia" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition">
+        <span class="text-lg">📘</span> Guía
+      </button>
+      <button onclick="cambiarTab('quiz')" id="nav-quiz" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition">
+        <span class="text-lg">📝</span> Prueba
+      </button>
+
+      <div class="h-px bg-[#E5E1DA] my-4"></div>
+
+      <a href="perfil.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition">
+        <span class="text-lg">🏆</span> Mi Perfil
+      </a>
+      <a href="index.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition">
+        <span class="text-lg">🏠</span> Inicio
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 md:ml-64 flex flex-col min-h-screen relative pb-20 md:pb-0">
+    
+    <!-- Header superior (Móvil) -->
+    <header class="bg-white border-b border-[#E5E1DA] px-4 py-3 flex items-center justify-between md:hidden sticky top-0 z-40">
+      <a href="index.html" class="text-sm font-medium hover:opacity-60 flex items-center gap-1">← Inicio</a>
+      <h1 class="text-sm font-bold truncate max-w-[200px]" id="headerTitle">Mi Kit</h1>
+      <a href="perfil.html" class="text-xl">🏆</a>
+    </header>
+
+    <div class="flex-1 flex flex-col items-center justify-center p-4 md:p-6 relative">
+      <div id="loading" class="text-center py-24">
+        <div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-sm text-[#8A8580]">Preparando tu material...</p>
       </div>
 
-      <div class="card-flip w-full h-[300px] cursor-pointer mb-6" onclick="voltearTarjeta()">
-        <div id="tarjeta" class="card-inner w-full h-full relative">
-          <div class="card-front bg-[#E8E6ED] flex flex-col items-center justify-center p-8 text-center shadow-sm border border-[#D6D1CA]">
-            <p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Pregunta</p>
-            <p id="texto-pregunta" class="text-3xl font-semibold text-[#1A1A1A]"></p>
+      <!-- 1. MAZO -->
+      <div id="mazoContainer" class="hidden w-full max-w-3xl flex-col items-center">
+        <div class="w-full flex justify-between items-center mb-6 bg-white px-4 md:px-6 py-3 rounded-2xl shadow-sm border border-[#E5E1DA]">
+          <div class="text-center"><p id="stat-aprendiendo" class="text-lg font-bold text-red-500">0</p><p class="text-[10px] md:text-xs text-[#8A8580]">Aprendiendo</p></div>
+          <div class="text-center border-l border-r border-[#E5E1DA] px-4 md:px-8"><p id="stat-revisando" class="text-lg font-bold text-yellow-500">0</p><p class="text-[10px] md:text-xs text-[#8A8580]">Revisando</p></div>
+          <div class="text-center"><p id="stat-dominado" class="text-lg font-bold text-green-500">0</p><p class="text-[10px] md:text-xs text-[#8A8580]">Dominado</p></div>
+        </div>
+
+        <div class="card-flip w-full h-[250px] md:h-[300px] cursor-pointer mb-6" onclick="voltearTarjeta()">
+          <div id="tarjeta" class="card-inner w-full h-full relative">
+            <div class="card-front bg-[#E8E6ED] flex flex-col items-center justify-center p-6 md:p-8 text-center shadow-sm border border-[#D6D1CA]">
+              <p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Pregunta</p>
+              <p id="texto-pregunta" class="text-xl md:text-3xl font-semibold text-[#1A1A1A]"></p>
+            </div>
+            <div class="card-back flex flex-col items-center justify-center p-6 md:p-8 text-center">
+              <p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Respuesta</p>
+              <p id="texto-respuesta" class="text-lg md:text-2xl font-medium text-[#1A1A1A]"></p>
+            </div>
           </div>
-          <div class="card-back flex flex-col items-center justify-center p-8 text-center">
-            <p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Respuesta</p>
-            <p id="texto-respuesta" class="text-2xl font-medium text-[#1A1A1A]"></p>
-          </div>
+        </div>
+
+        <button id="btnMostrar" onclick="voltearTarjeta()" class="w-full max-w-sm bg-[#1A1A1A] text-white font-bold py-3 md:py-4 rounded-xl shadow-lg hover:bg-opacity-80 transition mb-6 text-base md:text-lg">Mostrar Respuesta</button>
+
+        <div id="botones-calificacion" class="flex gap-3 md:gap-4 items-center opacity-0 pointer-events-none transition-opacity duration-300 mt-2 md:mt-4">
+          <button onclick="calificar(0)" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center text-lg md:text-xl shadow-lg">😞</button>
+          <button onclick="calificar(1)" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-yellow-400 hover:bg-yellow-500 text-white flex items-center justify-center text-lg md:text-xl shadow-lg">😐</button>
+          <button onclick="calificar(2)" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center text-lg md:text-xl shadow-lg">😊</button>
         </div>
       </div>
 
-      <button id="btnMostrar" onclick="voltearTarjeta()" class="w-full max-w-sm bg-[#1A1A1A] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-opacity-80 transition mb-6 text-lg">Mostrar Respuesta</button>
-
-      <div id="botones-calificacion" class="flex gap-4 items-center opacity-0 pointer-events-none transition-opacity duration-300 mt-4">
-        <p class="text-sm font-semibold text-[#8A8580] mr-2">¿Qué tal te fue?</p>
-        <button onclick="calificar(0)" class="w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center text-xl shadow-lg">😞</button>
-        <button onclick="calificar(1)" class="w-14 h-14 rounded-full bg-yellow-400 hover:bg-yellow-500 text-white flex items-center justify-center text-xl shadow-lg">😐</button>
-        <button onclick="calificar(2)" class="w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center text-xl shadow-lg">😊</button>
+      <!-- 2. LISTA -->
+      <div id="listaContainer" class="hidden w-full max-w-4xl bg-white p-4 md:p-10 rounded-3xl shadow-sm border border-[#E5E1DA]">
+        <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#1A1A1A]">Tarjetas de memoria</h2>
+        <div id="listaTarjetas" class="space-y-3"></div>
       </div>
-    </div>
 
-    <!-- 2. LISTA -->
-    <div id="listaContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-[#E5E1DA]">
-      <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A]">Tarjetas de memoria</h2>
-      <div id="listaTarjetas" class="space-y-3"></div>
-    </div>
+      <!-- 3. GUÍA -->
+      <div id="guiaContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA]">
+        <div id="guiaTexto" class="guia-content text-[#5A5550] text-sm md:text-base"></div>
+      </div>
 
-    <!-- 3. GUÍA -->
-    <div id="guiaContainer" class="hidden w-full max-w-4xl bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA]">
-      <div id="guiaTexto" class="guia-content text-[#5A5550]"></div>
-    </div>
+      <!-- 4. QUIZ / PRUEBA -->
+      <div id="quizContainer" class="hidden w-full max-w-3xl">
+        <div id="quizSetup" class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-[#E5E1DA] text-center mb-6">
+          <h2 class="text-xl md:text-2xl font-bold mb-2">Crear prueba</h2>
+          <p class="text-xs md:text-sm text-[#8A8580] mb-6">Configura tu examen basado en este kit.</p>
+          
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+            <label class="font-semibold text-xs md:text-sm text-[#1A1A1A]">Número de preguntas:</label>
+            <select id="selectCantidad" class="border border-[#D6D1CA] rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-[#1A1A1A] bg-[#F7F5F2]">
+              <option value="5">5 preguntas</option>
+              <option value="10">10 preguntas</option>
+              <option value="15">15 preguntas</option>
+              <option value="20">20 preguntas</option>
+              <option value="25">25 preguntas</option>
+            </select>
+          </div>
 
-    <!-- 4. QUIZ / PRUEBA -->
-    <div id="quizContainer" class="hidden w-full max-w-3xl">
-      <div id="quizSetup" class="bg-white p-8 rounded-3xl shadow-sm border border-[#E5E1DA] text-center mb-6">
-        <h2 class="text-2xl font-bold mb-2">Crear prueba</h2>
-        <p class="text-sm text-[#8A8580] mb-6">Configura tu examen basado en este kit.</p>
-        
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-          <label class="font-semibold text-sm text-[#1A1A1A]">Número de preguntas:</label>
-          <select id="selectCantidad" class="border border-[#D6D1CA] rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-[#1A1A1A] bg-[#F7F5F2]">
-            <option value="5">5 preguntas</option>
-            <option value="10">10 preguntas</option>
-            <option value="15">15 preguntas</option>
-            <option value="20">20 preguntas</option>
-            <option value="25">25 preguntas</option>
-          </select>
+          <button onclick="iniciarQuiz()" class="bg-[#1A1A1A] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-full font-bold hover:bg-opacity-80 transition text-sm md:text-base">Comenzar Prueba</button>
         </div>
-
-        <button onclick="iniciarQuiz()" class="bg-[#1A1A1A] text-white px-8 py-3 rounded-full font-bold hover:bg-opacity-80 transition">Comenzar Prueba</button>
+        <div id="preguntasQuiz" class="space-y-6"></div>
       </div>
-      <div id="preguntasQuiz" class="space-y-6"></div>
     </div>
   </main>
+
+  <!-- BARRA DE NAVEGACIÓN INFERIOR (Solo Móvil) -->
+  <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-[#E5E1DA] flex justify-around py-2 z-50">
+    <button onclick="cambiarTab('mazo')" id="mob-mazo" class="flex flex-col items-center p-2 text-[#1A1A1A]">
+      <span class="text-xl mb-1">🗂️</span><span class="text-[10px] font-bold">Mazo</span>
+    </button>
+    <button onclick="cambiarTab('lista')" id="mob-lista" class="flex flex-col items-center p-2 text-[#8A8580]">
+      <span class="text-xl mb-1">📄</span><span class="text-[10px] font-medium">Lista</span>
+    </button>
+    <button onclick="cambiarTab('guia')" id="mob-guia" class="flex flex-col items-center p-2 text-[#8A8580]">
+      <span class="text-xl mb-1">📘</span><span class="text-[10px] font-medium">Guía</span>
+    </button>
+    <button onclick="cambiarTab('quiz')" id="mob-quiz" class="flex flex-col items-center p-2 text-[#8A8580]">
+      <span class="text-xl mb-1">📝</span><span class="text-[10px] font-medium">Prueba</span>
+    </button>
+  </nav>
 
   <script src="api.js"></script>
   <script src="study.js"></script>
