@@ -16,13 +16,14 @@ Devuelve SOLO un JSON válido con esta estructura exacta, sin markdown, sin text
       "correcta": 0,
       "explicacion": "Por qué la correcta lo es y por qué las otras no."
     }
-  ]
+  ],
+  "guia": "Escribe aquí una guía de estudio completa basada en el texto. Usa títulos (con #, ##), viñetas, negritas y párrafos para estructurar los conceptos clave. Debe ser como un buen apunte de clase."
 }
 
 Reglas:
 - 4 flashcards y 3 preguntas de quiz.
 - Las preguntas deben evaluar comprensión, NO memorización literal.
-- Incluye siempre la explicación pedagógica en cada pregunta del quiz.
+- La guía debe ser detallada y fácil de leer.
 - En español.
 
 TEXTO:
@@ -64,7 +65,6 @@ async function generarMaterial(texto) {
 
   const data = await res.json();
   
-  // Limpiamos el JSON por si Groq añade texto extra
   const contenido = data.choices[0].message.content;
   let jsonLimpio = contenido.trim();
   const primerLlave = jsonLimpio.indexOf('{');
@@ -82,16 +82,8 @@ async function generarMaterial(texto) {
 
 function demoMaterial() {
   return {
-    flashcards: [
-      { pregunta: '¿Qué es la repetición espaciada?', respuesta: 'Una técnica que repite la información en intervalos crecientes para mejorar la retención a largo plazo.' }
-    ],
-    quiz: [
-      {
-        pregunta: '¿Cuál es el objetivo principal de la repetición espaciada?',
-        opciones: ['Memorizar todo en una noche', 'Retener a largo plazo con menos esfuerzo', 'Leer más rápido', 'Evitar el olvido por completo'],
-        correcta: 1,
-        explicacion: 'La repetición espaciada distribuye el repaso en intervalos crecientes.'
-      }
-    ]
+    flashcards: [{ pregunta: '¿Qué es la repetición espaciada?', respuesta: 'Una técnica de estudio.' }],
+    quiz: [{ pregunta: '¿Objetivo?', opciones: ['A', 'B', 'C', 'D'], correcta: 1, explicacion: 'Distribuye el repaso.' }],
+    guia: "## Guía de Estudio de Prueba\n\n- **Concepto 1:** Esto es una prueba."
   };
 }
