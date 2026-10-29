@@ -64,7 +64,7 @@ async function generarMaterial(texto) {
 
   const data = await res.json();
   
-  // 🛠️ ARREGLO: Limpiamos el JSON por si Groq añade texto extra
+  // Limpiamos el JSON por si Groq añade texto extra
   const contenido = data.choices[0].message.content;
   let jsonLimpio = contenido.trim();
   const primerLlave = jsonLimpio.indexOf('{');
