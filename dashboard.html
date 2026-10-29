@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis Kits | AprendeYa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-[#F7F5F2] min-h-screen p-6 md:p-12">
+
+  <header class="max-w-4xl mx-auto flex items-center justify-between mb-10">
+    <a href="index.html" class="text-sm font-medium hover:opacity-60 flex items-center gap-2">
+      ← Volver al inicio
+    </a>
+    <h1 class="text-2xl font-extrabold">Mis Kits de Estudio</h1>
+    <div class="w-24"></div>
+  </header>
+
+  <main class="max-w-4xl mx-auto">
+    <div id="kitsVacios" class="text-center py-20 hidden">
+      <p class="text-4xl mb-4">📭</p>
+      <p class="text-lg font-semibold mb-2">Aún no tienes kits guardados</p>
+      <p class="text-sm text-[#8A8580] mb-6">Ve a la página principal y genera tu primer kit de estudio.</p>
+      <a href="index.html" class="bg-[#1A1A1A] text-white px-6 py-3 rounded-full text-sm font-semibold hover:bg-opacity-80 transition">Crear mi primer Kit</a>
+    </div>
+
+    <div id="listaKits" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </main>
+
+  <script>
+    function cargarKits() {
+      const historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+      const contenedor = document.getElementById('listaKits');
+      const vacio = document.getElementById('kitsVacios');
+
+      if (historial.length === 0) {
+        vacio.classList.remove('hidden');
+        contenedor.innerHTML = '';
+        return;
+      }
+
+      vacio.classList.add('hidden');
+      contenedor.innerHTML = historial.map(kit => `
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-[#E5E1DA] hover:shadow-md transition flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-start mb-4">
+              <span class="text-3xl">📚</span>
+              <button onclick="borrarKit(${kit.id})" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition" title="Borrar Kit">
+                🗑️
+              </button>
+            </div>
+            <h3 class="font-bold text-lg text-[#1A1A1A] mb-1">${kit.nombre}</h3>
+            <p class="text-xs text-[#8A8580] mb-4">${kit.material.flashcards.length} Tarjetas</p>
+          </div>
+          <button onclick="abrirKit(${kit.id})" class="w-full bg-[#F7F5F2] text-[#1A1A1A] font-semibold py-2.5 rounded-xl text-sm hover:bg-[#E5E1DA] transition">
+            Estudiar ahora
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function abrirKit(id) {
+      const historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+      const kit = historial.find(k => k.id === id);
+      if (kit) {
+        localStorage.setItem('materialGenerado', JSON.stringify(kit.material));
+        localStorage.setItem('nombreMaterial', kit.nombre);
+        localStorage.setItem('material', 'cargado desde historial'); 
+        window.location.href = 'study.html';
+      }
+    }
+
+    function borrarKit(id) {
+      if (!confirm('¿Estás seguro de que quieres borrar este kit de estudio?')) return;
+      let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+      historial = historial.filter(k => k.id !== id);
+      localStorage.setItem('historialKits', JSON.stringify(historial));
+      cargarKits();
+    }
+
+    cargarKits();
+  </script>
+</body>
+</html>
