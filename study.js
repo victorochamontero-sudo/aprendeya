@@ -13,28 +13,12 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
     return;
   }
 
-  // Agregamos un botón para reintentar si la IA se demora
-  loadingDiv.innerHTML = `
-    <div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div>
-    <p class="text-sm text-[#8A8580] mb-2" id="loadingText">Preparando tu material...</p>
-    <button onclick="window.location.reload()" id="btnReintentar" class="hidden mt-4 bg-[#1A1A1A] text-white px-6 py-2 rounded-full text-sm font-bold">Reintentar</button>
-  `;
-
-  // Si pasan 15 segundos y no hay respuesta, mostramos el botón de reintentar
-  const timeout = setTimeout(() => {
-    document.getElementById('loadingText').textContent = "La IA está tardando más de lo normal...";
-    document.getElementById('btnReintentar').classList.remove('hidden');
-  }, 15000);
-
   try {
     const data = await generarMaterial(texto);
-    clearTimeout(timeout); // Cancelamos el reloj si la IA responde a tiempo
-
     material = data;
     mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
     stats.aprendiendo = mazo.length;
 
-    // Guardar en historial
     const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
     let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
     historial = historial.filter(k => k.nombre !== nombreKit);
@@ -45,11 +29,7 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
     document.getElementById('mazoContainer').classList.remove('hidden');
     actualizarUI();
   } catch (e) {
-    clearTimeout(timeout);
-    loadingDiv.innerHTML = `
-      <p class="text-sm text-red-600 mb-4">Hubo un error: ${e.message}</p>
-      <button onclick="window.location.reload()" class="bg-[#1A1A1A] text-white px-6 py-2 rounded-full text-sm font-bold">Reintentar</button>
-    `;
+    loadingDiv.innerHTML = `<p class="text-sm text-red-600">Error: ${e.message}</p>`;
   }
 })();
 
@@ -96,7 +76,7 @@ function calificar(nivel) {
   setTimeout(() => { actualizarUI(); }, 300);
 }
 
-function cambiarTab(tab) {
+async function cambiarTab(tab) {
   const activo = 'px-3 py-1.5 rounded-full font-semibold bg-[#1A1A1A] text-white';
   const inactivo = 'px-3 py-1.5 rounded-full font-semibold border border-[#D6D1CA] hover:bg-gray-50';
   
@@ -128,16 +108,28 @@ function cambiarTab(tab) {
   } else if (tab === 'guia') {
     document.getElementById('guiaContainer').classList.remove('hidden');
     const guiaHTML = document.getElementById('guiaTexto');
-    if (material.guia) {
-      guiaHTML.innerHTML = material.guia
-        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
-        .replace(/\n/g, '<br>');
-    } else {
-      guiaHTML.innerHTML = '<p>La guía no se generó.</p>';
+    
+    // Si la guía no se ha generado, la generamos aquí mismo
+    if (!material.guia || material.guia.includes("Haz clic")) {
+      guiaHTML.innerHTML = '<div class="text-center py-12"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-[#8A8580]">Generando tu guía de estudio...</p></div>';
+      try {
+        const textoOriginal = localStorage.getItem('material');
+        const nuevaGuia = await generarGuia(textoOriginal);
+        material.guia = nuevaGuia;
+        localStorage.setItem('materialGenerado', JSON.stringify(material));
+      } catch (e) {
+        guiaHTML.innerHTML = '<p class="text-red-500">Hubo un error generando la guía. Intenta de nuevo.</p>';
+        return;
+      }
     }
+    
+    guiaHTML.innerHTML = material.guia
+      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
+      .replace(/\n/g, '<br>');
+      
   } else if (tab === 'quiz') {
     document.getElementById('quizContainer').classList.remove('hidden');
     document.getElementById('quizSetup').classList.remove('hidden');
@@ -145,7 +137,6 @@ function cambiarTab(tab) {
   }
 }
 
-// --- LÓGICA DEL QUIZ ---
 async function iniciarQuiz() {
   const cantidad = parseInt(document.getElementById('selectCantidad').value);
   const contenedor = document.getElementById('preguntasQuiz');
