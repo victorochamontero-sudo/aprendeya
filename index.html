@@ -45,12 +45,18 @@
 
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 md:ml-64 flex flex-col relative pb-20 md:pb-0">
-    <header class="flex items-center justify-between px-6 py-5 bg-white/80 md:hidden border-b border-[#E5E1DA]">
-      <div class="flex items-center gap-2">
+    
+    <!-- HEADER (Solo móvil y botón de registro) -->
+    <header class="flex items-center justify-between px-6 py-4 bg-white/80 border-b border-[#E5E1DA]">
+      <div class="flex items-center gap-2 md:hidden">
         <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-white font-bold">A</div>
         <span class="font-extrabold text-lg">AprendeYa</span>
       </div>
-      <a href="perfil.html" class="text-xl">🏆</a>
+      <div class="hidden md:block"></div> <!-- Espacio vacío para empujar el botón a la derecha -->
+      
+      <button onclick="alert('¡Formulario de registro próximamente!')" class="bg-[#1A1A1A] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-opacity-80 transition shadow-md">
+        Registrarse
+      </button>
     </header>
 
     <div class="flex-1 flex flex-col items-center justify-center text-center px-6 pt-6 pb-12 relative overflow-hidden">
@@ -72,7 +78,6 @@
             </button>
           </div>
         </div>
-        <!-- rows="4" para que no ocupe tanto espacio vertical -->
         <textarea id="textInput" rows="4" placeholder="O pega/escribe tu texto aquí..." class="w-full bg-[#F7F5F2] border border-[#E5E1DA] rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition resize-none mb-4"></textarea>
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
           <p id="status" class="text-sm font-medium text-[#8A8580] text-center sm:text-left w-full sm:w-auto"></p>
@@ -98,8 +103,7 @@
       "La disciplina es el puente entre las metas y los logros.",
       "Cada experto fue una vez un principiante que no se rindió.",
       "El mejor momento para plantar un árbol fue hace 20 años. El segundo mejor momento es ahora.",
-      "No tienes que ser grande para empezar, pero tienes que empezar para ser grande.",
-      "El conocimiento es poder, pero el entusiasmo te lleva más lejos."
+      "No tienes que ser grande para empezar, pero tienes que empezar para ser grande."
     ];
 
     function cargarFraseDelDia() {
