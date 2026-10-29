@@ -23,7 +23,17 @@
         <span class="font-extrabold text-lg">AprendeYa</span>
       </a>
     </div>
-    <div class="p-4 flex-1 space-y-1">
+    
+    <!-- FRASE DEL DÍA (SUBIDA) -->
+    <div class="p-4 mx-4 mt-3 mb-2 bg-[#F7F5F2] rounded-2xl border border-[#E5E1DA]">
+      <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2">Frase del día</p>
+      <p id="fraseDiaria" class="text-sm font-medium text-[#1A1A1A] italic leading-relaxed mb-3">Cargando...</p>
+      <button onclick="compartirApp()" class="w-full flex items-center justify-center gap-2 bg-white border border-[#D6D1CA] text-[#1A1A1A] text-xs font-semibold px-3 py-2 rounded-lg hover:bg-[#E5E1DA] transition">
+        🔗 Compartir App
+      </button>
+    </div>
+
+    <div class="p-4 flex-1 space-y-1 overflow-y-auto">
       <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-3 mt-2 px-3">Menú</p>
       <a href="index.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition">
         <span class="text-lg">🏠</span> Inicio
@@ -47,14 +57,6 @@
         </button>
       </div>
     </div>
-
-    <div class="p-4 m-4 bg-[#F7F5F2] rounded-2xl border border-[#E5E1DA]">
-      <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2">Frase del día</p>
-      <p id="fraseDiaria" class="text-sm font-medium text-[#1A1A1A] italic leading-relaxed mb-4">Cargando...</p>
-      <button onclick="compartirApp()" class="w-full flex items-center justify-center gap-2 bg-white border border-[#D6D1CA] text-[#1A1A1A] text-sm font-semibold px-3 py-2 rounded-lg hover:bg-[#E5E1DA] transition">
-        🔗 Compartir App
-      </button>
-    </div>
   </aside>
 
   <!-- CONTENIDO PRINCIPAL -->
@@ -68,11 +70,7 @@
     </header>
 
     <div class="flex-1 flex flex-col items-center justify-center text-center px-6 pt-8 pb-24 relative overflow-hidden">
-      <div class="mb-6 flex items-center gap-2 text-xs font-bold text-green-700 bg-green-100 px-4 py-1.5 rounded-full">
-        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
-        <span id="contadorUsuarios">1.204</span> estudiantes ya están aprendiendo
-      </div>
-
+      
       <span class="inline-block bg-white text-xs font-bold tracking-widest uppercase text-[#8A8580] mb-6 px-4 py-1.5 rounded-full shadow-sm border border-[#E5E1DA]">✨ El compañero de estudio que necesitas</span>
       <h1 class="text-4xl md:text-6xl font-extrabold leading-tight max-w-4xl mb-6">Estudia menos.<br/>Aprende <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 italic">mucho más</span>.</h1>
       
@@ -107,6 +105,17 @@
           <p id="status" class="text-sm font-medium text-[#8A8580] text-center sm:text-left w-full sm:w-auto"></p>
           <button onclick="procesarEntrada()" id="btnGenerar" class="w-full sm:w-auto bg-gradient-to-r from-[#1A1A1A] to-[#333] text-white font-bold px-8 py-3 rounded-full hover:shadow-lg transition flex items-center justify-center gap-2">Generar con IA</button>
         </div>
+
+        <!-- CONTADOR DE VISITAS DEBAJO DE GENERAR -->
+        <div class="mt-6 pt-4 border-t border-[#E5E1DA] flex justify-center">
+          <button onclick="compartirApp()" class="flex items-center gap-2 text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-full transition">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span id="contadorUsuarios">1.204</span> estudiantes aprendiendo
+          </button>
+        </div>
       </div>
     </div>
   </main>
@@ -125,13 +134,11 @@
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
       <button onclick="cerrarModalLogin()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black transition">×</button>
 
-      <!-- Pestañas para alternar -->
       <div class="flex border-b border-[#E5E1DA] mb-6">
         <button onclick="cambiarAuthTab('login')" id="tab-login" class="flex-1 pb-3 text-sm font-bold text-[#1A1A1A] border-b-2 border-[#1A1A1A] transition">Ingresar</button>
         <button onclick="cambiarAuthTab('registro')" id="tab-registro" class="flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition">Crear Cuenta</button>
       </div>
 
-      <!-- Formulario Ingresar -->
       <form id="form-login" onsubmit="event.preventDefault(); iniciarSesion();">
         <input type="email" id="loginEmail" placeholder="Correo electrónico" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
         <input type="password" id="loginPassword" placeholder="Contraseña" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-2 text-sm focus:outline-none focus:border-[#1A1A1A]" />
@@ -141,7 +148,6 @@
         <button type="submit" class="w-full bg-[#1A1A1A] text-white font-semibold py-3 rounded-xl hover:bg-opacity-80 transition">Ingresar</button>
       </form>
 
-      <!-- Formulario Registro -->
       <form id="form-registro" class="hidden" onsubmit="event.preventDefault(); registrarUsuario();">
         <input type="text" id="regNombre" placeholder="Nombre completo" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
         <input type="email" id="regEmail" placeholder="Correo electrónico" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
@@ -196,7 +202,6 @@
     }
     actualizarInterfazUsuario();
 
-    // --- AUTENTICACIÓN ---
     function cambiarAuthTab(tab) {
       const tabLogin = document.getElementById('tab-login');
       const tabRegistro = document.getElementById('tab-registro');
@@ -220,10 +225,7 @@
       const nombre = document.getElementById('regNombre').value;
       const email = document.getElementById('regEmail').value;
       const password = document.getElementById('regPassword').value;
-      
-      const usuario = { nombre, email, password };
-      localStorage.setItem('usuarioAprendeYa', JSON.stringify(usuario));
-      
+      localStorage.setItem('usuarioAprendeYa', JSON.stringify({ nombre, email, password }));
       alert('¡Registro exitoso! Bienvenido a AprendeYa.');
       cerrarModalLogin();
       actualizarInterfazUsuario();
@@ -232,7 +234,6 @@
     function iniciarSesion() {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
-      
       const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
 
       if (usuarioGuardado && usuarioGuardado.email === email && usuarioGuardado.password === password) {
@@ -248,15 +249,13 @@
       e.preventDefault();
       const email = prompt("Ingresa el correo con el que te registraste:");
       const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
-      
       if (usuarioGuardado && usuarioGuardado.email === email) {
-        alert(`Tu contraseña es: ${usuarioGuardado.password}. (Por seguridad, en producción se enviaría un correo).`);
+        alert(`Tu contraseña es: ${usuarioGuardado.password}. (En producción se enviaría un correo).`);
       } else {
         alert('No encontramos ninguna cuenta con ese correo.');
       }
     }
 
-    // --- MODALES ---
     function abrirModalLogin() { document.getElementById('modalLogin').classList.remove('hidden'); document.getElementById('modalLogin').classList.add('flex'); }
     function cerrarModalLogin() { document.getElementById('modalLogin').classList.add('hidden'); document.getElementById('modalLogin').classList.remove('flex'); }
     
