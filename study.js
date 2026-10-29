@@ -4,7 +4,7 @@ let indiceActual = 0;
 let mostrandoRespuesta = false;
 let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
 let generacionesExtra = 0; 
-let sintetizador = window.speechSynthesis; // API de voz del navegador
+let sintetizador = window.speechSynthesis;
 
 (async function init() {
   const texto = localStorage.getItem('material');
@@ -90,7 +90,7 @@ function calificar(nivel) {
 async function cambiarTab(tab) {
   if (!material) return;
   
-  detenerLectura(); // Detiene cualquier audio al cambiar de pestaña
+  detenerLectura(); 
 
   const clasesNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]";
   const activoNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition";
@@ -170,6 +170,7 @@ async function cambiarTab(tab) {
         const nuevaGuia = await generarGuia(textoOriginal);
         material.guia = nuevaGuia;
         
+        // GUARDAR EN LOCALSTORAGE Y EN EL HISTORIAL
         localStorage.setItem('materialGenerado', JSON.stringify(material));
         const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
         let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
