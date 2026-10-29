@@ -1,5 +1,5 @@
-// ⚠️ CLAVE DE OPENROUTER CONFIGURADA DIRECTAMENTE
-const OPENROUTER_KEY = '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';
+// ⚠️ CLAVE DE GOOGLE AI STUDIO CONFIGURADA
+const GEMINI_KEY = 'AQ.Ab8RN6JMNPRvz8eThyImnU311vUt-EPIVeWvOWA_4g8vHFMjUg';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
 A partir del siguiente texto, genera material de estudio de ALTA CALIDAD.
@@ -37,41 +37,28 @@ async function generarMaterial(texto) {
     try { return JSON.parse(cache); } catch (e) { /* ignora cache corrupta */ }
   }
 
-  // Si no hay clave -> modo demo
-  if (!OPENROUTER_KEY || OPENROUTER_KEY === '') {
-    console.warn('Sin API key: usando modo demo.');
-    const demo = demoMaterial();
-    localStorage.setItem('materialGenerado', JSON.stringify(demo));
-    localStorage.setItem('textoGenerado', texto);
-    return demo;
-  }
-
-  // Llamada a OpenRouter
-  const url = 'https://openrouter.ai/api/v1/chat/completions';
+  // Llamada a Google Gemini
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
   
   const res = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENROUTER_KEY}`
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'google/gemini-2.0-flash-exp:free',
-      messages: [{ role: 'user', content: PROMPT + texto }],
-      temperature: 0.7,
-      response_format: { type: 'json_object' }
+      contents: [{ parts: [{ text: PROMPT + texto }] }],
+      generationConfig: {
+        temperature: 0.7,
+        responseMimeType: "application/json"
+      }
     })
   });
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error('Error API OpenRouter: ' + err);
+    throw new Error('Error API Gemini: ' + err);
   }
 
   const data = await res.json();
-  
-  // Extraemos el texto de la respuesta
-  const contenido = data.choices[0].message.content;
+  const contenido = data.candidates[0].content.parts[0].text;
   const material = JSON.parse(contenido);
   
   localStorage.setItem('materialGenerado', JSON.stringify(material));
