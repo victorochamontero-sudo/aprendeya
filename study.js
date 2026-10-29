@@ -3,12 +3,14 @@ let mazo = [];
 let indiceActual = 0;
 let mostrandoRespuesta = false;
 let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
+let generacionesExtra = 0; // Límite de 2 veces
 
 (async function init() {
   const texto = localStorage.getItem('material');
   const loadingDiv = document.getElementById('loading');
   const loadingText = document.getElementById('loadingText');
   const btnError = document.getElementById('btnError');
+  const spinner = document.getElementById('loadingSpinner');
   
   if (!texto) {
     loadingDiv.innerHTML = '<p class="text-sm text-[#8A8580]">No hay material. <a href="index.html" class="underline">Sube un archivo</a>.</p>';
@@ -31,10 +33,8 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
     loadingDiv.classList.add('hidden');
     cambiarTab('mazo');
   } catch (e) {
-    // ADVERTENCIA DE ERROR
-    loadingText.textContent = "¡Ups! Algo salió mal al conectar con la IA.";
+    loadingText.textContent = "¡Ups! Hubo un error de conexión con la IA.";
     loadingText.classList.add('text-red-500');
-    const spinner = document.querySelector('#loading .animate-spin');
     if(spinner) spinner.classList.add('hidden');
     if(btnError) btnError.classList.remove('hidden');
   }
@@ -268,12 +268,18 @@ function editarTarjeta(index) {
   cambiarTab('lista');
 }
 
-// --- NUEVA FUNCIÓN PARA GENERAR MÁS TARJETAS ---
+// --- NUEVA FUNCIÓN PARA GENERAR MÁS TARJETAS (Límite: 2 veces) ---
 async function pedirMasMaterial() {
   const btnMas = document.getElementById('btnMas');
   const textoOriginal = localStorage.getItem('material');
   
   if (!textoOriginal) return;
+
+  if (generacionesExtra >= 2) {
+    alert('Límite alcanzado: solo puedes generar material extra 2 veces por kit para no saturar la IA.');
+    btnMas.style.display = 'none';
+    return;
+  }
 
   btnMas.innerHTML = '<div class="inline-block w-4 h-4 border-2 border-[#1A1A1A] border-t-transparent rounded-full animate-spin"></div> Generando más...';
   btnMas.disabled = true;
@@ -281,10 +287,9 @@ async function pedirMasMaterial() {
   try {
     const extra = await generarMasMaterial(textoOriginal, material.flashcards, material.quiz);
     
-    // Añadimos las nuevas a los arrays existentes
     if (extra.flashcards) {
       material.flashcards = [...material.flashcards, ...extra.flashcards];
-      mazo = [...mazo, ...extra.flashcards].sort(() => Math.random() - 0.5); // Mezclamos de nuevo
+      mazo = [...mazo, ...extra.flashcards].sort(() => Math.random() - 0.5);
       stats.aprendiendo += extra.flashcards.length;
     }
     
@@ -292,7 +297,6 @@ async function pedirMasMaterial() {
       material.quiz = [...(material.quiz || []), ...extra.quiz];
     }
 
-    // Guardamos en caché y en el historial
     localStorage.setItem('materialGenerado', JSON.stringify(material));
     const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
     let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
@@ -302,15 +306,23 @@ async function pedirMasMaterial() {
       localStorage.setItem('historialKits', JSON.stringify(historial));
     }
 
-    // Actualizamos la UI para mostrar las nuevas tarjetas
+    generacionesExtra++;
+    if (generacionesExtra >= 2) {
+      btnMas.innerHTML = '✨ Límite de generación alcanzado';
+      btnMas.disabled = true;
+      btnMas.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      btnMas.innerHTML = '✨ Generar 8 tarjetas más con IA';
+      btnMas.disabled = false;
+    }
+
     indiceActual = 0; 
     actualizarUI();
-    alert('¡Se han añadido nuevas tarjetas y preguntas a tu kit!');
+    alert('¡Se han añadido 8 tarjetas y 4 preguntas nuevas a tu kit!');
   } catch (error) {
     console.error(error);
     alert('Hubo un error al generar más material. Por favor, recarga la página e intenta de nuevo.');
-  } finally {
-    btnMas.innerHTML = '✨ Generar más tarjetas con IA';
+    btnMas.innerHTML = '✨ Generar 8 tarjetas más con IA';
     btnMas.disabled = false;
   }
 }
