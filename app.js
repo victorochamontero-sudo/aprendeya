@@ -1,37 +1,3 @@
-// --- FUNCIONES DEL MODAL DE LOGIN ---
-const modal = document.getElementById('modalLogin');
-function abrirModal() { modal.classList.remove('hidden'); modal.classList.add('flex'); }
-function cerrarModal() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
-if(modal) { modal.addEventListener('click', (e) => { if (e.target === modal) cerrarModal(); }); }
-
-// --- FUNCIONES DE LOS MODALES DE INFORMACIÓN (Sobre nosotros, etc.) ---
-function abrirModalInfo(tipo) {
-  const modalInfo = document.getElementById('modalInfo');
-  const titulo = document.getElementById('infoTitulo');
-  const contenido = document.getElementById('infoContenido');
-
-  if (tipo === 'sobre') {
-    titulo.textContent = 'Sobre AprendeYa 🚀';
-    contenido.innerHTML = '<p>Somos una plataforma diseñada para revolucionar la forma en que estudias. Utilizamos inteligencia artificial para transformar tus apuntes aburridos en herramientas dinámicas de aprendizaje.</p><p>Nuestra misión es que apruebes con menos esfuerzo y más retención.</p>';
-  } else if (tipo === 'recomendaciones') {
-    titulo.textContent = 'Consejos de Estudio 💡';
-    contenido.innerHTML = '<ul class="list-disc pl-5 space-y-2"><li>Estudia en bloques de 25 minutos (Técnica Pomodoro).</li><li>Usa nuestras tarjetas todos los días, la constancia es clave.</li><li>No solo memorices, usa el Quiz para entender los conceptos.</li><li>Explícale a alguien más lo que aprendiste (Técnica Feynman).</li></ul>';
-  } else if (tipo === 'contacto') {
-    titulo.textContent = 'Contacto ✉️';
-    contenido.innerHTML = '<p>¿Tienes dudas, sugerencias o encontraste un error?</p><p>Escríbenos a: <strong>soporte@aprendeya.com</strong></p>';
-  }
-
-  modalInfo.classList.remove('hidden');
-  modalInfo.classList.add('flex');
-}
-
-function cerrarModalInfo() {
-  const modalInfo = document.getElementById('modalInfo');
-  modalInfo.classList.add('hidden');
-  modalInfo.classList.remove('flex');
-}
-
-// --- LECTURA DE ARCHIVOS ---
 async function handleFile(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -83,7 +49,6 @@ async function extraerTextoWord(file) {
   return result.value;
 }
 
-// --- PROCESAR Y GUARDAR KIT ---
 function procesarEntrada() {
   const textarea = document.getElementById('textInput');
   const texto = textarea.value.trim();
@@ -94,7 +59,6 @@ function procesarEntrada() {
     return;
   }
 
-  // Pedir nombre para el kit
   const nombreKit = prompt("Ponle un nombre a este kit de estudio (Ej: Contabilidad Básica):", "Mi Kit");
   if (!nombreKit) return;
 
@@ -103,5 +67,8 @@ function procesarEntrada() {
   localStorage.removeItem('materialGenerado'); 
   
   status.textContent = '🚀 Generando material...';
-  window.location.href = 'study.html';
+
+  setTimeout(() => {
+    window.location.href = 'study.html';
+  }, 500);
 }
