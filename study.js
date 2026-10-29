@@ -16,6 +16,7 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
   try {
     const data = await generarMaterial(texto);
     material = data;
+    if (!material.quiz) material.quiz = []; 
     mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
     stats.aprendiendo = mazo.length;
 
@@ -26,8 +27,7 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
     localStorage.setItem('historialKits', JSON.stringify(historial));
 
     loadingDiv.classList.add('hidden');
-    document.getElementById('mazoContainer').classList.remove('hidden');
-    actualizarUI();
+    cambiarTab('mazo');
   } catch (e) {
     loadingDiv.innerHTML = `<p class="text-sm text-red-600">Error: ${e.message}</p>`;
   }
@@ -77,32 +77,70 @@ function calificar(nivel) {
 }
 
 async function cambiarTab(tab) {
-  const activo = 'px-3 py-1.5 rounded-full font-semibold bg-[#1A1A1A] text-white';
-  const inactivo = 'px-3 py-1.5 rounded-full font-semibold border border-[#D6D1CA] hover:bg-gray-50';
+  // --- ESTILOS BARRA LATERAL (PC) ---
+  const clasesNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]";
+  const activoNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition";
   
-  document.getElementById('tab-mazo').className = tab === 'mazo' ? activo : inactivo;
-  document.getElementById('tab-lista').className = tab === 'lista' ? activo : inactivo;
-  document.getElementById('tab-guia').className = tab === 'guia' ? activo : inactivo;
-  document.getElementById('tab-quiz').className = tab === 'quiz' ? activo : inactivo;
+  if(document.getElementById('nav-mazo')) {
+    document.getElementById('nav-mazo').className = clasesNav;
+    document.getElementById('nav-lista').className = clasesNav;
+    document.getElementById('nav-guia').className = clasesNav;
+    document.getElementById('nav-quiz').className = clasesNav;
+    
+    if (tab === 'mazo') document.getElementById('nav-mazo').className = activoNav;
+    if (tab === 'lista') document.getElementById('nav-lista').className = activoNav;
+    if (tab === 'guia') document.getElementById('nav-guia').className = activoNav;
+    if (tab === 'quiz') document.getElementById('nav-quiz').className = activoNav;
+  }
 
+  // --- ESTILOS BARRA INFERIOR (MÓVIL) ---
+  const clasesMob = "flex flex-col items-center p-2 text-[#8A8580]";
+  const activoMob = "flex flex-col items-center p-2 text-[#1A1A1A]";
+  
+  if(document.getElementById('mob-mazo')) {
+    document.getElementById('mob-mazo').className = clasesMob;
+    document.getElementById('mob-lista').className = clasesMob;
+    document.getElementById('mob-guia').className = clasesMob;
+    document.getElementById('mob-quiz').className = clasesMob;
+    
+    if (tab === 'mazo') document.getElementById('mob-mazo').className = activoMob;
+    if (tab === 'lista') document.getElementById('mob-lista').className = activoMob;
+    if (tab === 'guia') document.getElementById('mob-guia').className = activoMob;
+    if (tab === 'quiz') document.getElementById('mob-quiz').className = activoMob;
+  }
+
+  // Actualizar título del header móvil
+  const headerTitle = document.getElementById('headerTitle');
+  if(headerTitle) {
+    if(tab === 'mazo') headerTitle.textContent = "Mazo";
+    if(tab === 'lista') headerTitle.textContent = "Lista";
+    if(tab === 'guia') headerTitle.textContent = "Guía de Estudio";
+    if(tab === 'quiz') headerTitle.textContent = "Prueba";
+  }
+
+  // Ocultar todo
   document.getElementById('mazoContainer').classList.add('hidden');
+  document.getElementById('mazoContainer').classList.remove('flex');
   document.getElementById('listaContainer').classList.add('hidden');
   document.getElementById('guiaContainer').classList.add('hidden');
   document.getElementById('quizContainer').classList.add('hidden');
 
+  // Mostrar el seleccionado
   if (tab === 'mazo') {
     document.getElementById('mazoContainer').classList.remove('hidden');
+    document.getElementById('mazoContainer').classList.add('flex');
+    actualizarUI();
   } else if (tab === 'lista') {
     document.getElementById('listaContainer').classList.remove('hidden');
     const cont = document.getElementById('listaTarjetas');
     cont.innerHTML = material.flashcards.map((f, i) => `
       <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-4 rounded-xl border border-[#E5E1DA] hover:border-[#1A1A1A] transition group">
         <div class="flex-1 mb-2 sm:mb-0">
-          <span class="font-bold text-[#1A1A1A] mr-2">${f.pregunta}</span>
+          <span class="font-bold text-[#1A1A1A] mr-2 text-sm md:text-base">${f.pregunta}</span>
           <span class="text-[#8A8580] hidden sm:inline">|</span>
-          <span class="text-sm text-[#5A5550] block sm:inline mt-1 sm:mt-0">${f.respuesta}</span>
+          <span class="text-xs md:text-sm text-[#5A5550] block sm:inline mt-1 sm:mt-0">${f.respuesta}</span>
         </div>
-        <button class="text-[#8A8580] group-hover:text-[#1A1A1A]">✏️</button>
+        <button onclick="editarTarjeta(${i})" class="text-[#8A8580] hover:text-blue-500 transition p-2" title="Editar tarjeta">✏️</button>
       </div>
     `).join('');
   } else if (tab === 'guia') {
@@ -128,7 +166,6 @@ async function cambiarTab(tab) {
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
       .replace(/\n/g, '<br>');
-      
   } else if (tab === 'quiz') {
     document.getElementById('quizContainer').classList.remove('hidden');
     document.getElementById('quizSetup').classList.remove('hidden');
@@ -144,26 +181,24 @@ async function iniciarQuiz() {
   setup.classList.add('hidden'); 
   contenedor.innerHTML = '<div class="text-center py-8"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-center text-[#8A8580]">Preparando tu examen...</p></div>';
 
-  // Si faltan preguntas, las generamos aquí
+  if (!material.quiz) material.quiz = [];
+
   if (material.quiz.length < cantidad) {
     try {
       const textoOriginal = localStorage.getItem('material');
       const cantidadFaltante = cantidad - material.quiz.length;
       const nuevasPreguntas = await generarPreguntasExtra(textoOriginal, cantidadFaltante);
-      
       if (nuevasPreguntas && nuevasPreguntas.length > 0) {
         material.quiz = [...material.quiz, ...nuevasPreguntas];
         localStorage.setItem('materialGenerado', JSON.stringify(material)); 
       }
     } catch (error) {
       console.error("No se pudieron generar preguntas extra", error);
-      // Si falla, seguimos con las que ya tenemos
     }
   }
 
-  // Si por alguna razón no hay preguntas, mostramos error
   if (material.quiz.length === 0) {
-    contenedor.innerHTML = '<p class="text-center text-red-500">No se pudieron generar preguntas para este texto. Intenta con un texto más largo.</p>';
+    contenedor.innerHTML = '<p class="text-center text-red-500">No se pudieron generar preguntas. Intenta generando un texto más largo.</p>';
     return;
   }
 
@@ -205,4 +240,28 @@ function responderQuiz(qIdx, opIdx) {
 
   exp.textContent = '💡 ' + q.explicacion;
   exp.classList.remove('hidden');
+}
+
+function editarTarjeta(index) {
+  const tarjeta = material.flashcards[index];
+  const nuevaPregunta = prompt("Edita la pregunta:", tarjeta.pregunta);
+  if (nuevaPregunta === null) return;
+  
+  const nuevaRespuesta = prompt("Edita la respuesta:", tarjeta.respuesta);
+  if (nuevaRespuesta === null) return;
+
+  material.flashcards[index].pregunta = nuevaPregunta;
+  material.flashcards[index].respuesta = nuevaRespuesta;
+  
+  localStorage.setItem('materialGenerado', JSON.stringify(material));
+  
+  const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
+  let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+  const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
+  if (kitIndex !== -1) {
+    historial[kitIndex].material = material;
+    localStorage.setItem('historialKits', JSON.stringify(historial));
+  }
+
+  cambiarTab('lista');
 }
