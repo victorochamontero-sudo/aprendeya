@@ -25,9 +25,9 @@
     </a>
     <h1 class="text-lg font-bold">Memorizar</h1>
     <div class="flex gap-2">
-      <button onclick="cambiarTab('lista')" class="px-4 py-1.5 rounded-full text-sm font-semibold border border-[#D6D1CA] hover:bg-gray-50">Lista</button>
+      <button onclick="cambiarTab('lista')" id="tab-lista" class="px-4 py-1.5 rounded-full text-sm font-semibold border border-[#D6D1CA] hover:bg-gray-50">Lista</button>
       <button onclick="cambiarTab('mazo')" id="tab-mazo" class="px-4 py-1.5 rounded-full text-sm font-semibold bg-[#1A1A1A] text-white">Mazo</button>
-      <button onclick="cambiarTab('juegos')" class="px-4 py-1.5 rounded-full text-sm font-semibold border border-[#D6D1CA] hover:bg-gray-50 opacity-50 cursor-not-allowed">Juegos</button>
+      <button onclick="cambiarTab('juegos')" id="tab-juegos" class="px-4 py-1.5 rounded-full text-sm font-semibold border border-[#D6D1CA] hover:bg-gray-50">Juegos</button>
     </div>
   </header>
 
@@ -82,6 +82,11 @@
       </div>
       
       <p id="instruccion" class="text-sm text-[#8A8580] mt-6">Haz clic en la tarjeta para ver la respuesta</p>
+    </div>
+
+    <!-- VISTA DE LISTA (Oculta por defecto) -->
+    <div id="listaContainer" class="hidden w-full max-w-3xl">
+      <div id="listaTarjetas" class="space-y-4"></div>
     </div>
 
   </main>
