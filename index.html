@@ -15,7 +15,7 @@
 </head>
 <body class="bg-pattern text-[#1A1A1A] min-h-screen flex">
 
-  <!-- SIDEBAR IZQUIERDO -->
+  <!-- SIDEBAR IZQUIERDO (PC) -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
     <div class="p-6 flex items-center gap-2 border-b border-[#E5E1DA]">
       <a href="index.html" class="flex items-center gap-2">
@@ -46,16 +46,30 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 md:ml-64 flex flex-col relative pb-20 md:pb-0">
     
-    <!-- Header superior (Móvil) -->
-    <header class="flex items-center justify-between px-6 py-4 bg-white/80 md:hidden border-b border-[#E5E1DA]">
-      <div class="flex items-center gap-2">
+    <!-- BARRA SUPERIOR (Menú y Registro) -->
+    <header class="flex items-center justify-between px-6 py-4 bg-white border-b border-[#E5E1DA]">
+      <!-- Logo solo visible en móvil -->
+      <div class="flex items-center gap-2 md:hidden">
         <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-white font-bold">A</div>
         <span class="font-extrabold text-lg">AprendeYa</span>
       </div>
-      <a href="perfil.html" class="text-xl">🏆</a>
+      
+      <!-- Espacio vacío para empujar los botones a la derecha en PC -->
+      <div class="hidden md:block"></div>
+
+      <!-- Botones de la barra superior -->
+      <div class="flex items-center gap-4 md:gap-6 text-sm font-medium">
+        <a href="#" onclick="alert('Sección en construcción')" class="hidden md:block hover:text-blue-600 transition">Sobre nosotros</a>
+        <a href="#" onclick="alert('Sección en construcción')" class="hidden md:block hover:text-blue-600 transition">Recomendaciones</a>
+        <a href="#" onclick="alert('Sección en construcción')" class="hidden md:block hover:text-blue-600 transition">Contacto</a>
+        
+        <button onclick="abrirModalRegistro()" class="bg-[#1A1A1A] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-opacity-80 transition shadow-md">
+          Registrar usuario
+        </button>
+      </div>
     </header>
 
-    <div class="flex-1 flex flex-col items-center justify-center text-center px-6 pt-12 pb-24 relative overflow-hidden">
+    <div class="flex-1 flex flex-col items-center justify-center text-center px-6 pt-8 pb-24 relative overflow-hidden">
       <span class="inline-block bg-white text-xs font-bold tracking-widest uppercase text-[#8A8580] mb-6 px-4 py-1.5 rounded-full shadow-sm border border-[#E5E1DA]">✨ El compañero de estudio que necesitas</span>
       <h1 class="text-4xl md:text-6xl font-extrabold leading-tight max-w-4xl mb-6">Estudia menos.<br/>Aprende <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 italic">mucho más</span>.</h1>
       
@@ -83,6 +97,28 @@
     </div>
   </main>
 
+  <!-- MODAL DE REGISTRO -->
+  <div id="modalRegistro" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
+      <button onclick="cerrarModalRegistro()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black transition">×</button>
+
+      <h2 class="text-2xl font-bold text-center mb-1">Crea tu cuenta</h2>
+      <p class="text-sm text-[#8A8580] text-center mb-6">Únete a AprendeYa y empieza a estudiar mejor</p>
+
+      <form onsubmit="event.preventDefault(); alert('¡Registro exitoso! Bienvenido a AprendeYa.'); cerrarModalRegistro();">
+        <input type="text" placeholder="Nombre completo" required
+          class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <input type="email" placeholder="Correo electrónico" required
+          class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <input type="password" placeholder="Contraseña" required
+          class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-4 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <button type="submit" class="w-full bg-[#1A1A1A] text-white font-semibold py-3 rounded-xl hover:bg-opacity-80 transition">
+          Registrarse
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- BARRA MÓVIL -->
   <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-[#E5E1DA] flex justify-around py-2 z-50">
     <a href="index.html" class="flex flex-col items-center p-2 text-[#1A1A1A]"><span class="text-xl mb-1">🏠</span><span class="text-[10px] font-bold">Inicio</span></a>
@@ -93,6 +129,7 @@
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     
+    // Frases motivadoras
     const frases = [
       "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
       "No te preocupes por los fracasos, preocúpate por las oportunidades que pierdes cuando no lo intentas.",
@@ -108,8 +145,20 @@
       const indiceFrase = diaDelAnio % frases.length;
       document.getElementById('fraseDiaria').textContent = `"${frases[indiceFrase]}"`;
     }
-    cargarFraseDia = cargarFraseDelDia();
     cargarFraseDelDia();
+
+    // Modal de registro
+    function abrirModalRegistro() {
+      const modal = document.getElementById('modalRegistro');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    
+    function cerrarModalRegistro() {
+      const modal = document.getElementById('modalRegistro');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
   </script>
   <script src="app.js"></script>
 </body>
