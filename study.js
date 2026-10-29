@@ -34,8 +34,9 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
     // ADVERTENCIA DE ERROR
     loadingText.textContent = "¡Ups! Algo salió mal al conectar con la IA.";
     loadingText.classList.add('text-red-500');
-    document.querySelector('#loading .animate-spin').classList.add('hidden');
-    btnError.classList.remove('hidden');
+    const spinner = document.querySelector('#loading .animate-spin');
+    if(spinner) spinner.classList.add('hidden');
+    if(btnError) btnError.classList.remove('hidden');
   }
 })();
 
@@ -227,9 +228,6 @@ async function iniciarQuiz() {
   material.quiz = preguntasFinales; 
 }
 
-function responderQuiz(qIdx, opIdx) {
-  const q = material.quiz[qIdx];
-  const botones = document.querySelectorAll
 function responderQuiz(qIdx, opIdx) {
   const q = material.quiz[qIdx];
   const botones = document.querySelectorAll(`#opciones-${qIdx} button`);
