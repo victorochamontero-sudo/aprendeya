@@ -21,12 +21,22 @@
 </head>
 <body class="bg-[#F7F5F2] min-h-screen flex">
 
-  <!-- SIDEBAR (PC) -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
-    <div class="p-6 flex items-center gap-2 border-b border-[#E5E1DA]">
-      <a href="index.html" class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-white font-bold">A</div>
-        <span class="font-extrabold text-lg">AprendeYa</span>
+    <div class="p-6 flex items-center gap-3 border-b border-[#E5E1DA]">
+      <a href="index.html" class="flex items-center gap-3">
+        <!-- LOGO NUEVO -->
+        <div class="w-9 h-9 rounded-xl bg-[#1A1A1A] flex items-center justify-center shadow-lg">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gradienteLogoStudy" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#3B82F6" />
+                <stop offset="100%" stop-color="#9333EA" />
+              </linearGradient>
+            </defs>
+            <path d="M12 4L4 20H8L9.5 16H14.5L16 20H20L12 4ZM10.5 13L12 8.5L13.5 13H10.5Z" fill="url(#gradienteLogoStudy)" />
+          </svg>
+        </div>
+        <span class="font-extrabold text-lg tracking-tight">AprendeYa</span>
       </a>
     </div>
     <div class="p-4 flex-1 space-y-1">
@@ -57,95 +67,4 @@
 
       <!-- 1. MAZO -->
       <div id="mazoContainer" class="hidden w-full max-w-3xl flex-col items-center">
-        <div class="w-full flex justify-between items-center mb-6 bg-white px-4 md:px-6 py-3 rounded-2xl shadow-sm border border-[#E5E1DA]">
-          <div class="text-center"><p id="stat-aprendiendo" class="text-lg font-bold text-red-500">0</p><p class="text-[10px] md:text-xs text-[#8A8580]">Aprendiendo</p></div>
-          <div class="text-center border-l border-r border-[#E5E1DA] px-4 md:px-8"><p id="stat-revisando" class="text-lg font-bold text-yellow-500">0</p><p class="text-[10px] md:text-xs text-[#8A8580]">Revisando</p></div>
-          <div class="text-center"><p id="stat-dominado" class="text-lg font-bold text-green-500">0</p><p class="text-[10px] md:text-xs text-[#8A8580]">Dominado</p></div>
-        </div>
-
-        <!-- BOTONES MAZO -->
-        <div class="flex gap-2 mb-4">
-          <button onclick="leerTextoActual()" class="text-sm bg-[#E8E6ED] text-[#1A1A1A] font-semibold px-4 py-2 rounded-full hover:bg-[#D6D1CA] transition flex items-center gap-2">
-            🔊 Escuchar Pregunta
-          </button>
-          <button onclick="detenerLectura()" id="btnDetenerMazo" class="text-sm bg-red-50 text-red-600 border border-red-200 font-semibold px-4 py-2 rounded-full hover:bg-red-100 transition flex items-center gap-2 hidden">
-            ⏹️ Detener
-          </button>
-        </div>
-
-        <div class="card-flip w-full h-[250px] md:h-[300px] cursor-pointer mb-6" onclick="voltearTarjeta()">
-          <div id="tarjeta" class="card-inner w-full h-full relative">
-            <div class="card-front bg-[#E8E6ED] flex flex-col items-center justify-center p-6 md:p-8 text-center shadow-sm border border-[#D6D1CA]">
-              <p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Pregunta</p>
-              <p id="texto-pregunta" class="text-xl md:text-3xl font-semibold text-[#1A1A1A]"></p>
-            </div>
-            <div class="card-back flex flex-col items-center justify-center p-6 md:p-8 text-center">
-              <p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Respuesta</p>
-              <p id="texto-respuesta" class="text-lg md:text-2xl font-medium text-[#1A1A1A]"></p>
-            </div>
-          </div>
-        </div>
-
-        <button id="btnMostrar" onclick="voltearTarjeta()" class="w-full max-w-sm bg-[#1A1A1A] text-white font-bold py-3 md:py-4 rounded-xl shadow-lg hover:bg-opacity-80 transition mb-2 text-base md:text-lg">Mostrar Respuesta</button>
-        <button onclick="pedirMasMaterial()" id="btnMas" class="w-full max-w-sm mt-0 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm md:text-base">✨ Generar 8 tarjetas más con IA</button>
-
-        <div id="botones-calificacion" class="flex gap-3 md:gap-4 items-center opacity-0 pointer-events-none transition-opacity duration-300 mt-6">
-          <button onclick="calificar(0)" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center text-lg md:text-xl shadow-lg">😞</button>
-          <button onclick="calificar(1)" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-yellow-400 hover:bg-yellow-500 text-white flex items-center justify-center text-lg md:text-xl shadow-lg">😐</button>
-          <button onclick="calificar(2)" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center text-lg md:text-xl shadow-lg">😊</button>
-        </div>
-      </div>
-
-      <!-- 2. LISTA -->
-      <div id="listaContainer" class="hidden w-full max-w-4xl bg-white p-4 md:p-10 rounded-3xl shadow-sm border border-[#E5E1DA]">
-        <div class="flex justify-between items-center mb-4 md:mb-6">
-          <h2 class="text-xl md:text-2xl font-bold text-[#1A1A1A]">Tarjetas de memoria</h2>
-          <button onclick="pedirMasMaterial()" class="text-xs md:text-sm bg-blue-100 text-blue-700 font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-blue-200 transition">+ Añadir más</button>
-        </div>
-        <div id="listaTarjetas" class="space-y-3"></div>
-      </div>
-
-      <!-- 3. GUÍA -->
-      <div id="guiaContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA]">
-        <div class="flex flex-wrap gap-2 mb-6 border-b border-[#E5E1DA] pb-4">
-          <button onclick="imprimirGuia('Word')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">📄 Descargar Word</button>
-          <button onclick="imprimirGuia('PDF')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">🖨️ Guardar PDF</button>
-          <button onclick="leerGuiaCompleta()" class="text-sm bg-[#E8E6ED] border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#D6D1CA] transition flex items-center gap-2">🔊 Escuchar Guía</button>
-          <button onclick="detenerLectura()" class="text-sm bg-red-50 text-red-600 border border-red-200 font-semibold px-4 py-2 rounded-lg hover:bg-red-100 transition flex items-center gap-2 hidden" id="btnDetenerAudio">⏹️ Detener</button>
-        </div>
-        <div id="guiaTexto" class="guia-content text-[#5A5550] text-sm md:text-base"></div>
-      </div>
-
-      <!-- 4. QUIZ / PRUEBA -->
-      <div id="quizContainer" class="hidden w-full max-w-3xl">
-        <div id="quizSetup" class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-[#E5E1DA] text-center mb-6">
-          <h2 class="text-xl md:text-2xl font-bold mb-2">Crear prueba</h2>
-          <p class="text-xs md:text-sm text-[#8A8580] mb-6">Configura tu examen basado en este kit.</p>
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-            <label class="font-semibold text-xs md:text-sm text-[#1A1A1A]">Número de preguntas:</label>
-            <select id="selectCantidad" class="border border-[#D6D1CA] rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-[#1A1A1A] bg-[#F7F5F2]">
-              <option value="5">5 preguntas</option>
-              <option value="10">10 preguntas</option>
-              <option value="15">15 preguntas</option>
-              <option value="20">20 preguntas</option>
-              <option value="25">25 preguntas</option>
-            </select>
-          </div>
-          <button onclick="iniciarQuiz()" class="bg-[#1A1A1A] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-full font-bold hover:bg-opacity-80 transition text-sm md:text-base">Comenzar Prueba</button>
-        </div>
-        <div id="preguntasQuiz" class="space-y-6"></div>
-      </div>
-    </div>
-  </main>
-
-  <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-[#E5E1DA] flex justify-around py-2 z-50">
-    <button onclick="cambiarTab('mazo')" id="mob-mazo" class="flex flex-col items-center p-2 text-[#1A1A1A]"><span class="text-xl mb-1">🗂️</span><span class="text-[10px] font-bold">Mazo</span></button>
-    <button onclick="cambiarTab('lista')" id="mob-lista" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📄</span><span class="text-[10px] font-medium">Lista</span></button>
-    <button onclick="cambiarTab('guia')" id="mob-guia" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📘</span><span class="text-[10px] font-medium">Guía</span></button>
-    <button onclick="cambiarTab('quiz')" id="mob-quiz" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📝</span><span class="text-[10px] font-medium">Prueba</span></button>
-  </nav>
-
-  <script src="api.js"></script>
-  <script src="study.js"></script>
-</body>
-</html>
+        <div class="w-full flex justify-between items-center mb-6 bg-white px-4 md:px-6 py-3 rounded-2xl shadow-sm border border-[#E5E1DA]
