@@ -19,12 +19,8 @@ let generacionesExtra = 0;
 
   try {
     const data = await generarMaterial(texto);
+    if (!data || !data.flashcards || data.flashcards.length === 0) throw new Error("La IA no devolvió tarjetas válidas.");
     
-    // BLINDAJE: Verificamos que la IA devolvió los datos correctos
-    if (!data || !data.flashcards || data.flashcards.length === 0) {
-      throw new Error("La IA no devolvió tarjetas válidas.");
-    }
-
     material = data;
     if (!material.quiz) material.quiz = []; 
     mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
@@ -43,7 +39,6 @@ let generacionesExtra = 0;
     loadingText.classList.add('text-red-500');
     if(spinner) spinner.classList.add('hidden');
     if(btnError) btnError.classList.remove('hidden');
-    console.error(e);
   }
 })();
 
@@ -55,7 +50,6 @@ function actualizarStatsUI() {
 
 function actualizarUI() {
   if (!material || !mazo || mazo.length === 0) return;
-  
   if (indiceActual >= mazo.length) {
     document.getElementById('texto-pregunta').textContent = "¡Mazo terminado!";
     document.getElementById('texto-respuesta').textContent = "Has repasado todas las tarjetas.";
@@ -93,9 +87,7 @@ function calificar(nivel) {
 }
 
 async function cambiarTab(tab) {
-  // BLINDAJE: Si no hay material, no hace nada
   if (!material) return;
-
   const clasesNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]";
   const activoNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition";
   
@@ -357,46 +349,17 @@ async function pedirMasMaterial() {
   }
 }
 
-function descargarGuiaWord() {
+// --- NUEVA FUNCIÓN DE IMPRESIÓN (SIRVE PARA WORD Y PDF) ---
+function imprimirGuia(tipo) {
   if (!material || !material.guia) {
     alert("Primero debes generar la guía de estudio.");
     return;
   }
   
+  // Creamos una ventana nueva temporal
+  const ventana = window.open('', '_blank');
+  
+  // Convertimos el markdown a HTML
   const guiaHTML = material.guia
     .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-    .replace(/^\* (.*$)/gim, '<li>$1</li>')
-    .replace(/\n/g, '<br>');
-
-  const htmlString = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Guía de Estudio - AprendeYa</title>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        h1 { color: #1a1a1a; font-size: 24px; }
-        h2 { color: #1a1a1a; font-size: 20px; }
-        li { margin-bottom: 8px; }
-      </style>
-    </head>
-    <body>
-      ${guiaHTML}
-    </body>
-    </html>
-  `;
-
-  const converted = htmlDocx.asBlob(htmlString);
-  
-  const url = window.URL.createObjectURL(converted);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'Guia_AprendeYa.docx';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-}
+    .replace(/^## (.*$)/gim, '<h2>$1</h
