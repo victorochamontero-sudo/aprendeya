@@ -41,7 +41,7 @@ async function generarMaterial(texto) {
     return demoMaterial();
   }
 
-  // Llamada a Groq (Modelo Llama 3, gratuito y rapidísimo)
+  // Llamada a Groq (Modelo ACTUALIZADO a llama-3.1-8b-instant)
   const url = 'https://api.groq.com/openai/v1/chat/completions';
   
   const res = await fetch(url, {
@@ -51,7 +51,7 @@ async function generarMaterial(texto) {
       'Authorization': `Bearer ${GROQ_KEY}`
     },
     body: JSON.stringify({
-      model: 'llama3-8b-8192', 
+      model: 'llama-3.1-8b-instant', 
       messages: [{ role: 'user', content: PROMPT + texto }],
       temperature: 0.7,
       response_format: { type: 'json_object' }
