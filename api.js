@@ -1,80 +1,115 @@
-const GROQ_KEY = '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';
+// --- FUNCIONES DEL MODAL DE LOGIN ---
+const modal = document.getElementById('modalLogin');
+function abrirModal() { if(modal){ modal.classList.remove('hidden'); modal.classList.add('flex'); } }
+function cerrarModal() { if(modal){ modal.classList.add('hidden'); modal.classList.remove('flex'); } }
+if(modal) { modal.addEventListener('click', (e) => { if (e.target === modal) cerrarModal(); }); }
 
-const PROMPT_MATERIAL = `Eres un experto en ciencias cognitivas del aprendizaje.
-A partir del siguiente texto, genera material de estudio.
-Devuelve SOLO un JSON válido con esta estructura, sin texto extra:
-{
-  "flashcards": [ { "pregunta": "...", "respuesta": "..." } ],
-  "quiz": [ { "pregunta": "...", "opciones": ["A", "B", "C", "D"], "correcta": 0, "explicacion": "..." } ]
-}
-Reglas: 8 flashcards y 5 preguntas de quiz. Evalúa comprensión. En español.
+// --- FUNCIONES DE LOS MODALES DE INFORMACIÓN ---
+function abrirModalInfo(tipo) {
+  const modalInfo = document.getElementById('modalInfo');
+  const titulo = document.getElementById('infoTitulo');
+  const contenido = document.getElementById('infoContenido');
 
-TEXTO:
-`;
+  if (!modalInfo) return;
 
-const PROMPT_GUIA = `Eres un profesor experto. A partir del siguiente texto, crea una Guía de Estudio completa.
-Usa títulos (con #, ##), viñetas, negritas y párrafos para estructurar los conceptos clave.
-Devuelve SOLO el texto de la guía, sin formato JSON.
-
-TEXTO:
-`;
-
-async function generarMaterial(texto) {
-  const cache = localStorage.getItem('materialGenerado');
-  const textoAnterior = localStorage.getItem('textoGenerado');
-  if (cache && textoAnterior === texto) {
-    try { return JSON.parse(cache); } catch (e) { }
+  if (tipo === 'sobre') {
+    titulo.textContent = 'Sobre AprendeYa 🚀';
+    contenido.innerHTML = '<p>Somos una plataforma diseñada para revolucionar la forma en que estudias. Utilizamos inteligencia artificial para transformar tus apuntes aburridos en herramientas dinámicas de aprendizaje.</p><p>Nuestra misión es que apruebes con menos esfuerzo y más retención.</p>';
+  } else if (tipo === 'recomendaciones') {
+    titulo.textContent = 'Consejos de Estudio 💡';
+    contenido.innerHTML = '<ul class="list-disc pl-5 space-y-2"><li>Estudia en bloques de 25 minutos (Técnica Pomodoro).</li><li>Usa nuestras tarjetas todos los días, la constancia es clave.</li><li>No solo memorices, usa el Quiz para entender los conceptos.</li><li>Explícale a alguien más lo que aprendiste (Técnica Feynman).</li></ul>';
+  } else if (tipo === 'contacto') {
+    titulo.textContent = 'Contacto ✉️';
+    contenido.innerHTML = '<p>¿Tienes dudas, sugerencias o encontraste un error?</p><p>Escríbenos a: <strong>soporte@aprendeya.com</strong></p>';
   }
 
-  if (!GROQ_KEY || GROQ_KEY.includes('pon_aqui')) return demoMaterial();
+  modalInfo.classList.remove('hidden');
+  modalInfo.classList.add('flex');
+}
 
-  const url = 'https://api.groq.com/openai/v1/chat/completions';
-  const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` };
+function cerrarModalInfo() {
+  const modalInfo = document.getElementById('modalInfo');
+  if (modalInfo) {
+    modalInfo.classList.add('hidden');
+    modalInfo.classList.remove('flex');
+  }
+}
+
+// --- LECTURA DE ARCHIVOS ---
+async function handleFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const status = document.getElementById('status');
+  const textarea = document.getElementById('textInput');
+  status.textContent = '⏳ Extrayendo texto del archivo...';
 
   try {
-    const res1 = await fetch(url, {
-      method: 'POST', headers: headers,
-      body: JSON.stringify({
-        model: 'openai/gpt-oss-20b',
-        messages: [{ role: 'user', content: PROMPT_MATERIAL + texto }],
-        temperature: 0.5, response_format: { type: 'json_object' }
-      })
-    });
-    if (!res1.ok) throw new Error('Error en tarjetas: ' + await res1.text());
-    const data1 = await res1.json();
-    let jsonLimpio = data1.choices[0].message.content.trim();
-    const p1 = jsonLimpio.indexOf('{'), p2 = jsonLimpio.lastIndexOf('}');
-    if (p1 !== -1 && p2 !== -1) jsonLimpio = jsonLimpio.substring(p1, p2 + 1);
-    const material = JSON.parse(jsonLimpio);
+    let texto = '';
+    const fileName = file.name.toLowerCase();
 
-    const res2 = await fetch(url, {
-      method: 'POST', headers: headers,
-      body: JSON.stringify({
-        model: 'openai/gpt-oss-20b',
-        messages: [{ role: 'user', content: PROMPT_GUIA + texto }],
-        temperature: 0.7
-      })
-    });
-    if (res2.ok) {
-      const data2 = await res2.json();
-      material.guia = data2.choices[0].message.content;
+    if (fileName.endsWith('.pdf')) {
+      texto = await extraerTextoPDF(file);
+    } else if (fileName.endsWith('.docx')) {
+      texto = await extraerTextoWord(file);
     } else {
-      material.guia = "No se pudo generar la guía.";
+      texto = await file.text();
     }
 
-    localStorage.setItem('materialGenerado', JSON.stringify(material));
-    localStorage.setItem('textoGenerado', texto);
-    return material;
-  } catch (error) {
-    console.error(error);
-    return { flashcards: [{ pregunta: "Error", respuesta: "Intenta de nuevo." }], quiz: [], guia: "Error." };
+    if (!texto.trim()) {
+      status.textContent = '⚠️ No se encontró texto legible.';
+      return;
+    }
+
+    textarea.value = texto.slice(0, 8000);
+    localStorage.setItem('borradorTexto', textarea.value);
+    status.textContent = '✅ Texto cargado. Puedes editarlo o hacer clic en "Generar con IA".';
+  } catch (err) {
+    status.textContent = '❌ Error al leer el archivo: ' + err.message;
   }
 }
 
-function demoMaterial() {
-  return {
-    flashcards: [{ pregunta: '¿Qué es la repetición espaciada?', respuesta: 'Una técnica.' }],
-    quiz: [{ pregunta: '¿Objetivo?', opciones: ['A', 'B', 'C', 'D'], correcta: 1, explicacion: 'Distribuye.' }],
-    guia: "## Guía\n\n- **Concepto 1:** Prueba."
-  };
+async function extraerTextoPDF(file) {
+  const buffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+  let texto = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    texto += content.items.map(item => item.str).join(' ') + '\n';
+  }
+  return texto;
+}
+
+async function extraerTextoWord(file) {
+  const buffer = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+  return result.value;
+}
+
+// --- PROCESAR Y GUARDAR KIT ---
+function procesarEntrada() {
+  const textarea = document.getElementById('textInput');
+  const texto = textarea.value.trim();
+  const status = document.getElementById('status');
+
+  if (!texto) {
+    status.textContent = '⚠️ Por favor, sube un archivo o escribe algo primero.';
+    return;
+  }
+
+  // Pedir nombre para el kit
+  const nombreKit = prompt("Ponle un nombre a este kit de estudio (Ej: Contabilidad Básica):", "Mi Kit");
+  if (!nombreKit) return;
+
+  localStorage.setItem('material', texto.slice(0, 8000));
+  localStorage.setItem('nombreMaterial', nombreKit);
+  localStorage.removeItem('materialGenerado'); 
+  
+  status.textContent = '🚀 Generando material...';
+
+  // 🛠️ EL TRUCO: Esperamos medio segundo para asegurar que el navegador guarde el texto
+  setTimeout(() => {
+    window.location.href = 'study.html';
+  }, 500);
 }
