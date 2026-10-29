@@ -51,22 +51,46 @@ async function extraerTextoWord(file) {
 
 function procesarEntrada() {
   const textarea = document.getElementById('textInput');
-  const texto = textarea.value.trim();
+  const youtubeInput = document.getElementById('youtubeInput');
   const status = document.getElementById('status');
+  
+  let texto = '';
+  let esYoutube = !document.getElementById('opcionYoutube').classList.contains('hidden');
 
-  if (!texto) {
-    status.textContent = '⚠️ Por favor, sube un archivo o escribe algo primero.';
-    return;
+  if (esYoutube) {
+    const url = youtubeInput.value.trim();
+    if (!url) {
+      status.textContent = '⚠️ Por favor, pega un link de YouTube.';
+      return;
+    }
+    // Extraemos el ID del video de la URL
+    const videoId = url.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    if (!videoId) {
+      status.textContent = '⚠️ El link de YouTube no es válido.';
+      return;
+    }
+    // Simulamos la transcripción del video (La API de YouTube no permite hacerlo desde el frontend sin un servidor)
+    texto = `[Transcripción simulada del video de YouTube ID: ${videoId[1]}]\n\nEl video trata sobre conceptos básicos de estudio y aprendizaje. La IA procesará este texto como si fuera la transcripción real del video.`;
+    
+    // NOTA: En producción esto debería llamar a un backend para usar la API de YouTube.
+    // Aquí usamos un texto de prueba para que la función no falle.
+    alert('⚠️ En esta versión de prueba, la transcripción de YouTube es simulada. En la próxima versión, se conectará a un backend para extraer el texto real del video.');
+    
+  } else {
+    texto = textarea.value.trim();
+    if (!texto) {
+      status.textContent = '⚠️ Por favor, sube un archivo o escribe algo primero.';
+      return;
+    }
   }
 
-  // LÓGICA FREEMIUM: Validar si el usuario ya usó su prueba gratis
+  // LÓGICA FREEMIUM
   const usuarioLogueado = localStorage.getItem('usuarioAprendeYa');
   const yaProbo = localStorage.getItem('pruebaGratisUsada');
 
   if (!usuarioLogueado && yaProbo) {
-    // Si no está logueado y ya usó la prueba, lo frenamos
     status.textContent = '⛔ Has alcanzado el límite de prueba.';
-    alert('¡Has creado tu kit de prueba! Para crear más kits ilimitados y guardar tu progreso, por favor regístrate.');
+    alert('¡Has creado tu kit de prueba! Para crear más kits ilimitados, por favor regístrate.');
     abrirModalRegistro();
     return;
   }
@@ -74,7 +98,6 @@ function procesarEntrada() {
   const nombreKit = prompt("Ponle un nombre a este kit de estudio (Ej: Contabilidad Básica):", "Mi Kit de Prueba");
   if (!nombreKit) return;
 
-  // Si no está logueado, marcamos que ya usó su prueba
   if (!usuarioLogueado) {
     localStorage.setItem('pruebaGratisUsada', 'true');
   }
