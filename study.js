@@ -6,7 +6,7 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
 let generacionesExtra = 0; 
 let sintetizador = window.speechSynthesis;
 
-// Variables del Juego
+// Variables del Juego Coincidencias
 let cartasJuego = [];
 let primeraCarta = null;
 let segundaCarta = null;
@@ -14,7 +14,13 @@ let bloqueoTablero = false;
 let puntosJuego = 0;
 let intentosJuego = 0;
 
-// Truco para desbloquear el audio en móviles (requiere interacción)
+// Variables del Juego Apilador
+let torreAltura = 0;
+let torreFallos = 0;
+let preguntasApilador = [];
+let indicePreguntaApilador = 0;
+
+// Truco para desbloquear el audio en móviles
 document.body.addEventListener('click', function() {
   if (sintetizador.speaking) return;
   const utterance = new SpeechSynthesisUtterance('');
@@ -233,6 +239,7 @@ async function cambiarTab(tab) {
     document.getElementById('juegosContainer').classList.remove('hidden');
     document.getElementById('menuJuegos').classList.remove('hidden');
     document.getElementById('juegoActivo').classList.add('hidden');
+    document.getElementById('juegoApilador').classList.add('hidden');
     document.querySelector('#juegosContainer h2').classList.remove('hidden');
   }
 }
@@ -552,9 +559,7 @@ function iniciarJuegoCoincidencias() {
   document.querySelector('#juegosContainer h2').classList.add('hidden');
   document.getElementById('juegoActivo').classList.remove('hidden');
 
-  // Tomamos hasta 6 preguntas (12 cartas) del material actual (mínimo 3)
   const cantidadPares = Math.min(6, Math.floor(material.flashcards.length / 2) * 2);
-  // Si hay muy poquitas tarjetas, usamos las que haya
   const cantidadFinal = Math.max(3, Math.min(cantidadPares, material.flashcards.length));
   
   let preguntasSeleccionadas = material.flashcards.slice(0, cantidadFinal);
@@ -576,10 +581,11 @@ function iniciarJuegoCoincidencias() {
   document.getElementById('intentosJuego').textContent = 0;
 
   const tablero = document.getElementById('tableroJuego');
+  // Cartas visibles desde el principio (sin el "?")
   tablero.innerHTML = cartasJuego.map((carta, index) => `
     <div onclick="voltearCartaJuego(${index})" id="carta-${index}" 
          class="h-32 md:h-40 bg-white border-2 border-[#E5E1DA] rounded-xl flex items-center justify-center p-2 text-center text-xs md:text-sm cursor-pointer transition transform hover:-translate-y-1 shadow-sm overflow-hidden select-none">
-      <span class="text-gray-300 text-3xl">?</span>
+      <span class="font-bold text-[#1A1A1A]">${carta.texto}</span>
     </div>
   `).join('');
 }
@@ -593,8 +599,9 @@ function voltearCartaJuego(index) {
   if (primeraCarta === index) return;
 
   const carta = cartasJuego[index];
-  cartaDiv.innerHTML = `<span class="font-bold text-[#1A1A1A]">${carta.texto}</span>`;
-  cartaDiv.classList.add('volteada', 'bg-[#F7F5F2]', 'border-[#1A1A1A]');
+  
+  // Marcamos visualmente la carta seleccionada
+  cartaDiv.classList.add('volteada', 'bg-blue-100', 'border-blue-500');
 
   if (!primeraCarta) {
     primeraCarta = index;
@@ -604,10 +611,14 @@ function voltearCartaJuego(index) {
     document.getElementById('intentosJuego').textContent = intentosJuego;
 
     if (cartasJuego[primeraCarta].id === cartasJuego[segundaCarta].id) {
+      // Acierto
       puntosJuego += 10;
       document.getElementById('puntosJuego').textContent = puntosJuego;
       
+      document.getElementById(`carta-${primeraCarta}`).classList.remove('bg-blue-100', 'border-blue-500');
       document.getElementById(`carta-${primeraCarta}`).classList.add('bg-green-100', 'border-green-500');
+      
+      document.getElementById(`carta-${segundaCarta}`).classList.remove('bg-blue-100', 'border-blue-500');
       document.getElementById(`carta-${segundaCarta}`).classList.add('bg-green-100', 'border-green-500');
       
       resetearSeleccion();
@@ -617,13 +628,11 @@ function voltearCartaJuego(index) {
       }
 
     } else {
+      // Fallo
       bloqueoTablero = true;
       setTimeout(() => {
-        document.getElementById(`carta-${primeraCarta}`).innerHTML = '<span class="text-gray-300 text-3xl">?</span>';
-        document.getElementById(`carta-${primeraCarta}`).classList.remove('volteada', 'bg-[#F7F5F2]', 'border-[#1A1A1A]');
-        
-        document.getElementById(`carta-${segundaCarta}`).innerHTML = '<span class="text-gray-300 text-3xl">?</span>';
-        document.getElementById(`carta-${segundaCarta}`).classList.remove('volteada', 'bg-[#F7F5F2]', 'border-[#1A1A1A]');
+        document.getElementById(`carta-${primeraCarta}`).classList.remove('volteada', 'bg-blue-100', 'border-blue-500');
+        document.getElementById(`carta-${segundaCarta}`).classList.remove('volteada', 'bg-blue-100', 'border-blue-500');
         
         bloqueoTablero = false;
         resetearSeleccion();
@@ -637,8 +646,95 @@ function resetearSeleccion() {
   segundaCarta = null;
 }
 
+// --- LÓGICA DEL JUEGO APILADOR ---
+function iniciarJuegoApilador() {
+  if (!material || !material.flashcards || material.flashcards.length === 0) {
+    alert("Necesitas tarjetas para jugar.");
+    return;
+  }
+
+  document.getElementById('menuJuegos').classList.add('hidden');
+  document.querySelector('#juegosContainer h2').classList.add('hidden');
+  document.getElementById('juegoApilador').classList.remove('hidden');
+
+  // Mezclamos todas las tarjetas
+  preguntasApilador = [...material.flashcards].sort(() => Math.random() - 0.5);
+  indicePreguntaApilador = 0;
+  torreAltura = 0;
+  torreFallos = 0;
+
+  document.getElementById('alturaTorre').textContent = 0;
+  document.getElementById('fallosTorre').textContent = 0;
+  document.getElementById('torreContainer').innerHTML = '';
+
+  cargarPreguntaApilador();
+}
+
+function cargarPreguntaApilador() {
+  if (indicePreguntaApilador >= preguntasApilador.length) {
+    alert('¡Increíble! Has respondido todas las tarjetas. 🏆');
+    salirJuego();
+    return;
+  }
+
+  const pregunta = preguntasApilador[indicePreguntaApilador];
+  document.getElementById('textoPreguntaApilador').textContent = pregunta.pregunta;
+
+  // Generamos 3 opciones falsas (de otras respuestas)
+  let opciones = [pregunta.respuesta];
+  while (opciones.length < 4 && material.flashcards.length > 1) {
+    const random = material.flashcards[Math.floor(Math.random() * material.flashcards.length)].respuesta;
+    if (!opciones.includes(random)) opciones.push(random);
+  }
+
+  // Mezclamos las opciones
+  opciones.sort(() => Math.random() - 0.5);
+
+  const contOpciones = document.getElementById('opcionesApilador');
+  contOpciones.innerHTML = opciones.map(op => `
+    <button onclick="responderApilador('${op.replace(/'/g, "\\'")}', '${pregunta.respuesta.replace(/'/g, "\\'")}')" 
+            class="w-full text-left px-4 py-3 rounded-xl border border-[#E5E1DA] bg-white hover:bg-[#F7F5F2] text-sm font-medium transition">
+      ${op}
+    </button>
+  `).join('');
+}
+
+function responderApilador(opcionElegida, respuestaCorrecta) {
+  const contOpciones = document.getElementById('opcionesApilador');
+  contOpciones.innerHTML = ''; // Ocultar opciones temporalmente
+
+  if (opcionElegida === respuestaCorrecta) {
+    // Acierto
+    torreAltura++;
+    document.getElementById('alturaTorre').textContent = torreAltura;
+    
+    // Añadir bloque a la torre
+    const bloque = document.createElement('div');
+    bloque.className = 'bloque-torre bloque-pregunta';
+    if (torreAltura % 2 === 0) bloque.style.width = '90%';
+    document.getElementById('torreContainer').appendChild(bloque);
+
+    document.getElementById('textoPreguntaApilador').textContent = "¡Correcto! 🎉";
+    setTimeout(() => {
+      indicePreguntaApilador++;
+      cargarPreguntaApilador();
+    }, 1000);
+
+  } else {
+    // Fallo
+    torreFallos++;
+    document.getElementById('fallosTorre').textContent = torreFallos;
+    
+    document.getElementById('textoPreguntaApilador').textContent = "¡Incorrecto! 😞";
+    setTimeout(() => {
+      indicePreguntaApilador++;
+      cargarPreguntaApilador();
+    }, 1500);
+  }
+}
+
 function salirJuego() {
   document.getElementById('juegoActivo').classList.add('hidden');
+  document.getElementById('juegoApilador').classList.add('hidden');
   document.getElementById('menuJuegos').classList.remove('hidden');
-  document.querySelector('#juegosContainer h2').classList.remove('hidden');
-}
+  document.querySelector('#juegosContainer
