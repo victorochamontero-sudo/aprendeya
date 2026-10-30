@@ -6,13 +6,20 @@ let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
 let generacionesExtra = 0; 
 let sintetizador = window.speechSynthesis;
 
-// Variables para el juego de Coincidencias
+// Variables del Juego
 let cartasJuego = [];
 let primeraCarta = null;
 let segundaCarta = null;
 let bloqueoTablero = false;
 let puntosJuego = 0;
 let intentosJuego = 0;
+
+// Truco para desbloquear el audio en móviles (requiere interacción)
+document.body.addEventListener('click', function() {
+  if (sintetizador.speaking) return;
+  const utterance = new SpeechSynthesisUtterance('');
+  sintetizador.speak(utterance);
+}, { once: true });
 
 (async function init() {
   const texto = localStorage.getItem('material');
@@ -31,11 +38,9 @@ let intentosJuego = 0;
     let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
     const kitGuardado = historial.find(k => k.nombre === nombreKit);
 
-    // LOGICA DE CARGA: Si el kit ya existe, lo usamos
     if (kitGuardado && kitGuardado.material && kitGuardado.material.flashcards && kitGuardado.material.flashcards.length > 0) {
       material = kitGuardado.material;
     } else {
-      // Si es nuevo, generamos
       const data = await generarMaterial(texto);
       if (!data || !data.flashcards || data.flashcards.length === 0) throw new Error("La IA no devolvió tarjetas válidas.");
       material = data;
@@ -187,7 +192,7 @@ async function cambiarTab(tab) {
     const guiaHTML = document.getElementById('guiaTexto');
     
     if (!material.guia || material.guia.includes("Haz clic") || material.guia.length < 50) {
-      guiaHTML.innerHTML = '<div class="text-center py-12"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-[#8A8580]">Generando tu guía de estudio (esto puede tardar unos segundos)...</p></div>';
+      guiaHTML.innerHTML = '<div class="text-center py-12"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-[#8A8580]">Generando tu guía de estudio...</p></div>';
       try {
         const textoOriginal = localStorage.getItem('material');
         const nuevaGuia = await generarGuia(textoOriginal);
@@ -209,7 +214,7 @@ async function cambiarTab(tab) {
 
       } catch (e) {
         console.error("Error generando guía:", e);
-        guiaHTML.innerHTML = '<p class="text-red-500">Hubo un error generando la guía. Por favor, recarga la página.</p>';
+        guiaHTML.innerHTML = '<p class="text-red-500">Hubo un error generando la guía.</p>';
         return;
       }
     }
@@ -538,8 +543,8 @@ function detenerLectura() {
 
 // --- LÓGICA DEL JUEGO DE COINCIDENCIAS ---
 function iniciarJuegoCoincidencias() {
-  if (!material || !material.flashcards || material.flashcards.length < 6) {
-    alert("Necesitas al menos 6 tarjetas para jugar. Genera más material.");
+  if (!material || !material.flashcards || material.flashcards.length < 3) {
+    alert("Necesitas al menos 3 tarjetas para jugar. Genera más material.");
     return;
   }
 
@@ -547,8 +552,12 @@ function iniciarJuegoCoincidencias() {
   document.querySelector('#juegosContainer h2').classList.add('hidden');
   document.getElementById('juegoActivo').classList.remove('hidden');
 
-  // Tomamos 6 preguntas (12 cartas) del material actual
-  let preguntasSeleccionadas = material.flashcards.slice(0, 6);
+  // Tomamos hasta 6 preguntas (12 cartas) del material actual (mínimo 3)
+  const cantidadPares = Math.min(6, Math.floor(material.flashcards.length / 2) * 2);
+  // Si hay muy poquitas tarjetas, usamos las que haya
+  const cantidadFinal = Math.max(3, Math.min(cantidadPares, material.flashcards.length));
+  
+  let preguntasSeleccionadas = material.flashcards.slice(0, cantidadFinal);
   
   cartasJuego = [];
   preguntasSeleccionadas.forEach((f, index) => {
