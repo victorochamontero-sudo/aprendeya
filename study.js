@@ -728,6 +728,7 @@ function responderApilador(opcionElegida, respuestaCorrecta) {
     const bloque = document.createElement('div');
     bloque.className = 'bloque-torre bloque-pregunta';
       bloque.className = 'bloque-torre bloque-pregunta';
+        bloque.className = 'bloque-torre bloque-pregunta';
     if (torreAltura % 2 === 0) bloque.style.width = '90%';
     document.getElementById('torreContainer').appendChild(bloque);
 
