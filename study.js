@@ -20,7 +20,7 @@ let torreFallos = 0;
 let preguntasApilador = [];
 let indicePreguntaApilador = 0;
 
-// Truco para desbloquear el audio en móviles
+// TRUCO PARA DESBLOQUEAR EL AUDIO EN MÓVILES
 document.body.addEventListener('click', function() {
   if (sintetizador.speaking) return;
   const utterance = new SpeechSynthesisUtterance('');
@@ -39,7 +39,6 @@ document.body.addEventListener('click', function() {
     return;
   }
 
-  // Reloj de seguridad: Si la IA tarda más de 15 segundos, mostramos error
   const timeout = setTimeout(() => {
     loadingText.textContent = "La IA está tardando más de lo normal...";
     loadingText.classList.add('text-red-500');
@@ -52,11 +51,9 @@ document.body.addEventListener('click', function() {
     let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
     const kitGuardado = historial.find(k => k.nombre === nombreKit);
 
-    // Si el kit ya existe y tiene tarjetas, lo usamos
     if (kitGuardado && kitGuardado.material && kitGuardado.material.flashcards && kitGuardado.material.flashcards.length > 0) {
       material = kitGuardado.material;
     } else {
-      // Si es nuevo, generamos
       const data = await generarMaterial(texto);
       if (!data || !data.flashcards || data.flashcards.length === 0) throw new Error("La IA no devolvió tarjetas válidas.");
       material = data;
@@ -66,7 +63,7 @@ document.body.addEventListener('click', function() {
       localStorage.setItem('historialKits', JSON.stringify(historial));
     }
 
-    clearTimeout(timeout); // Cancelamos el reloj si todo salió bien
+    clearTimeout(timeout);
 
     if (!material.quiz) material.quiz = []; 
     mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
@@ -253,6 +250,7 @@ async function cambiarTab(tab) {
     document.getElementById('menuJuegos').classList.remove('hidden');
     document.getElementById('juegoActivo').classList.add('hidden');
     document.getElementById('juegoApilador').classList.add('hidden');
+    document.getElementById('juegoApiladorActivo').classList.add('hidden');
     document.querySelector('#juegosContainer h2').classList.remove('hidden');
   }
 }
@@ -532,22 +530,32 @@ function leerGuiaCompleta() {
   if (!material || !material.guia) return;
   detenerLectura();
   
+  // Dividimos la guía en trozos más pequeños para que el celular no la corte
   const textoLimpio = material.guia
     .replace(/[#*]/g, '')
     .replace(/\n/g, ' ');
   
-  const utterance = new SpeechSynthesisUtterance(textoLimpio);
-  utterance.lang = 'es-ES';
-  utterance.rate = 0.9;
+  // Dividimos por puntos para que lea frase por frase
+  const frases = textoLimpio.match(/[^.!?]+[.!?]+/g) || [textoLimpio];
   
   const btnDetener = document.getElementById('btnDetenerAudio');
   if (btnDetener) btnDetener.classList.remove('hidden');
-  
-  utterance.onend = () => {
-    if (btnDetener) btnDetener.classList.add('hidden');
-  };
-  
-  sintetizador.speak(utterance);
+
+  let i = 0;
+  function leerSiguienteFrase() {
+    if (i < frases.length) {
+      const utterance = new SpeechSynthesisUtterance(frases[i]);
+      utterance.lang = 'es-ES';
+      utterance.rate = 0.9;
+      utterance.onend = leerSiguienteFrase; // Al terminar una frase, lee la siguiente
+      sintetizador.speak(utterance);
+      i++;
+    } else {
+      if (btnDetener) btnDetener.classList.add('hidden');
+    }
+  }
+
+  leerSiguienteFrase();
 }
 
 function detenerLectura() {
@@ -665,6 +673,12 @@ function iniciarJuegoApilador() {
   document.getElementById('menuJuegos').classList.add('hidden');
   document.querySelector('#juegosContainer h2').classList.add('hidden');
   document.getElementById('juegoApilador').classList.remove('hidden');
+}
+
+function comenzarApilador() {
+  document.getElementById('juegoApilador').classList.add('hidden');
+  document.getElementById('juegoApiladorActivo').classList.remove('hidden');
+  document.getElementById('juegoApiladorActivo').classList.add('flex');
 
   preguntasApilador = [...material.flashcards].sort(() => Math.random() - 0.5);
   indicePreguntaApilador = 0;
@@ -708,7 +722,6 @@ function cargarPreguntaApilador() {
 function responderApilador(opcionElegida, respuestaCorrecta) {
   const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = ''; 
-
   if (opcionElegida === respuestaCorrecta) {
     torreAltura++;
     document.getElementById('alturaTorre').textContent = torreAltura;
@@ -726,8 +739,7 @@ function responderApilador(opcionElegida, respuestaCorrecta) {
 
   } else {
     torreFallos++;
-    document.getElementById('fallosTorre').
-          document.getElementById('fallosTorre').textContent = torreFallos;
+    document.getElementById('fallosTorre').textContent = torreFallos;
     
     document.getElementById('textoPreguntaApilador').textContent = "¡Incorrecto! 😞";
     setTimeout(() => {
@@ -740,6 +752,9 @@ function responderApilador(opcionElegida, respuestaCorrecta) {
 function salirJuego() {
   document.getElementById('juegoActivo').classList.add('hidden');
   document.getElementById('juegoApilador').classList.add('hidden');
+  document.getElementById('juegoApiladorActivo').classList.add('hidden');
+  document.getElementById('juegoApiladorActivo').classList.remove('flex');
   document.getElementById('menuJuegos').classList.remove('hidden');
   document.querySelector('#juegosContainer h2').classList.remove('hidden');
 }
+  if (opcionElegida ===
