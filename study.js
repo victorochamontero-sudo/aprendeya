@@ -173,8 +173,7 @@ async function cambiarTab(tab) {
   document.getElementById('guiaContainer').classList.add('hidden');
   document.getElementById('quizContainer').classList.add('hidden');
   document.getElementById('juegosContainer').classList.add('hidden');
-
-  if (tab === 'mazo') {
+    if (tab === 'mazo') {
     document.getElementById('mazoContainer').classList.remove('hidden');
     document.getElementById('mazoContainer').classList.add('flex');
     actualizarUI();
@@ -359,7 +358,6 @@ function editarTarjeta(index) {
 
   cambiarTab('lista');
 }
-
 async function pedirMasMaterial() {
   const btnMas = document.getElementById('btnMas');
   const textoOriginal = localStorage.getItem('material');
@@ -727,16 +725,12 @@ function cargarPreguntaApilador() {
   // Dibujamos los botones
   const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = opciones.map(op => `
-    <button onclick="responderApilador('${op.replace(/'/g, "\\'")}', '${pregunta.respuesta.replace(/'/g, "\\'")}')" 
-            class="w-full text-left px-4 py-3 rounded-xl border border-[#E5E1DA] bg-white hover:bg-[#F7F5F2] text-sm font-medium transition mb-2">
-      ${op}
+    <button onclick="responderApilador('${op.replace(/'/    ${op}
     </button>
   `).join('');
 }
 
 function responderApilador(opcionElegida, respuestaCorrecta) {
-  const contOpciones = document.getElementById('opcionesApilador');
- function responderApilador(opcionElegida, respuestaCorrecta) {
   const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = ''; 
 
@@ -775,5 +769,3 @@ function salirJuego() {
   document.getElementById('menuJuegos').classList.remove('hidden');
   document.querySelector('#juegosContainer h2').classList.remove('hidden');
 }
-
- 
