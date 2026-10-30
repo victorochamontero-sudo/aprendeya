@@ -1,1 +1,752 @@
-let material=null,mazo=[],indiceActual=0,mostrandoRespuesta=!1,stats={aprendiendo:0,revisando:0,dominado:0},generacionesExtra=0,sintetizador=window.speechSynthesis,cartasJuego=[],primeraCarta=null,segundaCarta=null,bloqueoTablero=!1,puntosJuego=0,intentosJuego=0,torreAltura=0,torreFallos=0,preguntasApilador=[],indicePreguntaApilador=0;document.body.addEventListener("click",function(){if(!sintetizador.speaking){const e=new SpeechSynthesisUtterance("");sintetizador.speak(e)}},{once:!0}),async function init(){const e=localStorage.getItem("material"),t=document.getElementById("loading"),n=document.getElementById("loadingText"),o=document.getElementById("btnError"),a=document.getElementById("loadingSpinner");if(!e)return void(t.innerHTML='<p class="text-sm text-[#8A8580]">No hay material. <a href="index.html" class="underline">Sube un archivo</a>.</p>');const s=setTimeout(()=>{n.textContent="La IA está tardando más de lo normal...",n.classList.add("text-red-500"),a&&a.classList.add("hidden"),o&&o.classList.remove("hidden")},15e3);try{const t=localStorage.getItem("nombreMaterial")||"Mi Kit";let o=JSON.parse(localStorage.getItem("historialKits")||"[]");const a=o.find(e=>e.nombre===t);if(a&&a.material&&a.material.flashcards&&a.material.flashcards.length>0)material=a.material;else{const n=await generarMaterial(e);if(!n||!n.flashcards||0===n.flashcards.length)throw new Error("La IA no devolvió tarjetas válidas.");material=n,o=o.filter(e=>e.nombre!==t),o.unshift({id:Date.now(),nombre:t,material:material}),localStorage.setItem("historialKits",JSON.stringify(o))}clearTimeout(s),material.quiz||(material.quiz=[]),mazo=[...material.flashcards].sort(()=>Math.random()-.5),stats.aprendiendo=mazo.length,t.classList.add("hidden"),cambiarTab("mazo")}catch(e){clearTimeout(s),n.textContent="¡Ups! Hubo un error de conexión con la IA.",n.classList.add("text-red-500"),a&&a.classList.add("hidden"),o&&o.classList.remove("hidden")}}function actualizarStatsUI(){document.getElementById("stat-aprendiendo").textContent=stats.aprendiendo,document.getElementById("stat-revisando").textContent=stats.revisando,document.getElementById("stat-dominado").textContent=stats.dominado}function actualizarUI(){if(!material||!mazo||0===mazo.length)return;if(indiceActual>=mazo.length)return document.getElementById("texto-pregunta").textContent="¡Mazo terminado!",document.getElementById("texto-respuesta").textContent="Has repasado todas las tarjetas.",document.getElementById("botones-calificacion").classList.add("opacity-0","pointer-events-none"),void document.getElementById("btnMostrar").classList.add("hidden");const e=mazo[indiceActual];document.getElementById("texto-pregunta").textContent=e.pregunta,document.getElementById("texto-respuesta").textContent=e.respuesta,mostrandoRespuesta=!1,document.getElementById("tarjeta").classList.remove("flipped"),document.getElementById("botones-calificacion").classList.add("opacity-0","pointer-events-none"),document.getElementById("btnMostrar").classList.remove("hidden"),actualizarStatsUI()}function voltearTarjeta(){if(!mostrandoRespuesta&&!(indiceActual>=mazo.length)){mostrandoRespuesta=!0,document.getElementById("tarjeta").classList.add("flipped"),document.getElementById("btnMostrar").classList.add("hidden");setTimeout(()=>{document.getElementById("botones-calificacion").classList.remove("opacity-0","pointer-events-none")},300)}}function calificar(e){stats.aprendiendo--,0===e?(stats.aprendiendo++,mazo.push(mazo[indiceActual])):1===e?stats.revisando++:2===e&&stats.dominado++,indiceActual++,setTimeout(()=>{actualizarUI()},300)}async function cambiarTab(e){if(material){detenerLectura();const t="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]",n="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition";document.getElementById("nav-mazo")&&(document.getElementById("nav-mazo").className=t,document.getElementById("nav-lista").className=t,document.getElementById("nav-guia").className=t,document.getElementById("nav-quiz").className=t,document.getElementById("nav-juegos").className=t,"mazo"===e&&(document.getElementById("nav-mazo").className=n),"lista"===e&&(document.getElementById("nav-lista").className=n),"guia"===e&&(document.getElementById("nav-guia").className=n),"quiz"===e&&(document.getElementById("nav-quiz").className=n),"juegos"===e&&(document.getElementById("nav-juegos").className=n));const o="flex flex-col items-center p-2 text-[#8A8580]",a="flex flex-col items-center p-2 text-[#1A1A1A]";document.getElementById("mob-mazo")&&(document.getElementById("mob-mazo").className=o,document.getElementById("mob-lista").className=o,document.getElementById("mob-guia").className=o,document.getElementById("mob-quiz").className=o,document.getElementById("mob-juegos").className=o,"mazo"===e&&(document.getElementById("mob-mazo").className=a),"lista"===e&&(document.getElementById("mob-lista").className=a),"guia"===e&&(document.getElementById("mob-guia").className=a),"quiz"===e&&(document.getElementById("mob-quiz").className=a),"juegos"===e&&(document.getElementById("mob-juegos").className=a));const s=document.getElementById("headerTitle");if(s&&("mazo"===e&&(s.textContent="Mazo"),"lista"===e&&(s.textContent="Lista"),"guia"===e&&(s.textContent="Guía de Estudio"),"quiz"===e&&(s.textContent="Prueba"),"juegos"===e&&(s.textContent="Juegos")),document.getElementById("mazoContainer").classList.add("hidden"),document.getElementById("mazoContainer").classList.remove("flex"),document.getElementById("listaContainer").classList.add("hidden"),document.getElementById("guiaContainer").classList.add("hidden"),document.getElementById("quizContainer").classList.add("hidden"),document.getElementById("juegosContainer").classList.add("hidden"),"mazo"===e)document.getElementById("mazoContainer").classList.remove("hidden"),document.getElementById("mazoContainer").classList.add("flex"),actualizarUI();else if("lista"===e){document.getElementById("listaContainer").classList.remove("hidden");const e=document.getElementById("listaTarjetas");material&&material.flashcards&&(e.innerHTML=material.flashcards.map((e,t)=>`\n        <div class="bg-white rounded-xl border border-[#E5E1DA] overflow-hidden transition-all duration-300 mb-3">\n          <button onclick="toggleRespuesta(${t})" class="w-full text-left p-4 flex justify-between items-center hover:bg-[#F7F5F2] transition">\n            <span class="font-bold text-[#1A1A1A] text-sm md:text-base pr-4">${e.pregunta}</span>\n            <span id="icono-${t}" class="text-[#8A8580] text-xl font-bold transform transition-transform duration-300">+</span>\n          </button>\n          <div id="respuesta-${t}" class="hidden px-4 pb-4 pt-1 border-t border-[#F7F5F2]">\n            <p class="text-sm text-[#5A5550] mb-3">${e.respuesta}</p>\n            <div class="flex gap-2">\n              <button onclick="editarTarjeta(${t})" class="text-xs font-semibold text-blue-500 hover:text-blue-700">✏️ Editar</button>\n              <button onclick="leerTarjetaLista(${t})" class="text-xs font-semibold text-[#1A1A1A] bg-[#E8E6ED] px-2 py-1 rounded">🔊 Escuchar</button>\n              <button onclick="detenerLectura()" class="text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded">⏹️ Detener</button>\n            </div>\n          </div>\n        </div>\n      `).join(""))}else if("guia"===e){if(document.getElementById("guiaContainer").classList.remove("hidden"),!material.guia||material.guia.includes("Haz clic")||material.guia.length<50){const e=document.getElementById("guiaTexto");e.innerHTML='<div class="text-center py-12"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-[#8A8580]">Generando tu guía de estudio...</p></div>';try{const e=localStorage.getItem("material"),t=await generarGuia(e);material.guia=t,localStorage.setItem("materialGenerado",JSON.stringify(material));const n=localStorage.getItem("nombreMaterial")||"Mi Kit";let o=JSON.parse(localStorage.getItem("historialKits")||"[]");const a=o.findIndex(e=>e.nombre===n);-1!==a?(o[a].material=material,localStorage.setItem("historialKits",JSON.stringify(o))):(o.unshift({id:Date.now(),nombre:n,material:material}),localStorage.setItem("historialKits",JSON.stringify(o)))}catch(e){return void(e.innerHTML='<p class="text-red-500">Hubo un error generando la guía.</p>')}}document.getElementById("guiaTexto").innerHTML=material.guia.replace(/^# (.*$)/gim,"<h1>$1</h1>").replace(/^## (.*$)/gim,"<h2>$1</h2>").replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>").replace(/^\* (.*$)/gim,"<ul><li>$1</li></ul>").replace(/\n/g,"<br>")}else if("quiz"===e)document.getElementById("quizContainer").classList.remove("hidden"),document.getElementById("quizSetup").classList.remove("hidden"),document.getElementById("preguntasQuiz").innerHTML="";else if("juegos"===e){document.getElementById("juegosContainer").classList.remove("hidden"),document.getElementById("menuJuegos").classList.remove("hidden"),document.getElementById("juegoActivo").classList.add("hidden"),document.getElementById("juegoApilador").classList.add("hidden"),document.getElementById("juegoApiladorActivo").classList.add("hidden"),document.querySelector("#juegosContainer h2").classList.remove("hidden")}}}function toggleRespuesta(e){const t=document.getElementById(`respuesta-${e}`),n=document.getElementById(`icono-${e}`);t.classList.contains("hidden")?(t.classList.remove("hidden"),n.textContent="−",n.classList.add("rotate-180")):(t.classList.add("hidden"),n.textContent="+",n.classList.remove("rotate-180"))}async function iniciarQuiz(){if(!material)return;const e=parseInt(document.getElementById("selectCantidad").value),t=document.getElementById("preguntasQuiz"),n=document.getElementById("quizSetup");if(n.classList.add("hidden"),t.innerHTML='<div class="text-center py-8"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-center text-[#8A8580]">Preparando tu examen...</p></div>',material.quiz||(material.quiz=[]),material.quiz.length<e)try{const t=localStorage.getItem("material"),n=e-material.quiz.length,o=await generarPreguntasExtra(t,n);o&&o.length>0&&(material.quiz=[...material.quiz,...o],localStorage.setItem("materialGenerado",JSON.stringify(material)))}catch(e){}if(0===material.quiz.length)return void(t.innerHTML='<p class="text-center text-red-500">No se pudieron generar preguntas. Intenta con un texto más largo.</p>');const o=material.quiz.slice(0,e);t.innerHTML="",o.forEach((e,n)=>{const o=document.createElement("div");o.className="bg-white p-6 rounded-2xl shadow-sm border border-[#E5E1DA] mb-4",o.innerHTML=`\n      <p class="font-bold mb-4 text-lg">${n+1}. ${e.pregunta}</p>\n      <div class="space-y-2" id="opciones-${n}">\n        ${e.opciones.map((e,t)=>`\n          <button onclick="responderQuiz(${n}, ${t})"\n            class="w-full text-left px-5 py-3 rounded-xl border border-[#E5E1DA] text-sm hover:bg-[#F7F5F2] transition">\n            ${e}\n          </button>\n        `).join("")}\n      </div>\n      <p id="exp-${n}" class="hidden mt-4 text-sm text-[#5A5550] bg-[#F7F5F2] p-4 rounded-xl"></p>\n    `,t.appendChild(o)}),material.quiz=o}function responderQuiz(e,t){const n=material.quiz[e],o=document.querySelectorAll(`#opciones-${e} button`),a=document.getElementById(`exp-${e}`);o.forEach((e,o)=>{e.disabled=!0,o===n.correcta?e.className="w-full text-left px-5 py-3 rounded-xl border-2 border-green-500 bg-green-50 text-sm font-medium":o===t?e.className="w-full text-left px-5 py-3 rounded-xl border-2 border-red-400 bg-red-50 text-sm":e.className="w-full text-left px-5 py-3 rounded-xl border border-[#E5E1DA] text-sm opacity-50"}),a.textContent="💡 "+n.explicacion,a.classList.remove("hidden")}function editarTarjeta(e){if(!material||!material.flashcards)return;const t=material.flashcards[e],n=prompt("Edita la pregunta:",t.pregunta);if(null===n)return;const o=prompt("Edita la respuesta:",t.respuesta);if(null===o)return;material.flashcards[e].pregunta=n,material.flashcards[e].respuesta=o,localStorage.setItem("materialGenerado",JSON.stringify(material));const a=localStorage.getItem("nombreMaterial")||"Mi Kit";let s=JSON.parse(localStorage.getItem("historialKits")||"[]");const i=s.findIndex(e=>e.nombre===a);-1!==i&&(s[i].material=material,localStorage.setItem("historialKits",JSON.stringify(s))),cambiarTab("lista")}async function pedirMasMaterial(){const e=document.getElementById("btnMas"),t=localStorage.getItem("material");if(t&&material){if(generacionesExtra>=2)return alert("Límite alcanzado: solo puedes generar material extra 2 veces por kit."),void(e&&(e.style.display="none"));e&&(e.innerHTML='<div class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Generando...',e.disabled=!0);try{const n=await generarMasMaterial(t,material.flashcards,material.quiz);n.flashcards&&(material.flashcards=[...material.flashcards,...n.flashcards],mazo=[...mazo,...n.flashcards].sort(()=>Math.random()-.5),stats.aprendiendo+=n.flashcards.length),n.quiz&&(material.quiz=[...(material.quiz||[]),...n.quiz]),localStorage.setItem("materialGenerado",JSON.stringify(material));const o=localStorage.getItem("nombreMaterial")||"Mi Kit";let a=JSON.parse(localStorage.getItem("historialKits")||"[]");const s=a.findIndex(e=>e.nombre===o);-1!==s&&(a[s].material=material,localStorage.setItem("historialKits",JSON.stringify(a))),generacionesExtra++,generacionesExtra>=2?e&&(e.innerHTML="✨ Límite de generación alcanzado",e.classList.remove("bg-blue-500","hover:bg-blue-600"),e.classList.add("bg-gray-300","text-gray-500","cursor-not-allowed")):e&&(e.innerHTML="✨ Generar 8 tarjetas más con IA",e.disabled=!1),indiceActual=0,actualizarUI(),document.getElementById("listaContainer").classList.contains("hidden")?alert("¡Se han añadido 8 tarjetas y 4 preguntas nuevas a tu kit!"):cambiarTab("lista")}catch(t){alert("Hubo un error al generar más material. Por favor, recarga la página."),e&&(e.innerHTML="✨ Generar 8 tarjetas más con IA",e.disabled=!1)}}}function imprimirGuia(e){if(!material||!material.guia)return void alert("Primero debes generar la guía de estudio.");const t=window.open("","_blank"),n=material.guia.replace(/^# (.*$)/gim,"<h1>$1</h1>").replace(/^## (.*$)/gim,"<h2>$1</h2>").replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>").replace(/^\* (.*$)/gim,"<ul><li>$1</li></ul>").replace(/\n/g,"<br>"),o=localStorage.getItem("nombreMaterial")||"Mi Guía",a="Word"===e?"Guia_AprendeYa_Word":"Guia_AprendeYa_PDF";t.document.write(`\n    <!DOCTYPE html>\n    <html>\n    <head>\n      <meta charset="utf-8">\n      <title>${a}</title>\n      <style>\n        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 40px; max-width: 800px; margin: 0 auto; }\n        h1 { color: #1a1a1a; font-size: 28px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }\n        h2 { color: #1a1a1a; font-size: 22px; margin-top: 30px; }\n        li { margin-bottom: 10px; }\n        strong { color: #000; }\n        .header { text-align: center; margin-bottom: 40px; color: #888; font-size: 14px; }\n      </style>\n    </head>\n    <body>\n      <div class="header">\n        <h3>Guía de Estudio generada por AprendeYa</h3>\n        <p>Kit: ${o}</p>\n      </div>\n      ${n}\n    </body>\n    </html>\n  `),t.document.close(),t.focus(),setTimeout(()=>{t.print()},500)}function leerTextoActual(){if(!mazo||indiceActual>=mazo.length)return;detenerLectura();const e=mazo[indiceActual],t=mostrandoRespuesta?e.respuesta:e.pregunta,n=new SpeechSynthesisUtterance(t);n.lang="es-ES",n.rate=.9;const o=document.getElementById("btnDetenerMazo");o&&o.classList.remove("hidden"),n.onend=()=>{o&&o.classList.add("hidden")},sintetizador.speak(n)}function leerTarjetaLista(e){if(!material||!material.flashcards||!material.flashcards[e])return;detenerLectura();const t=material.flashcards[e],n=new SpeechSynthesisUtterance(`Pregunta: ${t.pregunta}. Respuesta: ${t.respuesta}`);n.lang="es-ES",n.rate=.9,sintetizador.speak(n)}function leerGuiaCompleta(){if(!material||!material.guia)return;detenerLectura();const e=material.guia.replace(/[#*]/g,"").replace(/\n/g," "),t=e.match(/[^.!?]+[.!?]+/g)||[e],n=document.getElementById("btnDetenerAudio");n&&n.classList.remove("hidden");let o=0;!function e(){if(o<t.length){const a=new SpeechSynthesisUtterance(t[o]);a.lang="es-ES",a.rate=.9,a.onend=e,sintetizador.speak(a),o++}else n&&n.classList.add("hidden")}()}function detenerLectura(){sintetizador.speaking&&sintetizador.cancel();const e=document.getElementById("btnDetenerMazo");e&&e.classList.add("hidden");const t=document.getElementById("btnDetenerAudio");t&&t.classList.add("hidden")}function iniciarJuegoCoincidencias(){if(!material||!material.flashcards||material.flashcards.length<3)return void alert("Necesitas al menos 3 tarjetas para jugar. Genera más material.");document.getElementById("menuJuegos").classList.add("hidden"),document.querySelector("#juegosContainer h2").classList.add("hidden"),document.getElementById("juegoActivo").classList.remove("hidden");const e=Math.min(6,Math.floor(material.flashcards.length/2)*2),t=Math.max(3,Math.min(e,material.flashcards.length));let n=material.flashcards.slice(0,t);cartasJuego=[],n.forEach((e,t)=>{cartasJuego.push({id:t,texto:e.pregunta,tipo:"pregunta"}),cartasJuego.push({id:t,texto:e.respuesta,tipo:"respuesta"})}),cartasJuego.sort(()=>Math.random()-.5),primeraCarta=null,segundaCarta=null,bloqueoTablero=!1,puntosJuego=0,intentosJuego=0,document.getElementById("puntosJuego").textContent=0,document.getElementById("intentosJuego").textContent=0,document.getElementById("tableroJuego").innerHTML=cartasJuego.map((e,t)=>`\n    <div onclick="voltearCartaJuego(${t})" id="carta-${t}" \n         class="h-32 md:h-40 bg-white border-2 border-[#E5E1DA] rounded-xl flex items-center justify-center p-2 text-center text-xs md:text-sm cursor-pointer transition transform hover:-translate-y-1 shadow-sm overflow-hidden select-none">\n      <span class="font-bold text-[#1A1A1A]">${e.texto}</span>\n    </div>\n  `).join("")}function voltearCartaJuego(e){if(bloqueoTablero)return;const t=document.getElementById(`carta-${e}`);if(t.classList.contains("volteada"))return;if(primeraCarta===e)return;const n=cartasJuego[e];if(t.classList.add("volteada","bg-blue-100","border-blue-500"),primeraCarta)if(segundaCarta=e,intentosJuego++,document.getElementById("intentosJuego").textContent=intentosJuego,cartasJuego[primeraCarta].id===cartasJuego[segundaCarta].id){puntosJuego+=10,document.getElementById("puntosJuego").textContent=puntosJuego,document.getElementById(`carta-${primeraCarta}`).classList.remove("bg-blue-100","border-blue-500"),document.getElementById(`carta-${primeraCarta}`).classList.add("bg-green-100","border-green-500"),document.getElementById(`carta-${segundaCarta}`).classList.remove("bg-blue-100","border-blue-500"),document.getElementById(`carta-${segundaCarta}`).classList.add("bg-green-100","border-green-500"),resetearSeleccion();puntosJuego===cartasJuego.length/2*10&&setTimeout(()=>alert("¡Felicidades! Has completado el juego. 🎉"),500)}else bloqueoTablero=!0,setTimeout(()=>{document.getElementById(`carta-${primeraCarta}`).classList.remove("volteada","bg-blue-100","border-blue-500"),document.getElementById(`carta-${segundaCarta}`).classList.remove("volteada","bg-blue-100","border-blue-500"),bloqueoTablero=!1,resetearSeleccion()},1e3);else primeraCarta=e}function resetearSeleccion(){primeraCarta=null,segundaCarta=null}function iniciarJuegoApilador(){material&&material.flashcards&&0!==material.flashcards.length?(document.getElementById("menuJuegos").classList.add("hidden"),document.querySelector("#juegosContainer h2").classList.add("hidden"),document.getElementById("juegoApilador").classList.remove("hidden"),document.getElementById("juegoApilador").classList.add("flex"),document.getElementById("instruccionesApilador").classList.remove("hidden"),document.getElementById("juegoApiladorActivo").classList.add("hidden"),document.getElementById("juegoApiladorActivo").classList.remove("flex")):alert("Necesitas tarjetas para jugar.")}function comenzarApilador(){document.getElementById("instruccionesApilador").classList.add("hidden"),document.getElementById("juegoApiladorActivo").classList.remove("hidden"),document.getElementById("juegoApiladorActivo").classList.add("flex"),preguntasApilador=[...material.flashcards].sort(()=>Math.random()-.5),indicePreguntaApilador=0,torreAltura=0,torreFallos=0,document.getElementById("alturaTorre").textContent=0,document.getElementById("fallosTorre").textContent=0,document.getElementById("torreContainer").innerHTML="",cargarPreguntaApilador()}function cargarPreguntaApilador(){if(indicePreguntaApilador>=preguntasApilador.length)return alert("¡Increíble! Has respondido todas las tarjetas. 🏆"),void salirJuego();const e=preguntasApilador[indicePreguntaApilador];document.getElementById("textoPreguntaApilador").textContent=e.pregunta;let t=[e.respuesta];for(;t.length<4&&material.flashcards.length>1;){const e=material.flashcards[Math.floor(Math.random()*material.flashcards.length)].respuesta;t.includes(e)||t.push(e)}t.sort(()=>Math.random()-.5),document.getElementById("opcionesApilador").innerHTML=t.map(t=>`\n    <button onclick="responderApilador('${t.replace(/'/g,"\\'")}', '${e.respuesta.replace(/'/g,"\\'")}')" \n            class="w-full text-left px-4 py-3 rounded-xl border border-[#E5E1DA] bg-white hover:bg-[#F7F5F2] text-sm font-medium transition">\n      ${t}\n    </button>\n  `).join("")}function responderApilador(e,t){document.getElementById("opcionesApilador").innerHTML="";if(e===t){torreAltura++,document.getElementById("alturaTorre").textContent=torreAltura;const e=document.createElement("div");e.className="bloque-torre bloque-pregunta",torreAltura%2==0&&(e.style.width="90%"),document.getElementById("torreContainer").appendChild(e),document.getElementById("textoPreguntaApilador").textContent="¡Correcto! 🎉",setTimeout(()=>{indicePreguntaApilador++,cargarPreguntaApilador()},1e3)}else torreFallos++,document.getElementById("fallosTorre").textContent=torreFallos,document.getElementById("textoPreguntaApilador").textContent="¡Incorrecto! 😞",setTimeout(()=>{indicePreguntaApilador++,cargarPreguntaApilador()},1500)}function salirJuego(){document.getElementById("juegoActivo").classList.add("hidden"),document.getElementById("juegoApilador").classList.add("hidden"),document.getElementById("juegoApiladorActivo").classList.add("hidden"),document.getElementById("juegoApiladorActivo").classList.remove("flex"),document.getElementById("menuJuegos").classList.remove("hidden"),document.querySelector("#juegosContainer h2").classList.remove("hidden")}
+let material = null;
+let mazo = [];
+let indiceActual = 0;
+let mostrandoRespuesta = false;
+let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
+let generacionesExtra = 0; 
+let sintetizador = window.speechSynthesis;
+
+let cartasJuego = [];
+let primeraCarta = null;
+let segundaCarta = null;
+let bloqueoTablero = false;
+let puntosJuego = 0;
+let intentosJuego = 0;
+
+let torreAltura = 0;
+let torreFallos = 0;
+let preguntasApilador = [];
+let indicePreguntaApilador = 0;
+
+document.body.addEventListener('click', function() {
+  if (sintetizador.speaking) return;
+  const utterance = new SpeechSynthesisUtterance('');
+  sintetizador.speak(utterance);
+}, { once: true });
+
+(async function init() {
+  const texto = localStorage.getItem('material');
+  const loadingDiv = document.getElementById('loading');
+  const loadingText = document.getElementById('loadingText');
+  const btnError = document.getElementById('btnError');
+  const spinner = document.getElementById('loadingSpinner');
+  
+  if (!texto) {
+    loadingDiv.innerHTML = '<p class="text-sm text-[#8A8580]">No hay material. <a href="index.html" class="underline">Sube un archivo</a>.</p>';
+    return;
+  }
+
+  const timeout = setTimeout(() => {
+    loadingText.textContent = "La IA está tardando más de lo normal...";
+    loadingText.classList.add('text-red-500');
+    if(spinner) spinner.classList.add('hidden');
+    if(btnError) btnError.classList.remove('hidden');
+  }, 15000);
+
+  try {
+    const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
+    let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+    const kitGuardado = historial.find(k => k.nombre === nombreKit);
+
+    if (kitGuardado && kitGuardado.material && kitGuardado.material.flashcards && kitGuardado.material.flashcards.length > 0) {
+      material = kitGuardado.material;
+    } else {
+      const data = await generarMaterial(texto);
+      if (!data || !data.flashcards || data.flashcards.length === 0) throw new Error("La IA no devolvió tarjetas válidas.");
+      material = data;
+      
+      historial = historial.filter(k => k.nombre !== nombreKit);
+      historial.unshift({ id: Date.now(), nombre: nombreKit, material: material });
+      localStorage.setItem('historialKits', JSON.stringify(historial));
+    }
+
+    clearTimeout(timeout);
+
+    if (!material.quiz) material.quiz = []; 
+    mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
+    stats.aprendiendo = mazo.length;
+
+    loadingDiv.classList.add('hidden');
+    cambiarTab('mazo');
+  } catch (e) {
+    clearTimeout(timeout);
+    loadingText.textContent = "¡Ups! Hubo un error de conexión con la IA.";
+    loadingText.classList.add('text-red-500');
+    if(spinner) spinner.classList.add('hidden');
+    if(btnError) btnError.classList.remove('hidden');
+  }
+})();
+
+function actualizarStatsUI() {
+  document.getElementById('stat-aprendiendo').textContent = stats.aprendiendo;
+  document.getElementById('stat-revisando').textContent = stats.revisando;
+  document.getElementById('stat-dominado').textContent = stats.dominado;
+}
+
+function actualizarUI() {
+  if (!material || !mazo || mazo.length === 0) return;
+  if (indiceActual >= mazo.length) {
+    document.getElementById('texto-pregunta').textContent = "¡Mazo terminado!";
+    document.getElementById('texto-respuesta').textContent = "Has repasado todas las tarjetas.";
+    document.getElementById('botones-calificacion').classList.add('opacity-0', 'pointer-events-none');
+    document.getElementById('btnMostrar').classList.add('hidden');
+    return;
+  }
+  const tarjeta = mazo[indiceActual];
+  document.getElementById('texto-pregunta').textContent = tarjeta.pregunta;
+  document.getElementById('texto-respuesta').textContent = tarjeta.respuesta;
+  mostrandoRespuesta = false;
+  document.getElementById('tarjeta').classList.remove('flipped');
+  document.getElementById('botones-calificacion').classList.add('opacity-0', 'pointer-events-none');
+  document.getElementById('btnMostrar').classList.remove('hidden');
+  actualizarStatsUI();
+}
+
+function voltearTarjeta() {
+  if (mostrandoRespuesta || indiceActual >= mazo.length) return;
+  mostrandoRespuesta = true;
+  document.getElementById('tarjeta').classList.add('flipped');
+  document.getElementById('btnMostrar').classList.add('hidden');
+  setTimeout(() => {
+    document.getElementById('botones-calificacion').classList.remove('opacity-0', 'pointer-events-none');
+  }, 300);
+}
+
+function calificar(nivel) {
+  stats.aprendiendo--;
+  if (nivel === 0) { stats.aprendiendo++; mazo.push(mazo[indiceActual]); }
+  else if (nivel === 1) { stats.revisando++; }
+  else if (nivel === 2) { stats.dominado++; }
+  indiceActual++;
+  setTimeout(() => { actualizarUI(); }, 300);
+}
+
+async function cambiarTab(tab) {
+  if (!material) return;
+  
+  detenerLectura(); 
+
+  const clasesNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]";
+  const activoNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition";
+  
+  if(document.getElementById('nav-mazo')) {
+    document.getElementById('nav-mazo').className = clasesNav;
+    document.getElementById('nav-lista').className = clasesNav;
+    document.getElementById('nav-guia').className = clasesNav;
+    document.getElementById('nav-quiz').className = clasesNav;
+    document.getElementById('nav-juegos').className = clasesNav;
+    
+    if (tab === 'mazo') document.getElementById('nav-mazo').className = activoNav;
+    if (tab === 'lista') document.getElementById('nav-lista').className = activoNav;
+    if (tab === 'guia') document.getElementById('nav-guia').className = activoNav;
+    if (tab === 'quiz') document.getElementById('nav-quiz').className = activoNav;
+    if (tab === 'juegos') document.getElementById('nav-juegos').className = activoNav;
+  }
+
+  const clasesMob = "flex flex-col items-center p-2 text-[#8A8580]";
+  const activoMob = "flex flex-col items-center p-2 text-[#1A1A1A]";
+  if(document.getElementById('mob-mazo')) {
+    document.getElementById('mob-mazo').className = clasesMob;
+    document.getElementById('mob-lista').className = clasesMob;
+    document.getElementById('mob-guia').className = clasesMob;
+    document.getElementById('mob-quiz').className = clasesMob;
+    document.getElementById('mob-juegos').className = clasesMob;
+    if (tab === 'mazo') document.getElementById('mob-mazo').className = activoMob;
+    if (tab === 'lista') document.getElementById('mob-lista').className = activoMob;
+    if (tab === 'guia') document.getElementById('mob-guia').className = activoMob;
+    if (tab === 'quiz') document.getElementById('mob-quiz').className = activoMob;
+    if (tab === 'juegos') document.getElementById('mob-juegos').className = activoMob;
+  }
+
+  const headerTitle = document.getElementById('headerTitle');
+  if(headerTitle) {
+    if(tab === 'mazo') headerTitle.textContent = "Mazo";
+    if(tab === 'lista') headerTitle.textContent = "Lista";
+    if(tab === 'guia') headerTitle.textContent = "Guía de Estudio";
+    if(tab === 'quiz') headerTitle.textContent = "Prueba";
+    if(tab === 'juegos') headerTitle.textContent = "Juegos";
+  }
+
+  document.getElementById('mazoContainer').classList.add('hidden');
+  document.getElementById('mazoContainer').classList.remove('flex');
+  document.getElementById('listaContainer').classList.add('hidden');
+  document.getElementById('guiaContainer').classList.add('hidden');
+  document.getElementById('quizContainer').classList.add('hidden');
+  document.getElementById('juegosContainer').classList.add('hidden');
+    if (tab === 'mazo') {
+    document.getElementById('mazoContainer').classList.remove('hidden');
+    document.getElementById('mazoContainer').classList.add('flex');
+    actualizarUI();
+  } else if (tab === 'lista') {
+    document.getElementById('listaContainer').classList.remove('hidden');
+    const cont = document.getElementById('listaTarjetas');
+    if (material && material.flashcards) {
+      cont.innerHTML = material.flashcards.map((f, i) => `
+        <div class="bg-white rounded-xl border border-[#E5E1DA] overflow-hidden transition-all duration-300 mb-3">
+          <button onclick="toggleRespuesta(${i})" class="w-full text-left p-4 flex justify-between items-center hover:bg-[#F7F5F2] transition">
+            <span class="font-bold text-[#1A1A1A] text-sm md:text-base pr-4">${f.pregunta}</span>
+            <span id="icono-${i}" class="text-[#8A8580] text-xl font-bold transform transition-transform duration-300">+</span>
+          </button>
+          <div id="respuesta-${i}" class="hidden px-4 pb-4 pt-1 border-t border-[#F7F5F2]">
+            <p class="text-sm text-[#5A5550] mb-3">${f.respuesta}</p>
+            <div class="flex gap-2">
+              <button onclick="editarTarjeta(${i})" class="text-xs font-semibold text-blue-500 hover:text-blue-700">✏️ Editar</button>
+              <button onclick="leerTarjetaLista(${i})" class="text-xs font-semibold text-[#1A1A1A] bg-[#E8E6ED] px-2 py-1 rounded">🔊 Escuchar</button>
+              <button onclick="detenerLectura()" class="text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded">⏹️ Detener</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  } else if (tab === 'guia') {
+    document.getElementById('guiaContainer').classList.remove('hidden');
+    const guiaHTML = document.getElementById('guiaTexto');
+    
+    if (!material.guia || material.guia.includes("Haz clic") || material.guia.length < 50) {
+      guiaHTML.innerHTML = '<div class="text-center py-12"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-[#8A8580]">Generando tu guía de estudio...</p></div>';
+      try {
+        const textoOriginal = localStorage.getItem('material');
+        const nuevaGuia = await generarGuia(textoOriginal);
+        
+        material.guia = nuevaGuia;
+        localStorage.setItem('materialGenerado', JSON.stringify(material));
+        
+        const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
+        let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+        const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
+        
+        if (kitIndex !== -1) {
+          historial[kitIndex].material = material;
+          localStorage.setItem('historialKits', JSON.stringify(historial));
+        } else {
+          historial.unshift({ id: Date.now(), nombre: nombreKit, material: material });
+          localStorage.setItem('historialKits', JSON.stringify(historial));
+        }
+
+      } catch (e) {
+        console.error("Error generando guía:", e);
+        guiaHTML.innerHTML = '<p class="text-red-500">Hubo un error generando la guía.</p>';
+        return;
+      }
+    }
+    
+    guiaHTML.innerHTML = material.guia
+      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
+      .replace(/\n/g, '<br>');
+  } else if (tab === 'quiz') {
+    document.getElementById('quizContainer').classList.remove('hidden');
+    document.getElementById('quizSetup').classList.remove('hidden');
+    document.getElementById('preguntasQuiz').innerHTML = '';
+  } else if (tab === 'juegos') {
+    document.getElementById('juegosContainer').classList.remove('hidden');
+    document.getElementById('menuJuegos').classList.remove('hidden');
+    document.getElementById('juegoActivo').classList.add('hidden');
+    document.getElementById('juegoApilador').classList.add('hidden');
+    document.getElementById('juegoApiladorActivo').classList.add('hidden');
+    document.querySelector('#juegosContainer h2').classList.remove('hidden');
+  }
+}
+
+function toggleRespuesta(index) {
+  const respuesta = document.getElementById(`respuesta-${index}`);
+  const icono = document.getElementById(`icono-${index}`);
+  if (respuesta.classList.contains('hidden')) {
+    respuesta.classList.remove('hidden');
+    icono.textContent = '−';
+    icono.classList.add('rotate-180');
+  } else {
+    respuesta.classList.add('hidden');
+    icono.textContent = '+';
+    icono.classList.remove('rotate-180');
+  }
+}
+
+async function iniciarQuiz() {
+  if (!material) return;
+  const cantidad = parseInt(document.getElementById('selectCantidad').value);
+  const contenedor = document.getElementById('preguntasQuiz');
+  const setup = document.getElementById('quizSetup');
+
+  setup.classList.add('hidden'); 
+  contenedor.innerHTML = '<div class="text-center py-8"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-center text-[#8A8580]">Preparando tu examen...</p></div>';
+
+  if (!material.quiz) material.quiz = [];
+
+  if (material.quiz.length < cantidad) {
+    try {
+      const textoOriginal = localStorage.getItem('material');
+      const cantidadFaltante = cantidad - material.quiz.length;
+      const nuevasPreguntas = await generarPreguntasExtra(textoOriginal, cantidadFaltante);
+      if (nuevasPreguntas && nuevasPreguntas.length > 0) {
+        material.quiz = [...material.quiz, ...nuevasPreguntas];
+        localStorage.setItem('materialGenerado', JSON.stringify(material)); 
+      }
+    } catch (error) {
+      console.error("No se pudieron generar preguntas extra", error);
+    }
+  }
+
+  if (material.quiz.length === 0) {
+    contenedor.innerHTML = '<p class="text-center text-red-500">No se pudieron generar preguntas. Intenta con un texto más largo.</p>';
+    return;
+  }
+
+  const preguntasFinales = material.quiz.slice(0, cantidad);
+  contenedor.innerHTML = '';
+
+  preguntasFinales.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white p-6 rounded-2xl shadow-sm border border-[#E5E1DA] mb-4';
+    div.innerHTML = `
+      <p class="font-bold mb-4 text-lg">${i + 1}. ${q.pregunta}</p>
+      <div class="space-y-2" id="opciones-${i}">
+        ${q.opciones.map((op, j) => `
+          <button onclick="responderQuiz(${i}, ${j})"
+            class="w-full text-left px-5 py-3 rounded-xl border border-[#E5E1DA] text-sm hover:bg-[#F7F5F2] transition">
+            ${op}
+          </button>
+        `).join('')}
+      </div>
+      <p id="exp-${i}" class="hidden mt-4 text-sm text-[#5A5550] bg-[#F7F5F2] p-4 rounded-xl"></p>
+    `;
+    contenedor.appendChild(div);
+  });
+
+  material.quiz = preguntasFinales; 
+}
+
+function responderQuiz(qIdx, opIdx) {
+  const q = material.quiz[qIdx];
+  const botones = document.querySelectorAll(`#opciones-${qIdx} button`);
+  const exp = document.getElementById(`exp-${qIdx}`);
+
+  botones.forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.correcta) b.className = 'w-full text-left px-5 py-3 rounded-xl border-2 border-green-500 bg-green-50 text-sm font-medium';
+    else if (i === opIdx) b.className = 'w-full text-left px-5 py-3 rounded-xl border-2 border-red-400 bg-red-50 text-sm';
+    else b.className = 'w-full text-left px-5 py-3 rounded-xl border border-[#E5E1DA] text-sm opacity-50';
+  });
+
+  exp.textContent = '💡 ' + q.explicacion;
+  exp.classList.remove('hidden');
+}
+
+function editarTarjeta(index) {
+  if (!material || !material.flashcards) return;
+  const tarjeta = material.flashcards[index];
+  const nuevaPregunta = prompt("Edita la pregunta:", tarjeta.pregunta);
+  if (nuevaPregunta === null) return;
+  
+  const nuevaRespuesta = prompt("Edita la respuesta:", tarjeta.respuesta);
+  if (nuevaRespuesta === null) return;
+
+  material.flashcards[index].pregunta = nuevaPregunta;
+  material.flashcards[index].respuesta = nuevaRespuesta;
+  
+  localStorage.setItem('materialGenerado', JSON.stringify(material));
+  
+  const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
+  let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+  const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
+  if (kitIndex !== -1) {
+    historial[kitIndex].material = material;
+    localStorage.setItem('historialKits', JSON.stringify(historial));
+  }
+
+  cambiarTab('lista');
+}
+
+async function pedirMasMaterial() {
+  const btnMas = document.getElementById('btnMas');
+  const textoOriginal = localStorage.getItem('material');
+  
+  if (!textoOriginal || !material) return;
+
+  if (generacionesExtra >= 2) {
+    alert('Límite alcanzado: solo puedes generar material extra 2 veces por kit.');
+    if(btnMas) btnMas.style.display = 'none';
+    return;
+  }
+
+  if(btnMas) {
+    btnMas.innerHTML = '<div class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Generando...';
+    btnMas.disabled = true;
+  }
+
+  try {
+    const extra = await generarMasMaterial(textoOriginal, material.flashcards, material.quiz);
+    
+    if (extra.flashcards) {
+      material.flashcards = [...material.flashcards, ...extra.flashcards];
+      mazo = [...mazo, ...extra.flashcards].sort(() => Math.random() - 0.5);
+      stats.aprendiendo += extra.flashcards.length;
+    }
+    
+    if (extra.quiz) {
+      material.quiz = [...(material.quiz || []), ...extra.quiz];
+    }
+
+    localStorage.setItem('materialGenerado', JSON.stringify(material));
+    const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
+    let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+    const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
+    if (kitIndex !== -1) {
+      historial[kitIndex].material = material;
+      localStorage.setItem('historialKits', JSON.stringify(historial));
+    }
+
+    generacionesExtra++;
+    
+    if (generacionesExtra >= 2) {
+      if(btnMas) {
+        btnMas.innerHTML = '✨ Límite de generación alcanzado';
+        btnMas.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+        btnMas.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+      }
+    } else {
+      if(btnMas) {
+        btnMas.innerHTML = '✨ Generar 8 tarjetas más con IA';
+        btnMas.disabled = false;
+      }
+    }
+
+    indiceActual = 0; 
+    actualizarUI();
+    
+    if (document.getElementById('listaContainer').classList.contains('hidden')) {
+      alert('¡Se han añadido 8 tarjetas y 4 preguntas nuevas a tu kit!');
+    } else {
+      cambiarTab('lista');
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert('Hubo un error al generar más material. Por favor, recarga la página.');
+    if(btnMas) {
+      btnMas.innerHTML = '✨ Generar 8 tarjetas más con IA';
+      btnMas.disabled = false;
+    }
+  }
+}
+
+function imprimirGuia(tipo) {
+  if (!material || !material.guia) {
+    alert("Primero debes generar la guía de estudio.");
+    return;
+  }
+  
+  const ventana = window.open('', '_blank');
+  
+  const guiaHTML = material.guia
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
+    .replace(/\n/g, '<br>');
+
+  const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Guía';
+  const tituloDocumento = tipo === 'Word' ? 'Guia_AprendeYa_Word' : 'Guia_AprendeYa_PDF';
+
+  ventana.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>${tituloDocumento}</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 40px; max-width: 800px; margin: 0 auto; }
+        h1 { color: #1a1a1a; font-size: 28px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        h2 { color: #1a1a1a; font-size: 22px; margin-top: 30px; }
+        li { margin-bottom: 10px; }
+        strong { color: #000; }
+        .header { text-align: center; margin-bottom: 40px; color: #888; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h3>Guía de Estudio generada por AprendeYa</h3>
+        <p>Kit: ${nombreKit}</p>
+      </div>
+      ${guiaHTML}
+    </body>
+    </html>
+  `);
+
+  ventana.document.close();
+  ventana.focus();
+  
+  setTimeout(() => {
+    ventana.print();
+  }, 500);
+}
+
+function leerTextoActual() {
+  if (!mazo || indiceActual >= mazo.length) return;
+  detenerLectura(); 
+  
+  const tarjeta = mazo[indiceActual];
+  const textoALeer = mostrandoRespuesta ? tarjeta.respuesta : tarjeta.pregunta;
+  
+  const utterance = new SpeechSynthesisUtterance(textoALeer);
+  utterance.lang = 'es-ES';
+  utterance.rate = 0.9;
+  
+  const btnDetener = document.getElementById('btnDetenerMazo');
+  if (btnDetener) btnDetener.classList.remove('hidden');
+  
+  utterance.onend = () => {
+    if (btnDetener) btnDetener.classList.add('hidden');
+  };
+  
+  sintetizador.speak(utterance);
+}
+
+function leerTarjetaLista(index) {
+  if (!material || !material.flashcards || !material.flashcards[index]) return;
+  detenerLectura();
+  
+  const tarjeta = material.flashcards[index];
+  const textoALeer = `Pregunta: ${tarjeta.pregunta}. Respuesta: ${tarjeta.respuesta}`;
+  
+  const utterance = new SpeechSynthesisUtterance(textoALeer);
+  utterance.lang = 'es-ES';
+  utterance.rate = 0.9;
+  
+  sintetizador.speak(utterance);
+}
+
+function leerGuiaCompleta() {
+  if (!material || !material.guia) return;
+  detenerLectura();
+  
+  const textoLimpio = material.guia
+    .replace(/[#*]/g, '')
+    .replace(/\n/g, ' ');
+  
+  const frases = textoLimpio.match(/[^.!?]+[.!?]+/g) || [textoLimpio];
+  
+  const btnDetener = document.getElementById('btnDetenerAudio');
+  if (btnDetener) btnDetener.classList.remove('hidden');
+
+  let i = 0;
+  function leerSiguienteFrase() {
+    if (i < frases.length) {
+      const utterance = new SpeechSynthesisUtterance(frases[i]);
+      utterance.lang = 'es-ES';
+      utterance.rate = 0.9;
+      utterance.onend = leerSiguienteFrase;
+      sintetizador.speak(utterance);
+      i++;
+    } else {
+      if (btnDetener) btnDetener.classList.add('hidden');
+    }
+  }
+
+  leerSiguienteFrase();
+}
+
+function detenerLectura() {
+  if (sintetizador.speaking) {
+    sintetizador.cancel();
+  }
+  const btnDetenerMazo = document.getElementById('btnDetenerMazo');
+  if (btnDetenerMazo) btnDetenerMazo.classList.add('hidden');
+  
+  const btnDetenerAudio = document.getElementById('btnDetenerAudio');
+  if (btnDetenerAudio) btnDetenerAudio.classList.add('hidden');
+}
+
+function iniciarJuegoCoincidencias() {
+  if (!material || !material.flashcards || material.flashcards.length < 3) {
+    alert("Necesitas al menos 3 tarjetas para jugar. Genera más material.");
+    return;
+  }
+
+  document.getElementById('menuJuegos').classList.add('hidden');
+  document.querySelector('#juegosContainer h2').classList.add('hidden');
+  document.getElementById('juegoActivo').classList.remove('hidden');
+
+  const cantidadPares = Math.min(6, Math.floor(material.flashcards.length / 2) * 2);
+  const cantidadFinal = Math.max(3, Math.min(cantidadPares, material.flashcards.length));
+  
+  let preguntasSeleccionadas = material.flashcards.slice(0, cantidadFinal);
+  
+  cartasJuego = [];
+  preguntasSeleccionadas.forEach((f, index) => {
+    cartasJuego.push({ id: index, texto: f.pregunta, tipo: 'pregunta' });
+    cartasJuego.push({ id: index, texto: f.respuesta, tipo: 'respuesta' });
+  });
+
+  cartasJuego.sort(() => Math.random() - 0.5);
+
+  primeraCarta = null;
+  segundaCarta = null;
+  bloqueoTablero = false;
+  puntosJuego = 0;
+  intentosJuego = 0;
+  document.getElementById('puntosJuego').textContent = 0;
+  document.getElementById('intentosJuego').textContent = 0;
+
+  const tablero = document.getElementById('tableroJuego');
+  tablero.innerHTML = cartasJuego.map((carta, index) => `
+    <div onclick="voltearCartaJuego(${index})" id="carta-${index}" 
+         class="h-32 md:h-40 bg-white border-2 border-[#E5E1DA] rounded-xl flex items-center justify-center p-2 text-center text-xs md:text-sm cursor-pointer transition transform hover:-translate-y-1 shadow-sm overflow-hidden select-none">
+      <span class="font-bold text-[#1A1A1A]">${carta.texto}</span>
+    </div>
+  `).join('');
+}
+
+function voltearCartaJuego(index) {
+  if (bloqueoTablero) return;
+  
+  const cartaDiv = document.getElementById(`carta-${index}`);
+  
+  if (cartaDiv.classList.contains('volteada')) return;
+  if (primeraCarta === index) return;
+
+  const carta = cartasJuego[index];
+  
+  cartaDiv.classList.add('volteada', 'bg-blue-100', 'border-blue-500');
+
+  if (!primeraCarta) {
+    primeraCarta = index;
+  } else {
+    segundaCarta = index;
+    intentosJuego++;
+    document.getElementById('intentosJuego').textContent = intentosJuego;
+
+    if (cartasJuego[primeraCarta].id === cartasJuego[segundaCarta].id) {
+      puntosJuego += 10;
+      document.getElementById('puntosJuego').textContent = puntosJuego;
+      
+      document.getElementById(`carta-${primeraCarta}`).classList.remove('bg-blue-100', 'border-blue-500');
+      document.getElementById(`carta-${primeraCarta}`).classList.add('bg-green-100', 'border-green-500');
+      
+      document.getElementById(`carta-${segundaCarta}`).classList.remove('bg-blue-100', 'border-blue-500');
+      document.getElementById(`carta-${segundaCarta}`).classList.add('bg-green-100', 'border-green-500');
+      
+      resetearSeleccion();
+
+      if (puntosJuego === (cartasJuego.length / 2) * 10) {
+        setTimeout(() => alert('¡Felicidades! Has completado el juego. 🎉'), 500);
+      }
+
+    } else {
+      bloqueoTablero = true;
+      setTimeout(() => {
+        document.getElementById(`carta-${primeraCarta}`).classList.remove('volteada', 'bg-blue-100', 'border-blue-500');
+        document.getElementById(`carta-${segundaCarta}`).classList.remove('volteada', 'bg-blue-100', 'border-blue-500');
+        
+        bloqueoTablero = false;
+        resetearSeleccion();
+      }, 1000);
+    }
+  }
+}
+
+function resetearSeleccion() {
+  primeraCarta = null;
+  segundaCarta = null;
+}
+
+function iniciarJuegoApilador() {
+  if (!material || !material.flashcards || material.flashcards.length === 0) {
+    alert("Necesitas tarjetas para jugar.");
+    return;
+  }
+
+  document.getElementById('menuJuegos').classList.add('hidden');
+  document.querySelector('#juegosContainer h2').classList.add('hidden');
+  document.getElementById('juegoApilador').classList.remove('hidden');
+  document.getElementById('juegoApilador').classList.add('flex');
+  
+  document.getElementById('instruccionesApilador').classList.remove('hidden');
+  document.getElementById('juegoApiladorActivo').classList.add('hidden');
+  document.getElementById('juegoApiladorActivo').classList.remove('flex');
+}
+
+function comenzarApilador() {
+  document.getElementById('instruccionesApilador').classList.add('hidden');
+  document.getElementById('juegoApiladorActivo').classList.remove('hidden');
+  document.getElementById('juegoApiladorActivo').classList.add('flex');
+
+  preguntasApilador = [...material.flashcards].sort(() => Math.random() - 0.5);
+  indicePreguntaApilador = 0;
+  torreAltura = 0;
+  torreFallos = 0;
+
+  document.getElementById('alturaTorre').textContent = 0;
+  document.getElementById('fallosTorre').textContent = 0;
+  document.getElementById('torreContainer').innerHTML = '';
+
+  cargarPreguntaApilador();
+}
+
+function cargarPreguntaApilador() {
+  if (indicePreguntaApilador >= preguntasApilador.length) {
+    alert('¡Increíble! Has respondido todas las tarjetas. 🏆');
+    salirJuego();
+    return;
+  }
+
+  const pregunta = preguntasApilador[indicePreguntaApilador];
+  document.getElementById('textoPreguntaApilador').textContent = pregunta.pregunta;
+
+  let opciones = [pregunta.respuesta];
+  while (opciones.length < 4 && material.flashcards.length > 1) {
+    const random = material.flashcards[Math.floor(Math.random() * material.flashcards.length)].respuesta;
+    if (!opciones.includes(random)) opciones.push(random);
+  }
+
+  opciones.sort(() => Math.random() - 0.5);
+
+  const contOpciones = document.getElementById('opcionesApilador');
+  contOpciones.innerHTML = opciones.map(op => `
+    <button onclick="responderApilador('${op.replace(/'/g, "\\'")}', '${pregunta.respuesta.replace(/'/g, "\\'")}')" 
+        ${op}
+    </button>
+  `).join('');
+}
+
+function responderApilador(opcionElegida, respuestaCorrecta) {
+  const contOpciones = document.getElementById('opcionesApilador');
+  contOpciones.innerHTML = ''; 
+
+  if (opcionElegida === respuestaCorrecta) {
+    torreAltura++;
+    document.getElementById('alturaTorre').textContent = torreAltura;
+    
+    const bloque = document.createElement('div');
+    bloque.className = 'bloque-torre bloque-pregunta';
+    if (torreAltura % 2 === 0) bloque.style.width = '90%';
+    document.getElementById('torreContainer').appendChild(bloque);
+
+    document.getElementById('textoPreguntaApilador').textContent = "¡Correcto! 🎉";
+    setTimeout(() => {
+      indicePreguntaApilador++;
+      cargarPreguntaApilador();
+    }, 1000);
+
+  } else {
+    torreFallos++;
+    document.getElementById('fallosTorre').textContent = torreFallos;
+    
+    document.getElementById('textoPreguntaApilador').textContent = "¡Incorrecto! 😞";
+    setTimeout(() => {
+      indicePreguntaApilador++;
+      cargarPreguntaApilador();
+    }, 1500);
+  }
+}
+
+function salirJuego() {
+  document.getElementById('juegoActivo').classList.add('hidden');
+  document.getElementById('juegoApilador').classList.add('hidden');
+  document.getElementById('juegoApiladorActivo').classList.add('hidden');
+  document.getElementById('juegoApiladorActivo').classList.remove('flex');
+  document.getElementById('menuJuegos').classList.remove('hidden');
+  document.querySelector('#juegosContainer h2').classList.remove('hidden');
+}
