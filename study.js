@@ -18,6 +18,10 @@ let torreFallos = 0;
 let preguntasApilador = [];
 let indicePreguntaApilador = 0;
 
+// Variables del Temporizador
+let intervaloReloj = null;
+let tiempoTotalSegundos = 0;
+
 document.body.addEventListener('click', function() {
   if (sintetizador.speaking) return;
   const utterance = new SpeechSynthesisUtterance('');
@@ -558,7 +562,6 @@ function detenerLectura() {
   const btnDetenerAudio = document.getElementById('btnDetenerAudio');
   if (btnDetenerAudio) btnDetenerAudio.classList.add('hidden');
 }
-
 function iniciarJuegoCoincidencias() {
   if (!material || !material.flashcards || material.flashcards.length < 3) {
     alert("Necesitas al menos 3 tarjetas para jugar. Genera más material.");
@@ -684,6 +687,7 @@ function comenzarApilador() {
 
   cargarPreguntaApilador();
 }
+
 function cargarPreguntaApilador() {
   if (indicePreguntaApilador >= preguntasApilador.length) {
     alert('¡Increíble! Has respondido todas las tarjetas. 🏆');
@@ -728,6 +732,9 @@ function cargarPreguntaApilador() {
 
 function responderApilador(opcionElegida, respuestaCorrecta) {
   const contOpciones = document.getElementById('opcionesApilador');
+  contOpciones.innerHTML = '';
+  function responderApilador(opcionElegida, respuestaCorrecta) {
+  const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = ''; 
 
   if (opcionElegida === respuestaCorrecta) {
@@ -764,4 +771,78 @@ function salirJuego() {
   document.getElementById('juegoApiladorActivo').classList.remove('flex');
   document.getElementById('menuJuegos').classList.remove('hidden');
   document.querySelector('#juegosContainer h2').classList.remove('hidden');
+}
+
+// ==========================================
+// LÓGICA DEL TEMPORIZADOR
+// ==========================================
+function abrirTemporizador() {
+  const modal = document.getElementById('modalTemporizador');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  
+  if (intervaloReloj) {
+    document.getElementById('opcionesTiempo').classList.add('hidden');
+    document.getElementById('relojActivo').classList.remove('hidden');
+  } else {
+    document.getElementById('opcionesTiempo').classList.remove('hidden');
+    document.getElementById('relojActivo').classList.add('hidden');
+  }
+}
+
+function cerrarTemporizador() {
+  const modal = document.getElementById('modalTemporizador');
+  if (modal) modal.classList.add('hidden');
+}
+
+function iniciarTemporizador(minutos) {
+  if (intervaloReloj) clearInterval(intervaloReloj);
+  
+  tiempoTotalSegundos = minutos * 60;
+  document.getElementById('opcionesTiempo').classList.add('hidden');
+  document.getElementById('relojActivo').classList.remove('hidden');
+  
+  actualizarDisplayTiempo();
+  
+  intervaloReloj = setInterval(() => {
+    tiempoTotalSegundos--;
+    actualizarDisplayTiempo();
+    
+    if (tiempoTotalSegundos <= 0) {
+      clearInterval(intervaloReloj);
+      intervaloReloj = null;
+      finalizarTemporizador();
+    }
+  }, 1000);
+}
+
+function actualizarDisplayTiempo() {
+  const minutos = Math.floor(tiempoTotalSegundos / 60);
+  const segundos = tiempoTotalSegundos % 60;
+  document.getElementById('tiempoRestante').textContent = 
+    `${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+}
+
+function detenerTemporizador() {
+  if (intervaloReloj) {
+    clearInterval(intervaloReloj);
+    intervaloReloj = null;
+  }
+  document.getElementById('opcionesTiempo').classList.remove('hidden');
+  document.getElementById('relojActivo').classList.add('hidden');
+}
+
+function finalizarTemporizador() {
+  const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+  audio.play().catch(e => console.log("Audio bloqueado:", e));
+
+  alert("¡Tiempo terminado! Es hora de descansar. 🧘‍♂️");
+  
+  document.getElementById('opcionesTiempo').classList.remove('hidden');
+  document.getElementById('relojActivo').classList.add('hidden');
+  cerrarTemporizador();
+  
+  const mensaje = new SpeechSynthesisUtterance("Tiempo de estudio terminado. Es hora de descansar.");
+  mensaje.lang = 'es-ES';
+  sintetizador.speak(mensaje);
 }
