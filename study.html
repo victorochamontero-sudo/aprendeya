@@ -17,10 +17,16 @@
     .guia-content h2 { font-size: 1.4rem; font-weight: 700; margin-top: 1.2rem; color: #1A1A1A; }
     .guia-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
     .guia-content p { margin-bottom: 1rem; line-height: 1.6; }
+    
+    /* Estilos para el Apilador */
+    .bloque-torre { height: 24px; border-radius: 4px; margin-bottom: 2px; transition: all 0.3s; }
+    .bloque-pregunta { background-color: #3B82F6; width: 100%; }
+    .bloque-respuesta { background-color: #9333EA; width: 100%; }
   </style>
 </head>
 <body class="bg-[#F7F5F2] min-h-screen flex">
 
+  <!-- SIDEBAR (PC) -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
     <div class="p-5 flex items-center border-b border-[#E5E1DA]">
       <a href="index.html" class="flex items-center group">
@@ -150,6 +156,7 @@
         <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A]">Elige un juego</h2>
         
         <div id="menuJuegos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Juego 1: Coincidencias (Ahora visible) -->
           <button onclick="iniciarJuegoCoincidencias()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] hover:border-blue-400 hover:bg-blue-50 transition text-left">
             <div class="text-4xl text-[#1A1A1A]">🧩</div>
             <div>
@@ -158,16 +165,17 @@
             </div>
           </button>
           
-          <button onclick="alert('Próximamente...')" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] opacity-50 cursor-not-allowed text-left">
+          <!-- Juego 2: Apilador -->
+          <button onclick="iniciarJuegoApilador()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] hover:border-blue-400 hover:bg-blue-50 transition text-left">
             <div class="text-4xl text-[#1A1A1A]">🥞</div>
             <div>
               <h3 class="font-bold text-[#1A1A1A]">Apilador</h3>
-              <p class="text-xs text-[#8A8580]">Construye la torre más alta.</p>
+              <p class="text-xs text-[#8A8580]">Responde bien para apilar bloques.</p>
             </div>
           </button>
         </div>
 
-        <!-- CONTENEDOR DEL JUEGO ACTIVO -->
+        <!-- CONTENEDOR DEL JUEGO DE COINCIDENCIAS -->
         <div id="juegoActivo" class="hidden mt-8">
           <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700">← Volver a juegos</button>
           
@@ -176,10 +184,34 @@
             <p class="text-sm text-[#8A8580]">Intentos: <span id="intentosJuego">0</span></p>
           </div>
 
-          <div id="tableroJuego" class="grid grid-cols-3 sm:grid-cols-4 gap-3 md:gap-4">
-            <!-- Las cartas se generan con JS -->
+          <div id="tableroJuego" class="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
+            <!-- Cartas visibles -->
           </div>
         </div>
+
+        <!-- CONTENEDOR DEL JUEGO APILADOR -->
+        <div id="juegoApilador" class="hidden mt-8">
+          <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700">← Volver a juegos</button>
+          
+          <div class="flex flex-col items-center w-full max-w-md mx-auto">
+            <div class="flex justify-between w-full bg-[#F7F5F2] p-4 rounded-xl mb-6">
+              <p class="font-bold text-[#1A1A1A]">Altura: <span id="alturaTorre" class="text-blue-600">0</span></p>
+              <p class="text-sm text-[#8A8580]">Fallos: <span id="fallosTorre">0</span></p>
+            </div>
+
+            <!-- Torre -->
+            <div id="torreContainer" class="w-full flex flex-col-reverse justify-start h-48 bg-[#E5E1DA] rounded-lg overflow-hidden border-2 border-[#D6D1CA] mb-6 p-1">
+              <!-- Los bloques se apilan aquí -->
+            </div>
+
+            <!-- Pregunta y Opciones -->
+            <div id="preguntaApilador" class="w-full text-center">
+              <h3 class="text-lg font-bold mb-4 text-[#1A1A1A]" id="textoPreguntaApilador"></h3>
+              <div class="space-y-2" id="opcionesApilador"></div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </main>
