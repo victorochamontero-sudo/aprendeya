@@ -13,20 +13,21 @@
     .card-inner.flipped { transform: rotateY(180deg); }
     .card-front, .card-back { backface-visibility: hidden; position: absolute; width: 100%; height: 100%; border-radius: 1.5rem; }
     .card-back { transform: rotateY(180deg); background-color: #F7F5F2; border: 2px solid #1A1A1A; }
-    .guia-content h1 { font-size: 1.8rem; font-weight: 800; margin-top: 1.5rem; color: #1A1A1A; }
-    .guia-content h2 { font-size: 1.4rem; font-weight: 700; margin-top: 1.2rem; color: #1A1A1A; }
-    .guia-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
-    .guia-content p { margin-bottom: 1rem; line-height: 1.6; }
-    
-    /* Estilos para el Apilador */
-    .bloque-torre { height: 24px; border-radius: 4px; margin-bottom: 2px; transition: all 0.3s; }
-    .bloque-pregunta { background-color: #3B82F6; width: 100%; }
-    .bloque-respuesta { background-color: #9333EA; width: 100%; }
+    .guia-content h1 { font-size: 1.5rem; font-weight: 800; margin-top: 1.5rem; color: #1A1A1A; }
+    .guia-content h2 { font-size: 1.2rem; font-weight: 700; margin-top: 1.2rem; color: #1A1A1A; }
+    .guia-content ul { list-style-type: disc; padding-left: 1.2rem; margin-bottom: 1rem; }
+    .guia-content p { margin-bottom: 1rem; line-height: 1.6; font-size: 0.95rem; }
+    @media (min-width: 768px) {
+      .guia-content h1 { font-size: 1.8rem; }
+      .guia-content h2 { font-size: 1.4rem; }
+      .guia-content ul { padding-left: 1.5rem; }
+      .guia-content p { font-size: 1rem; }
+    }
+    .bloque-torre { height: 24px; border-radius: 4px; margin-bottom: 2px; transition: all 0.3s; background-color: #3B82F6; width: 100%; }
   </style>
 </head>
 <body class="bg-[#F7F5F2] min-h-screen flex">
 
-  <!-- SIDEBAR (PC) -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
     <div class="p-5 flex items-center border-b border-[#E5E1DA]">
       <a href="index.html" class="flex items-center group">
@@ -123,12 +124,12 @@
       <!-- 3. GUÍA -->
       <div id="guiaContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA]">
         <div class="flex flex-wrap gap-2 mb-6 border-b border-[#E5E1DA] pb-4">
-          <button onclick="imprimirGuia('Word')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">📄 Descargar Word</button>
-          <button onclick="imprimirGuia('PDF')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">🖨️ Guardar PDF</button>
-          <button onclick="leerGuiaCompleta()" class="text-sm bg-[#E8E6ED] border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#D6D1CA] transition flex items-center gap-2">🔊 Escuchar Guía</button>
+          <button onclick="imprimirGuia('Word')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">📄 Word</button>
+          <button onclick="imprimirGuia('PDF')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">🖨️ PDF</button>
+          <button onclick="leerGuiaCompleta()" class="text-sm bg-[#E8E6ED] border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#D6D1CA] transition flex items-center gap-2">🔊 Escuchar</button>
           <button onclick="detenerLectura()" class="text-sm bg-red-50 text-red-600 border border-red-200 font-semibold px-4 py-2 rounded-lg hover:bg-red-100 transition flex items-center gap-2 hidden" id="btnDetenerAudio">⏹️ Detener</button>
         </div>
-        <div id="guiaTexto" class="guia-content text-[#5A5550] text-sm md:text-base"></div>
+        <div id="guiaTexto" class="guia-content text-[#5A5550]"></div>
       </div>
 
       <!-- 4. QUIZ / PRUEBA -->
@@ -156,7 +157,6 @@
         <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A]">Elige un juego</h2>
         
         <div id="menuJuegos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <!-- Juego 1: Coincidencias (Ahora visible) -->
           <button onclick="iniciarJuegoCoincidencias()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] hover:border-blue-400 hover:bg-blue-50 transition text-left">
             <div class="text-4xl text-[#1A1A1A]">🧩</div>
             <div>
@@ -165,7 +165,6 @@
             </div>
           </button>
           
-          <!-- Juego 2: Apilador -->
           <button onclick="iniciarJuegoApilador()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] hover:border-blue-400 hover:bg-blue-50 transition text-left">
             <div class="text-4xl text-[#1A1A1A]">🥞</div>
             <div>
@@ -175,36 +174,34 @@
           </button>
         </div>
 
-        <!-- CONTENEDOR DEL JUEGO DE COINCIDENCIAS -->
+        <!-- JUEGO COINCIDENCIAS -->
         <div id="juegoActivo" class="hidden mt-8">
           <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700">← Volver a juegos</button>
-          
           <div class="flex justify-between items-center bg-[#F7F5F2] p-4 rounded-xl mb-6">
             <p class="font-bold text-[#1A1A1A]">Puntuación: <span id="puntosJuego" class="text-blue-600">0</span></p>
             <p class="text-sm text-[#8A8580]">Intentos: <span id="intentosJuego">0</span></p>
           </div>
-
-          <div id="tableroJuego" class="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
-            <!-- Cartas visibles -->
-          </div>
+          <div id="tableroJuego" class="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4"></div>
         </div>
 
-        <!-- CONTENEDOR DEL JUEGO APILADOR -->
-        <div id="juegoApilador" class="hidden mt-8">
-          <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700">← Volver a juegos</button>
+        <!-- JUEGO APILADOR (AHORA SÍ SE VE BIEN) -->
+        <div id="juegoApilador" class="hidden mt-8 flex-col w-full">
+          <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700 text-left">← Volver a juegos</button>
           
-          <div class="flex flex-col items-center w-full max-w-md mx-auto">
+          <!-- INSTRUCCIONES -->
+          <div id="instruccionesApilador" class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-6 text-center">
+            <h3 class="font-bold text-xl text-blue-800 mb-2">¿Cómo jugar al Apilador?</h3>
+            <p class="text-sm text-blue-700 mb-4">Responde correctamente a la pregunta para apilar un bloque en la torre. ¡Si fallas, el bloque no sube! Intenta llegar lo más alto posible.</p>
+            <button onclick="comenzarApilador()" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-full hover:bg-blue-700 transition">¡Entendido, a jugar!</button>
+          </div>
+
+          <!-- ÁREA DE JUEGO -->
+          <div id="juegoApiladorActivo" class="hidden flex-col items-center w-full max-w-md mx-auto">
             <div class="flex justify-between w-full bg-[#F7F5F2] p-4 rounded-xl mb-6">
               <p class="font-bold text-[#1A1A1A]">Altura: <span id="alturaTorre" class="text-blue-600">0</span></p>
               <p class="text-sm text-[#8A8580]">Fallos: <span id="fallosTorre">0</span></p>
             </div>
-
-            <!-- Torre -->
-            <div id="torreContainer" class="w-full flex flex-col-reverse justify-start h-48 bg-[#E5E1DA] rounded-lg overflow-hidden border-2 border-[#D6D1CA] mb-6 p-1">
-              <!-- Los bloques se apilan aquí -->
-            </div>
-
-            <!-- Pregunta y Opciones -->
+            <div id="torreContainer" class="w-full flex flex-col-reverse justify-start h-48 bg-[#E5E1DA] rounded-lg overflow-hidden border-2 border-[#D6D1CA] mb-6 p-1"></div>
             <div id="preguntaApilador" class="w-full text-center">
               <h3 class="text-lg font-bold mb-4 text-[#1A1A1A]" id="textoPreguntaApilador"></h3>
               <div class="space-y-2" id="opcionesApilador"></div>
