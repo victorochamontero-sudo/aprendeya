@@ -19,21 +19,19 @@ let sintetizador = window.speechSynthesis;
   }
 
   try {
-    // Intentamos cargar el kit ya generado desde el historial
     const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
     let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
     const kitGuardado = historial.find(k => k.nombre === nombreKit);
 
-    // Si el kit ya existe en la memoria y tiene la guía, lo cargamos tal cual
-    if (kitGuardado && kitGuardado.material && kitGuardado.material.guia && !kitGuardado.material.guia.includes("Haz clic")) {
+    // LOGICA DE CARGA: Si el kit ya existe y tiene tarjetas, lo usamos
+    if (kitGuardado && kitGuardado.material && kitGuardado.material.flashcards && kitGuardado.material.flashcards.length > 0) {
       material = kitGuardado.material;
     } else {
-      // Si es nuevo, generamos el material inicial
+      // Si es nuevo, generamos
       const data = await generarMaterial(texto);
       if (!data || !data.flashcards || data.flashcards.length === 0) throw new Error("La IA no devolvió tarjetas válidas.");
       material = data;
       
-      // Actualizamos el historial con el nuevo material
       historial = historial.filter(k => k.nombre !== nombreKit);
       historial.unshift({ id: Date.now(), nombre: nombreKit, material: material });
       localStorage.setItem('historialKits', JSON.stringify(historial));
@@ -46,7 +44,8 @@ let sintetizador = window.speechSynthesis;
     loadingDiv.classList.add('hidden');
     cambiarTab('mazo');
   } catch (e) {
-    loadingText.textContent = "¡Ups! Hubo un error de conexión con la IA.";
+    console.error("Error en Init:", e);
+    loadingText.textContent = "¡Ups! Hubo un error.";
     loadingText.classList.add('text-red-500');
     if(spinner) spinner.classList.add('hidden');
     if(btnError) btnError.classList.remove('hidden');
@@ -173,23 +172,32 @@ async function cambiarTab(tab) {
     document.getElementById('guiaContainer').classList.remove('hidden');
     const guiaHTML = document.getElementById('guiaTexto');
     
-    if (!material.guia || material.guia.includes("Haz clic")) {
-      guiaHTML.innerHTML = '<div class="text-center py-12"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-[#8A8580]">Generando tu guía de estudio...</p></div>';
+    // FORZAR: Si no hay guía o es el texto por defecto, la generamos
+    if (!material.guia || material.guia.includes("Haz clic") || material.guia.length < 50) {
+      guiaHTML.innerHTML = '<div class="text-center py-12"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-[#8A8580]">Generando tu guía de estudio (esto puede tardar unos segundos)...</p></div>';
       try {
         const textoOriginal = localStorage.getItem('material');
         const nuevaGuia = await generarGuia(textoOriginal);
-        material.guia = nuevaGuia;
         
-        // GUARDAR LA GUÍA EN EL HISTORIAL
+        // GUARDADO FORZADO EN EL KIT ACTUAL
+        material.guia = nuevaGuia;
         localStorage.setItem('materialGenerado', JSON.stringify(material));
+        
         const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
         let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
         const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
+        
         if (kitIndex !== -1) {
-          historial[kitIndex].material = material;
+          historial[kitIndex].material = material; // Actualizamos el objeto completo
+          localStorage.setItem('historialKits', JSON.stringify(historial));
+        } else {
+          // Si por alguna razón no existe, lo creamos
+          historial.unshift({ id: Date.now(), nombre: nombreKit, material: material });
           localStorage.setItem('historialKits', JSON.stringify(historial));
         }
+
       } catch (e) {
+        console.error("Error generando guía:", e);
         guiaHTML.innerHTML = '<p class="text-red-500">Hubo un error generando la guía. Por favor, recarga la página.</p>';
         return;
       }
