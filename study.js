@@ -530,12 +530,10 @@ function leerGuiaCompleta() {
   if (!material || !material.guia) return;
   detenerLectura();
   
-  // Dividimos la guía en trozos más pequeños para que el celular no la corte
   const textoLimpio = material.guia
     .replace(/[#*]/g, '')
     .replace(/\n/g, ' ');
   
-  // Dividimos por puntos para que lea frase por frase
   const frases = textoLimpio.match(/[^.!?]+[.!?]+/g) || [textoLimpio];
   
   const btnDetener = document.getElementById('btnDetenerAudio');
@@ -547,7 +545,7 @@ function leerGuiaCompleta() {
       const utterance = new SpeechSynthesisUtterance(frases[i]);
       utterance.lang = 'es-ES';
       utterance.rate = 0.9;
-      utterance.onend = leerSiguienteFrase; // Al terminar una frase, lee la siguiente
+      utterance.onend = leerSiguienteFrase;
       sintetizador.speak(utterance);
       i++;
     } else {
@@ -722,6 +720,7 @@ function cargarPreguntaApilador() {
 function responderApilador(opcionElegida, respuestaCorrecta) {
   const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = ''; 
+
   if (opcionElegida === respuestaCorrecta) {
     torreAltura++;
     document.getElementById('alturaTorre').textContent = torreAltura;
@@ -731,7 +730,7 @@ function responderApilador(opcionElegida, respuestaCorrecta) {
     if (torreAltura % 2 === 0) bloque.style.width = '90%';
     document.getElementById('torreContainer').appendChild(bloque);
 
-    document.getElementById('textoPreguntaApilador').textContent = "¡Correcto! 🎉";
+    document.getElementById('textoPregunta    document.getElementById('textoPreguntaApilador').textContent = "¡Correcto! 🎉";
     setTimeout(() => {
       indicePreguntaApilador++;
       cargarPreguntaApilador();
@@ -757,4 +756,3 @@ function salirJuego() {
   document.getElementById('menuJuegos').classList.remove('hidden');
   document.querySelector('#juegosContainer h2').classList.remove('hidden');
 }
-  if (opcionElegida ===
