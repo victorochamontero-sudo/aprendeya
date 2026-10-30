@@ -581,7 +581,6 @@ function iniciarJuegoCoincidencias() {
   document.getElementById('intentosJuego').textContent = 0;
 
   const tablero = document.getElementById('tableroJuego');
-  // Cartas visibles desde el principio (sin el "?")
   tablero.innerHTML = cartasJuego.map((carta, index) => `
     <div onclick="voltearCartaJuego(${index})" id="carta-${index}" 
          class="h-32 md:h-40 bg-white border-2 border-[#E5E1DA] rounded-xl flex items-center justify-center p-2 text-center text-xs md:text-sm cursor-pointer transition transform hover:-translate-y-1 shadow-sm overflow-hidden select-none">
@@ -600,7 +599,6 @@ function voltearCartaJuego(index) {
 
   const carta = cartasJuego[index];
   
-  // Marcamos visualmente la carta seleccionada
   cartaDiv.classList.add('volteada', 'bg-blue-100', 'border-blue-500');
 
   if (!primeraCarta) {
@@ -611,7 +609,6 @@ function voltearCartaJuego(index) {
     document.getElementById('intentosJuego').textContent = intentosJuego;
 
     if (cartasJuego[primeraCarta].id === cartasJuego[segundaCarta].id) {
-      // Acierto
       puntosJuego += 10;
       document.getElementById('puntosJuego').textContent = puntosJuego;
       
@@ -628,7 +625,6 @@ function voltearCartaJuego(index) {
       }
 
     } else {
-      // Fallo
       bloqueoTablero = true;
       setTimeout(() => {
         document.getElementById(`carta-${primeraCarta}`).classList.remove('volteada', 'bg-blue-100', 'border-blue-500');
@@ -657,7 +653,6 @@ function iniciarJuegoApilador() {
   document.querySelector('#juegosContainer h2').classList.add('hidden');
   document.getElementById('juegoApilador').classList.remove('hidden');
 
-  // Mezclamos todas las tarjetas
   preguntasApilador = [...material.flashcards].sort(() => Math.random() - 0.5);
   indicePreguntaApilador = 0;
   torreAltura = 0;
@@ -680,14 +675,12 @@ function cargarPreguntaApilador() {
   const pregunta = preguntasApilador[indicePreguntaApilador];
   document.getElementById('textoPreguntaApilador').textContent = pregunta.pregunta;
 
-  // Generamos 3 opciones falsas (de otras respuestas)
   let opciones = [pregunta.respuesta];
   while (opciones.length < 4 && material.flashcards.length > 1) {
     const random = material.flashcards[Math.floor(Math.random() * material.flashcards.length)].respuesta;
     if (!opciones.includes(random)) opciones.push(random);
   }
 
-  // Mezclamos las opciones
   opciones.sort(() => Math.random() - 0.5);
 
   const contOpciones = document.getElementById('opcionesApilador');
@@ -701,14 +694,12 @@ function cargarPreguntaApilador() {
 
 function responderApilador(opcionElegida, respuestaCorrecta) {
   const contOpciones = document.getElementById('opcionesApilador');
-  contOpciones.innerHTML = ''; // Ocultar opciones temporalmente
+  contOpciones.innerHTML = ''; 
 
   if (opcionElegida === respuestaCorrecta) {
-    // Acierto
     torreAltura++;
     document.getElementById('alturaTorre').textContent = torreAltura;
     
-    // Añadir bloque a la torre
     const bloque = document.createElement('div');
     bloque.className = 'bloque-torre bloque-pregunta';
     if (torreAltura % 2 === 0) bloque.style.width = '90%';
@@ -721,7 +712,6 @@ function responderApilador(opcionElegida, respuestaCorrecta) {
     }, 1000);
 
   } else {
-    // Fallo
     torreFallos++;
     document.getElementById('fallosTorre').textContent = torreFallos;
     
@@ -737,4 +727,5 @@ function salirJuego() {
   document.getElementById('juegoActivo').classList.add('hidden');
   document.getElementById('juegoApilador').classList.add('hidden');
   document.getElementById('menuJuegos').classList.remove('hidden');
-  document.querySelector('#juegosContainer
+  document.querySelector('#juegosContainer h2').classList.remove('hidden');
+}
