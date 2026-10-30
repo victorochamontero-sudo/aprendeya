@@ -13,16 +13,10 @@
     .card-inner.flipped { transform: rotateY(180deg); }
     .card-front, .card-back { backface-visibility: hidden; position: absolute; width: 100%; height: 100%; border-radius: 1.5rem; }
     .card-back { transform: rotateY(180deg); background-color: #F7F5F2; border: 2px solid #1A1A1A; }
-    .guia-content h1 { font-size: 1.5rem; font-weight: 800; margin-top: 1.5rem; color: #1A1A1A; }
-    .guia-content h2 { font-size: 1.2rem; font-weight: 700; margin-top: 1.2rem; color: #1A1A1A; }
-    .guia-content ul { list-style-type: disc; padding-left: 1.2rem; margin-bottom: 1rem; }
-    .guia-content p { margin-bottom: 1rem; line-height: 1.6; font-size: 0.95rem; }
-    @media (min-width: 768px) {
-      .guia-content h1 { font-size: 1.8rem; }
-      .guia-content h2 { font-size: 1.4rem; }
-      .guia-content ul { padding-left: 1.5rem; }
-      .guia-content p { font-size: 1rem; }
-    }
+    .guia-content h1 { font-size: 1.8rem; font-weight: 800; margin-top: 1.5rem; color: #1A1A1A; }
+    .guia-content h2 { font-size: 1.4rem; font-weight: 700; margin-top: 1.2rem; color: #1A1A1A; }
+    .guia-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+    .guia-content p { margin-bottom: 1rem; line-height: 1.6; }
     .bloque-torre { height: 24px; border-radius: 4px; margin-bottom: 2px; transition: all 0.3s; background-color: #3B82F6; width: 100%; }
   </style>
 </head>
@@ -39,13 +33,18 @@
         </span>
       </a>
     </div>
-    <div class="p-4 flex-1 space-y-1">
+    <div class="p-4 flex-1 space-y-1 overflow-y-auto">
       <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-3 mt-2 px-3">Mi Kit</p>
       <button onclick="cambiarTab('mazo')" id="nav-mazo" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition"><span class="text-lg">🗂️</span> Mazo</button>
       <button onclick="cambiarTab('lista')" id="nav-lista" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">📄</span> Lista</button>
       <button onclick="cambiarTab('guia')" id="nav-guia" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">📘</span> Guía</button>
       <button onclick="cambiarTab('quiz')" id="nav-quiz" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">📝</span> Prueba</button>
       <button onclick="cambiarTab('juegos')" id="nav-juegos" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">🎮</span> Juegos</button>
+      
+      <div class="h-px bg-[#E5E1DA] my-4"></div>
+      
+      <button onclick="cambiarTab('cronometro')" id="nav-cronometro" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">⏱️</span> Cronómetro</button>
+      
       <div class="h-px bg-[#E5E1DA] my-4"></div>
       <a href="perfil.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">🏆</span> Mi Perfil</a>
       <a href="index.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">🏠</span> Inicio</a>
@@ -58,9 +57,7 @@
         <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center shadow-md z-10">
           <span class="text-white font-extrabold text-base leading-none">A</span>
         </div>
-        <span class="font-extrabold text-lg tracking-tighter text-[#1A1A1A] ml-0.5 z-0">
-          prendeYa
-        </span>
+        <span class="font-extrabold text-lg tracking-tighter text-[#1A1A1A] ml-0.5 z-0">prendeYa</span>
       </a>
       <a href="perfil.html" class="text-xl">🏆</a>
     </header>
@@ -81,12 +78,8 @@
         </div>
 
         <div class="flex gap-2 mb-4">
-          <button onclick="leerTextoActual()" class="text-sm bg-[#E8E6ED] text-[#1A1A1A] font-semibold px-4 py-2 rounded-full hover:bg-[#D6D1CA] transition flex items-center gap-2">
-            🔊 Escuchar Pregunta
-          </button>
-          <button onclick="detenerLectura()" id="btnDetenerMazo" class="text-sm bg-red-50 text-red-600 border border-red-200 font-semibold px-4 py-2 rounded-full hover:bg-red-100 transition flex items-center gap-2 hidden">
-            ⏹️ Detener
-          </button>
+          <button onclick="leerTextoActual()" class="text-sm bg-[#E8E6ED] text-[#1A1A1A] font-semibold px-4 py-2 rounded-full hover:bg-[#D6D1CA] transition flex items-center gap-2">🔊 Escuchar</button>
+          <button onclick="detenerLectura()" id="btnDetenerMazo" class="text-sm bg-red-50 text-red-600 border border-red-200 font-semibold px-4 py-2 rounded-full hover:bg-red-100 transition flex items-center gap-2 hidden">⏹️ Detener</button>
         </div>
 
         <div class="card-flip w-full h-[250px] md:h-[300px] cursor-pointer mb-6" onclick="voltearTarjeta()">
@@ -155,26 +148,18 @@
       <!-- 5. JUEGOS -->
       <div id="juegosContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-[#E5E1DA]">
         <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A]">Elige un juego</h2>
-        
         <div id="menuJuegos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button onclick="iniciarJuegoCoincidencias()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] hover:border-blue-400 hover:bg-blue-50 transition text-left">
             <div class="text-4xl text-[#1A1A1A]">🧩</div>
-            <div>
-              <h3 class="font-bold text-[#1A1A1A]">Coincidencias</h3>
-              <p class="text-xs text-[#8A8580]">Empareja el término con su definición.</p>
-            </div>
+            <div><h3 class="font-bold text-[#1A1A1A]">Coincidencias</h3><p class="text-xs text-[#8A8580]">Empareja el término con su definición.</p></div>
           </button>
-          
           <button onclick="iniciarJuegoApilador()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] hover:border-blue-400 hover:bg-blue-50 transition text-left">
             <div class="text-4xl text-[#1A1A1A]">🥞</div>
-            <div>
-              <h3 class="font-bold text-[#1A1A1A]">Apilador</h3>
-              <p class="text-xs text-[#8A8580]">Responde bien para apilar bloques.</p>
-            </div>
+            <div><h3 class="font-bold text-[#1A1A1A]">Apilador</h3><p class="text-xs text-[#8A8580]">Responde bien para apilar bloques.</p></div>
           </button>
         </div>
 
-        <!-- JUEGO COINCIDENCIAS -->
+        <!-- COINCIDENCIAS -->
         <div id="juegoActivo" class="hidden mt-8">
           <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700">← Volver a juegos</button>
           <div class="flex justify-between items-center bg-[#F7F5F2] p-4 rounded-xl mb-6">
@@ -184,18 +169,14 @@
           <div id="tableroJuego" class="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4"></div>
         </div>
 
-        <!-- JUEGO APILADOR (AHORA SÍ SE VE BIEN) -->
+        <!-- APILADOR -->
         <div id="juegoApilador" class="hidden mt-8 flex-col w-full">
           <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700 text-left">← Volver a juegos</button>
-          
-          <!-- INSTRUCCIONES -->
           <div id="instruccionesApilador" class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-6 text-center">
             <h3 class="font-bold text-xl text-blue-800 mb-2">¿Cómo jugar al Apilador?</h3>
-            <p class="text-sm text-blue-700 mb-4">Responde correctamente a la pregunta para apilar un bloque en la torre. ¡Si fallas, el bloque no sube! Intenta llegar lo más alto posible.</p>
+            <p class="text-sm text-blue-700 mb-4">Responde correctamente a la pregunta para apilar un bloque en la torre. ¡Si fallas, el bloque no sube!</p>
             <button onclick="comenzarApilador()" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-full hover:bg-blue-700 transition">¡Entendido, a jugar!</button>
           </div>
-
-          <!-- ÁREA DE JUEGO -->
           <div id="juegoApiladorActivo" class="hidden flex-col items-center w-full max-w-md mx-auto">
             <div class="flex justify-between w-full bg-[#F7F5F2] p-4 rounded-xl mb-6">
               <p class="font-bold text-[#1A1A1A]">Altura: <span id="alturaTorre" class="text-blue-600">0</span></p>
@@ -208,8 +189,27 @@
             </div>
           </div>
         </div>
-
       </div>
+
+      <!-- 6. CRONÓMETRO -->
+      <div id="cronometroContainer" class="hidden w-full max-w-2xl bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA] text-center">
+        <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A]">⏱️ Temporizador de Estudio</h2>
+        <p class="text-sm text-[#8A8580] mb-8">Selecciona un tiempo para obligarte a estudiar sin distracciones.</p>
+        
+        <div class="flex flex-wrap justify-center gap-3 mb-8">
+          <button onclick="iniciarCronometro(5)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">5 min</button>
+          <button onclick="iniciarCronometro(10)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">10 min</button>
+          <button onclick="iniciarCronometro(15)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">15 min</button>
+          <button onclick="iniciarCronometro(20)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">20 min</button>
+          <button onclick="iniciarCronometro(25)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">25 min</button>
+          <button onclick="iniciarCronometro(30)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">30 min</button>
+        </div>
+
+        <div class="text-6xl md:text-8xl font-extrabold text-[#1A1A1A] mb-8" id="tiempoPantalla">00:00</div>
+        
+        <button onclick="detenerCronometro()" id="btnDetenerCrono" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full transition">Detener y Reiniciar</button>
+      </div>
+
     </div>
   </main>
 
@@ -219,6 +219,7 @@
     <button onclick="cambiarTab('guia')" id="mob-guia" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📘</span><span class="text-[10px] font-medium">Guía</span></button>
     <button onclick="cambiarTab('quiz')" id="mob-quiz" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📝</span><span class="text-[10px] font-medium">Prueba</span></button>
     <button onclick="cambiarTab('juegos')" id="mob-juegos" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">🎮</span><span class="text-[10px] font-medium">Juegos</span></button>
+    <button onclick="cambiarTab('cronometro')" id="mob-cronometro" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">⏱️</span><span class="text-[10px] font-medium">Tiempo</span></button>
   </nav>
 
   <script src="api.js"></script>
