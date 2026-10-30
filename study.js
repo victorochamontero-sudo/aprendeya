@@ -173,7 +173,8 @@ async function cambiarTab(tab) {
   document.getElementById('guiaContainer').classList.add('hidden');
   document.getElementById('quizContainer').classList.add('hidden');
   document.getElementById('juegosContainer').classList.add('hidden');
-    if (tab === 'mazo') {
+
+  if (tab === 'mazo') {
     document.getElementById('mazoContainer').classList.remove('hidden');
     document.getElementById('mazoContainer').classList.add('flex');
     actualizarUI();
@@ -695,10 +696,29 @@ function cargarPreguntaApilador() {
   const pregunta = preguntasApilador[indicePreguntaApilador];
   document.getElementById('textoPreguntaApilador').textContent = pregunta.pregunta;
 
+  // BUG ARREGLADO: Aseguramos que SIEMPRE haya 4 opciones
   let opciones = [pregunta.respuesta];
+  
+  // Intentamos llenar con respuestas de otras tarjetas
   while (opciones.length < 4 && material.flashcards.length > 1) {
     const random = material.flashcards[Math.floor(Math.random() * material.flashcards.length)].respuesta;
-    if (!opciones.includes(random)) opciones.push(random);
+    if (!opciones.includes(random)) {
+      opciones.push(random);
+    }
+    // Si se queda atascado porque hay muy pocas tarjetas, forzamos una salida
+    if (opciones.length >= 2 && material.flashcards.length < 4) {
+      break;
+    }
+  }
+  
+  // Rellenamos con comodines si aún faltan
+  const comodines = ["Ninguna de las anteriores", "Todas las anteriores", "No aplica", "Es un concepto diferente"];
+  let cIndex = 0;
+  while (opciones.length < 4) {
+    if (!opciones.includes(comodines[cIndex])) {
+      opciones.push(comodines[cIndex]);
+    }
+    cIndex++;
   }
 
   opciones.sort(() => Math.random() - 0.5);
