@@ -24,8 +24,6 @@
   <!-- SIDEBAR (PC) -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
     <div class="p-5 flex items-center border-b border-[#E5E1DA]">
-      
-      <!-- LOGO -->
       <a href="index.html" class="flex items-center group">
         <div class="w-9 h-9 rounded-xl bg-[#1A1A1A] flex items-center justify-center shadow-md z-10">
           <span class="text-white font-extrabold text-xl leading-none">A</span>
@@ -34,7 +32,6 @@
           prendeYa
         </span>
       </a>
-
     </div>
     <div class="p-4 flex-1 space-y-1">
       <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-3 mt-2 px-3">Mi Kit</p>
@@ -42,6 +39,7 @@
       <button onclick="cambiarTab('lista')" id="nav-lista" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">📄</span> Lista</button>
       <button onclick="cambiarTab('guia')" id="nav-guia" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">📘</span> Guía</button>
       <button onclick="cambiarTab('quiz')" id="nav-quiz" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">📝</span> Prueba</button>
+      <button onclick="cambiarTab('juegos')" id="nav-juegos" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">🎮</span> Juegos</button>
       <div class="h-px bg-[#E5E1DA] my-4"></div>
       <a href="perfil.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">🏆</span> Mi Perfil</a>
       <a href="index.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">🏠</span> Inicio</a>
@@ -147,6 +145,47 @@
         </div>
         <div id="preguntasQuiz" class="space-y-6"></div>
       </div>
+
+      <!-- 5. JUEGOS -->
+      <div id="juegosContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-[#E5E1DA]">
+        <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A]">Elige un juego</h2>
+        
+        <div id="menuJuegos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Juego 1: Coincidencias -->
+          <button onclick="iniciarJuegoCoincidencias()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] hover:border-blue-400 hover:bg-blue-50 transition text-left">
+            <div class="text-4xl text-[#1A1A1A]">🧩</div>
+            <div>
+              <h3 class="font-bold text-[#1A1A1A]">Coincidencias</h3>
+              <p class="text-xs text-[#8A8580]">Empareja el término con su definición.</p>
+            </div>
+          </button>
+          
+          <!-- Juego 2: Apilador (Próximamente) -->
+          <button onclick="alert('Próximamente...')" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] opacity-50 cursor-not-allowed text-left">
+            <div class="text-4xl text-[#1A1A1A]">🥞</div>
+            <div>
+              <h3 class="font-bold text-[#1A1A1A]">Apilador</h3>
+              <p class="text-xs text-[#8A8580]">Construye la torre más alta.</p>
+            </div>
+          </button>
+        </div>
+
+        <!-- CONTENEDOR DEL JUEGO ACTIVO -->
+        <div id="juegoActivo" class="hidden mt-8">
+          <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700">← Volver a juegos</button>
+          
+          <!-- Marcador -->
+          <div class="flex justify-between items-center bg-[#F7F5F2] p-4 rounded-xl mb-6">
+            <p class="font-bold text-[#1A1A1A]">Puntuación: <span id="puntosJuego" class="text-blue-600">0</span></p>
+            <p class="text-sm text-[#8A8580]">Intentos: <span id="intentosJuego">0</span></p>
+          </div>
+
+          <!-- Tablero de cartas -->
+          <div id="tableroJuego" class="grid grid-cols-3 sm:grid-cols-4 gap-3 md:gap-4">
+            <!-- Las cartas se generan con JS -->
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -155,6 +194,7 @@
     <button onclick="cambiarTab('lista')" id="mob-lista" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📄</span><span class="text-[10px] font-medium">Lista</span></button>
     <button onclick="cambiarTab('guia')" id="mob-guia" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📘</span><span class="text-[10px] font-medium">Guía</span></button>
     <button onclick="cambiarTab('quiz')" id="mob-quiz" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📝</span><span class="text-[10px] font-medium">Prueba</span></button>
+    <button onclick="cambiarTab('juegos')" id="mob-juegos" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">🎮</span><span class="text-[10px] font-medium">Juegos</span></button>
   </nav>
 
   <script src="api.js"></script>
