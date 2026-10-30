@@ -19,19 +19,29 @@ let sintetizador = window.speechSynthesis;
   }
 
   try {
-    const data = await generarMaterial(texto);
-    if (!data || !data.flashcards || data.flashcards.length === 0) throw new Error("La IA no devolvió tarjetas válidas.");
-    
-    material = data;
+    // Intentamos cargar el kit ya generado desde el historial
+    const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
+    let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
+    const kitGuardado = historial.find(k => k.nombre === nombreKit);
+
+    // Si el kit ya existe en la memoria y tiene la guía, lo cargamos tal cual
+    if (kitGuardado && kitGuardado.material && kitGuardado.material.guia && !kitGuardado.material.guia.includes("Haz clic")) {
+      material = kitGuardado.material;
+    } else {
+      // Si es nuevo, generamos el material inicial
+      const data = await generarMaterial(texto);
+      if (!data || !data.flashcards || data.flashcards.length === 0) throw new Error("La IA no devolvió tarjetas válidas.");
+      material = data;
+      
+      // Actualizamos el historial con el nuevo material
+      historial = historial.filter(k => k.nombre !== nombreKit);
+      historial.unshift({ id: Date.now(), nombre: nombreKit, material: material });
+      localStorage.setItem('historialKits', JSON.stringify(historial));
+    }
+
     if (!material.quiz) material.quiz = []; 
     mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
     stats.aprendiendo = mazo.length;
-
-    const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
-    let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
-    historial = historial.filter(k => k.nombre !== nombreKit);
-    historial.unshift({ id: Date.now(), nombre: nombreKit, material: material });
-    localStorage.setItem('historialKits', JSON.stringify(historial));
 
     loadingDiv.classList.add('hidden');
     cambiarTab('mazo');
@@ -170,7 +180,7 @@ async function cambiarTab(tab) {
         const nuevaGuia = await generarGuia(textoOriginal);
         material.guia = nuevaGuia;
         
-        // GUARDAR EN LOCALSTORAGE Y EN EL HISTORIAL
+        // GUARDAR LA GUÍA EN EL HISTORIAL
         localStorage.setItem('materialGenerado', JSON.stringify(material));
         const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
         let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
