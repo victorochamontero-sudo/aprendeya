@@ -123,7 +123,6 @@ function calificar(nivel) {
 
 async function cambiarTab(tab) {
   if (!material) return;
-  
   detenerLectura(); 
 
   const clasesNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]";
@@ -173,7 +172,8 @@ async function cambiarTab(tab) {
   document.getElementById('guiaContainer').classList.add('hidden');
   document.getElementById('quizContainer').classList.add('hidden');
   document.getElementById('juegosContainer').classList.add('hidden');
-    if (tab === 'mazo') {
+
+  if (tab === 'mazo') {
     document.getElementById('mazoContainer').classList.remove('hidden');
     document.getElementById('mazoContainer').classList.add('flex');
     actualizarUI();
@@ -358,6 +358,7 @@ function editarTarjeta(index) {
 
   cambiarTab('lista');
 }
+
 async function pedirMasMaterial() {
   const btnMas = document.getElementById('btnMas');
   const textoOriginal = localStorage.getItem('material');
@@ -683,7 +684,6 @@ function comenzarApilador() {
 
   cargarPreguntaApilador();
 }
-
 function cargarPreguntaApilador() {
   if (indicePreguntaApilador >= preguntasApilador.length) {
     alert('¡Increíble! Has respondido todas las tarjetas. 🏆');
@@ -694,22 +694,18 @@ function cargarPreguntaApilador() {
   const pregunta = preguntasApilador[indicePreguntaApilador];
   document.getElementById('textoPreguntaApilador').textContent = pregunta.pregunta;
 
-  // Generamos 4 opciones (1 correcta y 3 falsas)
   let opciones = [pregunta.respuesta];
   
-  // Intentamos llenar con respuestas de otras tarjetas
   while (opciones.length < 4 && material.flashcards.length > 1) {
     const random = material.flashcards[Math.floor(Math.random() * material.flashcards.length)].respuesta;
     if (!opciones.includes(random)) {
       opciones.push(random);
     }
-    // Si se queda atascado porque hay muy pocas tarjetas, forzamos una salida
     if (opciones.length >= 2 && material.flashcards.length < 4) {
       break;
     }
   }
   
-  // Rellenamos con comodines si aún faltan
   const comodines = ["Ninguna de las anteriores", "Todas las anteriores", "No aplica", "Es un concepto diferente"];
   let cIndex = 0;
   while (opciones.length < 4) {
@@ -719,13 +715,13 @@ function cargarPreguntaApilador() {
     cIndex++;
   }
 
-  // Mezclamos las opciones
   opciones.sort(() => Math.random() - 0.5);
 
-  // Dibujamos los botones
   const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = opciones.map(op => `
-    <button onclick="responderApilador('${op.replace(/'/    ${op}
+    <button onclick="responderApilador('${op.replace(/'/g, "\\'")}', '${pregunta.respuesta.replace(/'/g, "\\'")}')" 
+            class="w-full text-left px-4 py-3 rounded-xl border border-[#E5E1DA] bg-white hover:bg-[#F7F5F2] text-sm font-medium transition mb-2">
+      ${op}
     </button>
   `).join('');
 }
