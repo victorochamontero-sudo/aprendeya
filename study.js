@@ -18,10 +18,6 @@ let torreFallos = 0;
 let preguntasApilador = [];
 let indicePreguntaApilador = 0;
 
-// Variables del Temporizador
-let intervaloReloj = null;
-let tiempoTotalSegundos = 0;
-
 document.body.addEventListener('click', function() {
   if (sintetizador.speaking) return;
   const utterance = new SpeechSynthesisUtterance('');
@@ -127,6 +123,7 @@ function calificar(nivel) {
 
 async function cambiarTab(tab) {
   if (!material) return;
+  
   detenerLectura(); 
 
   const clasesNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]";
@@ -562,6 +559,7 @@ function detenerLectura() {
   const btnDetenerAudio = document.getElementById('btnDetenerAudio');
   if (btnDetenerAudio) btnDetenerAudio.classList.add('hidden');
 }
+
 function iniciarJuegoCoincidencias() {
   if (!material || !material.flashcards || material.flashcards.length < 3) {
     alert("Necesitas al menos 3 tarjetas para jugar. Genera más material.");
@@ -698,18 +696,22 @@ function cargarPreguntaApilador() {
   const pregunta = preguntasApilador[indicePreguntaApilador];
   document.getElementById('textoPreguntaApilador').textContent = pregunta.pregunta;
 
+  // Generamos 4 opciones (1 correcta y 3 falsas)
   let opciones = [pregunta.respuesta];
   
+  // Intentamos llenar con respuestas de otras tarjetas
   while (opciones.length < 4 && material.flashcards.length > 1) {
     const random = material.flashcards[Math.floor(Math.random() * material.flashcards.length)].respuesta;
     if (!opciones.includes(random)) {
       opciones.push(random);
     }
+    // Si se queda atascado porque hay muy pocas tarjetas, forzamos una salida
     if (opciones.length >= 2 && material.flashcards.length < 4) {
       break;
     }
   }
   
+  // Rellenamos con comodines si aún faltan
   const comodines = ["Ninguna de las anteriores", "Todas las anteriores", "No aplica", "Es un concepto diferente"];
   let cIndex = 0;
   while (opciones.length < 4) {
@@ -719,8 +721,10 @@ function cargarPreguntaApilador() {
     cIndex++;
   }
 
+  // Mezclamos las opciones
   opciones.sort(() => Math.random() - 0.5);
 
+  // Dibujamos los botones
   const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = opciones.map(op => `
     <button onclick="responderApilador('${op.replace(/'/g, "\\'")}', '${pregunta.respuesta.replace(/'/g, "\\'")}')" 
@@ -732,8 +736,7 @@ function cargarPreguntaApilador() {
 
 function responderApilador(opcionElegida, respuestaCorrecta) {
   const contOpciones = document.getElementById('opcionesApilador');
-  contOpciones.innerHTML = '';
-  function responderApilador(opcionElegida, respuestaCorrecta) {
+function responderApilador(opcionElegida, respuestaCorrecta) {
   const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = ''; 
 
@@ -773,76 +776,4 @@ function salirJuego() {
   document.querySelector('#juegosContainer h2').classList.remove('hidden');
 }
 
-// ==========================================
-// LÓGICA DEL TEMPORIZADOR
-// ==========================================
-function abrirTemporizador() {
-  const modal = document.getElementById('modalTemporizador');
-  if (!modal) return;
-  modal.classList.remove('hidden');
-  
-  if (intervaloReloj) {
-    document.getElementById('opcionesTiempo').classList.add('hidden');
-    document.getElementById('relojActivo').classList.remove('hidden');
-  } else {
-    document.getElementById('opcionesTiempo').classList.remove('hidden');
-    document.getElementById('relojActivo').classList.add('hidden');
-  }
-}
-
-function cerrarTemporizador() {
-  const modal = document.getElementById('modalTemporizador');
-  if (modal) modal.classList.add('hidden');
-}
-
-function iniciarTemporizador(minutos) {
-  if (intervaloReloj) clearInterval(intervaloReloj);
-  
-  tiempoTotalSegundos = minutos * 60;
-  document.getElementById('opcionesTiempo').classList.add('hidden');
-  document.getElementById('relojActivo').classList.remove('hidden');
-  
-  actualizarDisplayTiempo();
-  
-  intervaloReloj = setInterval(() => {
-    tiempoTotalSegundos--;
-    actualizarDisplayTiempo();
-    
-    if (tiempoTotalSegundos <= 0) {
-      clearInterval(intervaloReloj);
-      intervaloReloj = null;
-      finalizarTemporizador();
-    }
-  }, 1000);
-}
-
-function actualizarDisplayTiempo() {
-  const minutos = Math.floor(tiempoTotalSegundos / 60);
-  const segundos = tiempoTotalSegundos % 60;
-  document.getElementById('tiempoRestante').textContent = 
-    `${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
-}
-
-function detenerTemporizador() {
-  if (intervaloReloj) {
-    clearInterval(intervaloReloj);
-    intervaloReloj = null;
-  }
-  document.getElementById('opcionesTiempo').classList.remove('hidden');
-  document.getElementById('relojActivo').classList.add('hidden');
-}
-
-function finalizarTemporizador() {
-  const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-  audio.play().catch(e => console.log("Audio bloqueado:", e));
-
-  alert("¡Tiempo terminado! Es hora de descansar. 🧘‍♂️");
-  
-  document.getElementById('opcionesTiempo').classList.remove('hidden');
-  document.getElementById('relojActivo').classList.add('hidden');
-  cerrarTemporizador();
-  
-  const mensaje = new SpeechSynthesisUtterance("Tiempo de estudio terminado. Es hora de descansar.");
-  mensaje.lang = 'es-ES';
-  sintetizador.speak(mensaje);
-}
+ 
