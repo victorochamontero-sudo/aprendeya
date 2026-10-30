@@ -696,7 +696,7 @@ function cargarPreguntaApilador() {
   const pregunta = preguntasApilador[indicePreguntaApilador];
   document.getElementById('textoPreguntaApilador').textContent = pregunta.pregunta;
 
-  // BUG ARREGLADO: Aseguramos que SIEMPRE haya 4 opciones
+  // Generamos 4 opciones (1 correcta y 3 falsas)
   let opciones = [pregunta.respuesta];
   
   // Intentamos llenar con respuestas de otras tarjetas
@@ -721,17 +721,22 @@ function cargarPreguntaApilador() {
     cIndex++;
   }
 
+  // Mezclamos las opciones
   opciones.sort(() => Math.random() - 0.5);
 
+  // Dibujamos los botones
   const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = opciones.map(op => `
     <button onclick="responderApilador('${op.replace(/'/g, "\\'")}', '${pregunta.respuesta.replace(/'/g, "\\'")}')" 
-        ${op}
+            class="w-full text-left px-4 py-3 rounded-xl border border-[#E5E1DA] bg-white hover:bg-[#F7F5F2] text-sm font-medium transition mb-2">
+      ${op}
     </button>
   `).join('');
 }
 
 function responderApilador(opcionElegida, respuestaCorrecta) {
+  const contOpciones = document.getElementById('opcionesApilador');
+ function responderApilador(opcionElegida, respuestaCorrecta) {
   const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = ''; 
 
@@ -770,3 +775,5 @@ function salirJuego() {
   document.getElementById('menuJuegos').classList.remove('hidden');
   document.querySelector('#juegosContainer h2').classList.remove('hidden');
 }
+
+ 
