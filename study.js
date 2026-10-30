@@ -23,11 +23,9 @@ let sintetizador = window.speechSynthesis;
     let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
     const kitGuardado = historial.find(k => k.nombre === nombreKit);
 
-    // LOGICA DE CARGA: Si el kit ya existe y tiene tarjetas, lo usamos
     if (kitGuardado && kitGuardado.material && kitGuardado.material.flashcards && kitGuardado.material.flashcards.length > 0) {
       material = kitGuardado.material;
     } else {
-      // Si es nuevo, generamos
       const data = await generarMaterial(texto);
       if (!data || !data.flashcards || data.flashcards.length === 0) throw new Error("La IA no devolvió tarjetas válidas.");
       material = data;
@@ -109,11 +107,13 @@ async function cambiarTab(tab) {
     document.getElementById('nav-lista').className = clasesNav;
     document.getElementById('nav-guia').className = clasesNav;
     document.getElementById('nav-quiz').className = clasesNav;
+    document.getElementById('nav-juegos').className = clasesNav;
     
     if (tab === 'mazo') document.getElementById('nav-mazo').className = activoNav;
     if (tab === 'lista') document.getElementById('nav-lista').className = activoNav;
     if (tab === 'guia') document.getElementById('nav-guia').className = activoNav;
     if (tab === 'quiz') document.getElementById('nav-quiz').className = activoNav;
+    if (tab === 'juegos') document.getElementById('nav-juegos').className = activoNav;
   }
 
   const clasesMob = "flex flex-col items-center p-2 text-[#8A8580]";
@@ -123,10 +123,12 @@ async function cambiarTab(tab) {
     document.getElementById('mob-lista').className = clasesMob;
     document.getElementById('mob-guia').className = clasesMob;
     document.getElementById('mob-quiz').className = clasesMob;
+    document.getElementById('mob-juegos').className = clasesMob;
     if (tab === 'mazo') document.getElementById('mob-mazo').className = activoMob;
     if (tab === 'lista') document.getElementById('mob-lista').className = activoMob;
     if (tab === 'guia') document.getElementById('mob-guia').className = activoMob;
     if (tab === 'quiz') document.getElementById('mob-quiz').className = activoMob;
+    if (tab === 'juegos') document.getElementById('mob-juegos').className = activoMob;
   }
 
   const headerTitle = document.getElementById('headerTitle');
@@ -135,6 +137,7 @@ async function cambiarTab(tab) {
     if(tab === 'lista') headerTitle.textContent = "Lista";
     if(tab === 'guia') headerTitle.textContent = "Guía de Estudio";
     if(tab === 'quiz') headerTitle.textContent = "Prueba";
+    if(tab === 'juegos') headerTitle.textContent = "Juegos";
   }
 
   document.getElementById('mazoContainer').classList.add('hidden');
@@ -142,6 +145,7 @@ async function cambiarTab(tab) {
   document.getElementById('listaContainer').classList.add('hidden');
   document.getElementById('guiaContainer').classList.add('hidden');
   document.getElementById('quizContainer').classList.add('hidden');
+  document.getElementById('juegosContainer').classList.add('hidden');
 
   if (tab === 'mazo') {
     document.getElementById('mazoContainer').classList.remove('hidden');
@@ -172,14 +176,12 @@ async function cambiarTab(tab) {
     document.getElementById('guiaContainer').classList.remove('hidden');
     const guiaHTML = document.getElementById('guiaTexto');
     
-    // FORZAR: Si no hay guía o es el texto por defecto, la generamos
     if (!material.guia || material.guia.includes("Haz clic") || material.guia.length < 50) {
       guiaHTML.innerHTML = '<div class="text-center py-12"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-[#8A8580]">Generando tu guía de estudio (esto puede tardar unos segundos)...</p></div>';
       try {
         const textoOriginal = localStorage.getItem('material');
         const nuevaGuia = await generarGuia(textoOriginal);
         
-        // GUARDADO FORZADO EN EL KIT ACTUAL
         material.guia = nuevaGuia;
         localStorage.setItem('materialGenerado', JSON.stringify(material));
         
@@ -188,10 +190,9 @@ async function cambiarTab(tab) {
         const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
         
         if (kitIndex !== -1) {
-          historial[kitIndex].material = material; // Actualizamos el objeto completo
+          historial[kitIndex].material = material;
           localStorage.setItem('historialKits', JSON.stringify(historial));
         } else {
-          // Si por alguna razón no existe, lo creamos
           historial.unshift({ id: Date.now(), nombre: nombreKit, material: material });
           localStorage.setItem('historialKits', JSON.stringify(historial));
         }
@@ -213,6 +214,11 @@ async function cambiarTab(tab) {
     document.getElementById('quizContainer').classList.remove('hidden');
     document.getElementById('quizSetup').classList.remove('hidden');
     document.getElementById('preguntasQuiz').innerHTML = '';
+  } else if (tab === 'juegos') {
+    document.getElementById('juegosContainer').classList.remove('hidden');
+    document.getElementById('menuJuegos').classList.remove('hidden');
+    document.getElementById('juegoActivo').classList.add('hidden');
+    document.querySelector('#juegosContainer h2').classList.remove('hidden');
   }
 }
 
@@ -237,285 +243,4 @@ async function iniciarQuiz() {
   const setup = document.getElementById('quizSetup');
 
   setup.classList.add('hidden'); 
-  contenedor.innerHTML = '<div class="text-center py-8"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-center text-[#8A8580]">Preparando tu examen...</p></div>';
-
-  if (!material.quiz) material.quiz = [];
-
-  if (material.quiz.length < cantidad) {
-    try {
-      const textoOriginal = localStorage.getItem('material');
-      const cantidadFaltante = cantidad - material.quiz.length;
-      const nuevasPreguntas = await generarPreguntasExtra(textoOriginal, cantidadFaltante);
-      if (nuevasPreguntas && nuevasPreguntas.length > 0) {
-        material.quiz = [...material.quiz, ...nuevasPreguntas];
-        localStorage.setItem('materialGenerado', JSON.stringify(material)); 
-      }
-    } catch (error) {
-      console.error("No se pudieron generar preguntas extra", error);
-    }
-  }
-
-  if (material.quiz.length === 0) {
-    contenedor.innerHTML = '<p class="text-center text-red-500">No se pudieron generar preguntas. Intenta con un texto más largo.</p>';
-    return;
-  }
-
-  const preguntasFinales = material.quiz.slice(0, cantidad);
-  contenedor.innerHTML = '';
-
-  preguntasFinales.forEach((q, i) => {
-    const div = document.createElement('div');
-    div.className = 'bg-white p-6 rounded-2xl shadow-sm border border-[#E5E1DA] mb-4';
-    div.innerHTML = `
-      <p class="font-bold mb-4 text-lg">${i + 1}. ${q.pregunta}</p>
-      <div class="space-y-2" id="opciones-${i}">
-        ${q.opciones.map((op, j) => `
-          <button onclick="responderQuiz(${i}, ${j})"
-            class="w-full text-left px-5 py-3 rounded-xl border border-[#E5E1DA] text-sm hover:bg-[#F7F5F2] transition">
-            ${op}
-          </button>
-        `).join('')}
-      </div>
-      <p id="exp-${i}" class="hidden mt-4 text-sm text-[#5A5550] bg-[#F7F5F2] p-4 rounded-xl"></p>
-    `;
-    contenedor.appendChild(div);
-  });
-
-  material.quiz = preguntasFinales; 
-}
-
-function responderQuiz(qIdx, opIdx) {
-  const q = material.quiz[qIdx];
-  const botones = document.querySelectorAll(`#opciones-${qIdx} button`);
-  const exp = document.getElementById(`exp-${qIdx}`);
-
-  botones.forEach((b, i) => {
-    b.disabled = true;
-    if (i === q.correcta) b.className = 'w-full text-left px-5 py-3 rounded-xl border-2 border-green-500 bg-green-50 text-sm font-medium';
-    else if (i === opIdx) b.className = 'w-full text-left px-5 py-3 rounded-xl border-2 border-red-400 bg-red-50 text-sm';
-    else b.className = 'w-full text-left px-5 py-3 rounded-xl border border-[#E5E1DA] text-sm opacity-50';
-  });
-
-  exp.textContent = '💡 ' + q.explicacion;
-  exp.classList.remove('hidden');
-}
-
-function editarTarjeta(index) {
-  if (!material || !material.flashcards) return;
-  const tarjeta = material.flashcards[index];
-  const nuevaPregunta = prompt("Edita la pregunta:", tarjeta.pregunta);
-  if (nuevaPregunta === null) return;
-  
-  const nuevaRespuesta = prompt("Edita la respuesta:", tarjeta.respuesta);
-  if (nuevaRespuesta === null) return;
-
-  material.flashcards[index].pregunta = nuevaPregunta;
-  material.flashcards[index].respuesta = nuevaRespuesta;
-  
-  localStorage.setItem('materialGenerado', JSON.stringify(material));
-  
-  const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
-  let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
-  const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
-  if (kitIndex !== -1) {
-    historial[kitIndex].material = material;
-    localStorage.setItem('historialKits', JSON.stringify(historial));
-  }
-
-  cambiarTab('lista');
-}
-
-async function pedirMasMaterial() {
-  const btnMas = document.getElementById('btnMas');
-  const textoOriginal = localStorage.getItem('material');
-  
-  if (!textoOriginal || !material) return;
-
-  if (generacionesExtra >= 2) {
-    alert('Límite alcanzado: solo puedes generar material extra 2 veces por kit.');
-    if(btnMas) btnMas.style.display = 'none';
-    return;
-  }
-
-  if(btnMas) {
-    btnMas.innerHTML = '<div class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Generando...';
-    btnMas.disabled = true;
-  }
-
-  try {
-    const extra = await generarMasMaterial(textoOriginal, material.flashcards, material.quiz);
-    
-    if (extra.flashcards) {
-      material.flashcards = [...material.flashcards, ...extra.flashcards];
-      mazo = [...mazo, ...extra.flashcards].sort(() => Math.random() - 0.5);
-      stats.aprendiendo += extra.flashcards.length;
-    }
-    
-    if (extra.quiz) {
-      material.quiz = [...(material.quiz || []), ...extra.quiz];
-    }
-
-    localStorage.setItem('materialGenerado', JSON.stringify(material));
-    const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
-    let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
-    const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
-    if (kitIndex !== -1) {
-      historial[kitIndex].material = material;
-      localStorage.setItem('historialKits', JSON.stringify(historial));
-    }
-
-    generacionesExtra++;
-    
-    if (generacionesExtra >= 2) {
-      if(btnMas) {
-        btnMas.innerHTML = '✨ Límite de generación alcanzado';
-        btnMas.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-        btnMas.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
-      }
-    } else {
-      if(btnMas) {
-        btnMas.innerHTML = '✨ Generar 8 tarjetas más con IA';
-        btnMas.disabled = false;
-      }
-    }
-
-    indiceActual = 0; 
-    actualizarUI();
-    
-    if (document.getElementById('listaContainer').classList.contains('hidden')) {
-      alert('¡Se han añadido 8 tarjetas y 4 preguntas nuevas a tu kit!');
-    } else {
-      cambiarTab('lista');
-    }
-
-  } catch (error) {
-    console.error(error);
-    alert('Hubo un error al generar más material. Por favor, recarga la página.');
-    if(btnMas) {
-      btnMas.innerHTML = '✨ Generar 8 tarjetas más con IA';
-      btnMas.disabled = false;
-    }
-  }
-}
-
-// --- FUNCIÓN DE IMPRESIÓN Y DESCARGA ---
-function imprimirGuia(tipo) {
-  if (!material || !material.guia) {
-    alert("Primero debes generar la guía de estudio.");
-    return;
-  }
-  
-  const ventana = window.open('', '_blank');
-  
-  const guiaHTML = material.guia
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
-    .replace(/\n/g, '<br>');
-
-  const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Guía';
-  const tituloDocumento = tipo === 'Word' ? 'Guia_AprendeYa_Word' : 'Guia_AprendeYa_PDF';
-
-  ventana.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>${tituloDocumento}</title>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 40px; max-width: 800px; margin: 0 auto; }
-        h1 { color: #1a1a1a; font-size: 28px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
-        h2 { color: #1a1a1a; font-size: 22px; margin-top: 30px; }
-        li { margin-bottom: 10px; }
-        strong { color: #000; }
-        .header { text-align: center; margin-bottom: 40px; color: #888; font-size: 14px; }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h3>Guía de Estudio generada por AprendeYa</h3>
-        <p>Kit: ${nombreKit}</p>
-      </div>
-      ${guiaHTML}
-    </body>
-    </html>
-  `);
-
-  ventana.document.close();
-  ventana.focus();
-  
-  setTimeout(() => {
-    ventana.print();
-  }, 500);
-}
-
-// --- LECTURA POR VOZ (TEXT TO SPEECH) ---
-
-function leerTextoActual() {
-  if (!mazo || indiceActual >= mazo.length) return;
-  detenerLectura(); 
-  
-  const tarjeta = mazo[indiceActual];
-  const textoALeer = mostrandoRespuesta ? tarjeta.respuesta : tarjeta.pregunta;
-  
-  const utterance = new SpeechSynthesisUtterance(textoALeer);
-  utterance.lang = 'es-ES';
-  utterance.rate = 0.9;
-  
-  const btnDetener = document.getElementById('btnDetenerMazo');
-  if (btnDetener) btnDetener.classList.remove('hidden');
-  
-  utterance.onend = () => {
-    if (btnDetener) btnDetener.classList.add('hidden');
-  };
-  
-  sintetizador.speak(utterance);
-}
-
-function leerTarjetaLista(index) {
-  if (!material || !material.flashcards || !material.flashcards[index]) return;
-  detenerLectura();
-  
-  const tarjeta = material.flashcards[index];
-  const textoALeer = `Pregunta: ${tarjeta.pregunta}. Respuesta: ${tarjeta.respuesta}`;
-  
-  const utterance = new SpeechSynthesisUtterance(textoALeer);
-  utterance.lang = 'es-ES';
-  utterance.rate = 0.9;
-  
-  sintetizador.speak(utterance);
-}
-
-function leerGuiaCompleta() {
-  if (!material || !material.guia) return;
-  detenerLectura();
-  
-  const textoLimpio = material.guia
-    .replace(/[#*]/g, '')
-    .replace(/\n/g, ' ');
-  
-  const utterance = new SpeechSynthesisUtterance(textoLimpio);
-  utterance.lang = 'es-ES';
-  utterance.rate = 0.9;
-  
-  const btnDetener = document.getElementById('btnDetenerAudio');
-  if (btnDetener) btnDetener.classList.remove('hidden');
-  
-  utterance.onend = () => {
-    if (btnDetener) btnDetener.classList.add('hidden');
-  };
-  
-  sintetizador.speak(utterance);
-}
-
-function detenerLectura() {
-  if (sintetizador.speaking) {
-    sintetizador.cancel();
-  }
-  const btnDetenerMazo = document.getElementById('btnDetenerMazo');
-  if (btnDetenerMazo) btnDetenerMazo.classList.add('hidden');
-  
-  const btnDetenerAudio = document.getElementById('btnDetenerAudio');
-  if (btnDetenerAudio) btnDetenerAudio.classList.add('hidden');
-}
+  contenedor.innerHTML = '<div class="text-center py-8"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class
