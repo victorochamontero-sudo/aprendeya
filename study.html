@@ -21,7 +21,6 @@
 </head>
 <body class="bg-[#F7F5F2] min-h-screen flex">
 
-  <!-- SIDEBAR (PC) -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
     <div class="p-5 flex items-center border-b border-[#E5E1DA]">
       <a href="index.html" class="flex items-center group">
@@ -151,7 +150,6 @@
         <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A]">Elige un juego</h2>
         
         <div id="menuJuegos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <!-- Juego 1: Coincidencias -->
           <button onclick="iniciarJuegoCoincidencias()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] hover:border-blue-400 hover:bg-blue-50 transition text-left">
             <div class="text-4xl text-[#1A1A1A]">🧩</div>
             <div>
@@ -160,7 +158,6 @@
             </div>
           </button>
           
-          <!-- Juego 2: Apilador (Próximamente) -->
           <button onclick="alert('Próximamente...')" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] opacity-50 cursor-not-allowed text-left">
             <div class="text-4xl text-[#1A1A1A]">🥞</div>
             <div>
@@ -174,13 +171,11 @@
         <div id="juegoActivo" class="hidden mt-8">
           <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700">← Volver a juegos</button>
           
-          <!-- Marcador -->
           <div class="flex justify-between items-center bg-[#F7F5F2] p-4 rounded-xl mb-6">
             <p class="font-bold text-[#1A1A1A]">Puntuación: <span id="puntosJuego" class="text-blue-600">0</span></p>
             <p class="text-sm text-[#8A8580]">Intentos: <span id="intentosJuego">0</span></p>
           </div>
 
-          <!-- Tablero de cartas -->
           <div id="tableroJuego" class="grid grid-cols-3 sm:grid-cols-4 gap-3 md:gap-4">
             <!-- Las cartas se generan con JS -->
           </div>
