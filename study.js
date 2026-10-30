@@ -39,14 +39,24 @@ document.body.addEventListener('click', function() {
     return;
   }
 
+  // Reloj de seguridad: Si la IA tarda más de 15 segundos, mostramos error
+  const timeout = setTimeout(() => {
+    loadingText.textContent = "La IA está tardando más de lo normal...";
+    loadingText.classList.add('text-red-500');
+    if(spinner) spinner.classList.add('hidden');
+    if(btnError) btnError.classList.remove('hidden');
+  }, 15000);
+
   try {
     const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
     let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
     const kitGuardado = historial.find(k => k.nombre === nombreKit);
 
+    // Si el kit ya existe y tiene tarjetas, lo usamos
     if (kitGuardado && kitGuardado.material && kitGuardado.material.flashcards && kitGuardado.material.flashcards.length > 0) {
       material = kitGuardado.material;
     } else {
+      // Si es nuevo, generamos
       const data = await generarMaterial(texto);
       if (!data || !data.flashcards || data.flashcards.length === 0) throw new Error("La IA no devolvió tarjetas válidas.");
       material = data;
@@ -56,6 +66,8 @@ document.body.addEventListener('click', function() {
       localStorage.setItem('historialKits', JSON.stringify(historial));
     }
 
+    clearTimeout(timeout); // Cancelamos el reloj si todo salió bien
+
     if (!material.quiz) material.quiz = []; 
     mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
     stats.aprendiendo = mazo.length;
@@ -63,8 +75,9 @@ document.body.addEventListener('click', function() {
     loadingDiv.classList.add('hidden');
     cambiarTab('mazo');
   } catch (e) {
+    clearTimeout(timeout);
     console.error("Error en Init:", e);
-    loadingText.textContent = "¡Ups! Hubo un error.";
+    loadingText.textContent = "¡Ups! Hubo un error de conexión con la IA.";
     loadingText.classList.add('text-red-500');
     if(spinner) spinner.classList.add('hidden');
     if(btnError) btnError.classList.remove('hidden');
@@ -713,7 +726,8 @@ function responderApilador(opcionElegida, respuestaCorrecta) {
 
   } else {
     torreFallos++;
-    document.getElementById('fallosTorre').textContent = torreFallos;
+    document.getElementById('fallosTorre').
+          document.getElementById('fallosTorre').textContent = torreFallos;
     
     document.getElementById('textoPreguntaApilador').textContent = "¡Incorrecto! 😞";
     setTimeout(() => {
