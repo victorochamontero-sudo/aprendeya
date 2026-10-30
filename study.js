@@ -20,6 +20,7 @@ let torreFallos = 0;
 let preguntasApilador = [];
 let indicePreguntaApilador = 0;
 
+// TRUCO PARA DESBLOQUEAR EL AUDIO EN MÓVILES
 document.body.addEventListener('click', function() {
   if (sintetizador.speaking) return;
   const utterance = new SpeechSynthesisUtterance('');
@@ -72,6 +73,7 @@ document.body.addEventListener('click', function() {
     cambiarTab('mazo');
   } catch (e) {
     clearTimeout(timeout);
+    console.error("Error en Init:", e);
     loadingText.textContent = "¡Ups! Hubo un error de conexión con la IA.";
     loadingText.classList.add('text-red-500');
     if(spinner) spinner.classList.add('hidden');
@@ -122,6 +124,7 @@ function calificar(nivel) {
   indiceActual++;
   setTimeout(() => { actualizarUI(); }, 300);
 }
+
 async function cambiarTab(tab) {
   if (!material) return;
   
@@ -265,6 +268,7 @@ function toggleRespuesta(index) {
     icono.classList.remove('rotate-180');
   }
 }
+
 async function iniciarQuiz() {
   if (!material) return;
   const cantidad = parseInt(document.getElementById('selectCantidad').value);
@@ -722,16 +726,8 @@ function responderApilador(opcionElegida, respuestaCorrecta) {
     document.getElementById('alturaTorre').textContent = torreAltura;
     
     const bloque = document.createElement('div');
-    bloque.className = 'function responderApilador(opcionElegida, respuestaCorrecta) {
-  const contOpciones = document.getElementById('opcionesApilador');
-  contOpciones.innerHTML = ''; 
-
-  if (opcionElegida === respuestaCorrecta) {
-    torreAltura++;
-    document.getElementById('alturaTorre').textContent = torreAltura;
-    
-    const bloque = document.createElement('div');
     bloque.className = 'bloque-torre bloque-pregunta';
+    if    bloque.className = 'bloque-torre bloque-pregunta';
     if (torreAltura % 2 === 0) bloque.style.width = '90%';
     document.getElementById('torreContainer').appendChild(bloque);
 
