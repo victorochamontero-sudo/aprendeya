@@ -4,7 +4,6 @@ let indiceActual = 0;
 let mostrandoRespuesta = false;
 let stats = { aprendiendo: 0, revisando: 0, dominado: 0 };
 let generacionesExtra = 0; 
-let sintetizador = window.speechSynthesis;
 
 let cartasJuego = [];
 let primeraCarta = null;
@@ -17,12 +16,6 @@ let torreAltura = 0;
 let torreFallos = 0;
 let preguntasApilador = [];
 let indicePreguntaApilador = 0;
-
-document.body.addEventListener('click', function() {
-  if (sintetizador.speaking) return;
-  const utterance = new SpeechSynthesisUtterance('');
-  sintetizador.speak(utterance);
-}, { once: true });
 
 (async function init() {
   const texto = localStorage.getItem('material');
@@ -61,7 +54,6 @@ document.body.addEventListener('click', function() {
     }
 
     clearTimeout(timeout);
-
     if (!material.quiz) material.quiz = []; 
     mazo = [...material.flashcards].sort(() => Math.random() - 0.5);
     stats.aprendiendo = mazo.length;
@@ -70,6 +62,7 @@ document.body.addEventListener('click', function() {
     cambiarTab('mazo');
   } catch (e) {
     clearTimeout(timeout);
+    console.error(e);
     loadingText.textContent = "¡Ups! Hubo un error de conexión con la IA.";
     loadingText.classList.add('text-red-500');
     if(spinner) spinner.classList.add('hidden');
@@ -124,7 +117,7 @@ function calificar(nivel) {
 async function cambiarTab(tab) {
   if (!material) return;
   
-  detenerLectura(); 
+  // NOTA: Quitamos la función de audio por ahora para que el archivo sea estable.
 
   const clasesNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition text-[#5A5550] hover:bg-[#F7F5F2]";
   const activoNav = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition";
@@ -192,8 +185,6 @@ async function cambiarTab(tab) {
             <p class="text-sm text-[#5A5550] mb-3">${f.respuesta}</p>
             <div class="flex gap-2">
               <button onclick="editarTarjeta(${i})" class="text-xs font-semibold text-blue-500 hover:text-blue-700">✏️ Editar</button>
-              <button onclick="leerTarjetaLista(${i})" class="text-xs font-semibold text-[#1A1A1A] bg-[#E8E6ED] px-2 py-1 rounded">🔊 Escuchar</button>
-              <button onclick="detenerLectura()" class="text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded">⏹️ Detener</button>
             </div>
           </div>
         </div>
@@ -265,76 +256,6 @@ function toggleRespuesta(index) {
   }
 }
 
-async function iniciarQuiz() {
-  if (!material) return;
-  const cantidad = parseInt(document.getElementById('selectCantidad').value);
-  const contenedor = document.getElementById('preguntasQuiz');
-  const setup = document.getElementById('quizSetup');
-
-  setup.classList.add('hidden'); 
-  contenedor.innerHTML = '<div class="text-center py-8"><div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4"></div><p class="text-center text-[#8A8580]">Preparando tu examen...</p></div>';
-
-  if (!material.quiz) material.quiz = [];
-
-  if (material.quiz.length < cantidad) {
-    try {
-      const textoOriginal = localStorage.getItem('material');
-      const cantidadFaltante = cantidad - material.quiz.length;
-      const nuevasPreguntas = await generarPreguntasExtra(textoOriginal, cantidadFaltante);
-      if (nuevasPreguntas && nuevasPreguntas.length > 0) {
-        material.quiz = [...material.quiz, ...nuevasPreguntas];
-        localStorage.setItem('materialGenerado', JSON.stringify(material)); 
-      }
-    } catch (error) {
-      console.error("No se pudieron generar preguntas extra", error);
-    }
-  }
-
-  if (material.quiz.length === 0) {
-    contenedor.innerHTML = '<p class="text-center text-red-500">No se pudieron generar preguntas. Intenta con un texto más largo.</p>';
-    return;
-  }
-
-  const preguntasFinales = material.quiz.slice(0, cantidad);
-  contenedor.innerHTML = '';
-
-  preguntasFinales.forEach((q, i) => {
-    const div = document.createElement('div');
-    div.className = 'bg-white p-6 rounded-2xl shadow-sm border border-[#E5E1DA] mb-4';
-    div.innerHTML = `
-      <p class="font-bold mb-4 text-lg">${i + 1}. ${q.pregunta}</p>
-      <div class="space-y-2" id="opciones-${i}">
-        ${q.opciones.map((op, j) => `
-          <button onclick="responderQuiz(${i}, ${j})"
-            class="w-full text-left px-5 py-3 rounded-xl border border-[#E5E1DA] text-sm hover:bg-[#F7F5F2] transition">
-            ${op}
-          </button>
-        `).join('')}
-      </div>
-      <p id="exp-${i}" class="hidden mt-4 text-sm text-[#5A5550] bg-[#F7F5F2] p-4 rounded-xl"></p>
-    `;
-    contenedor.appendChild(div);
-  });
-
-  material.quiz = preguntasFinales; 
-}
-
-function responderQuiz(qIdx, opIdx) {
-  const q = material.quiz[qIdx];
-  const botones = document.querySelectorAll(`#opciones-${qIdx} button`);
-  const exp = document.getElementById(`exp-${qIdx}`);
-
-  botones.forEach((b, i) => {
-    b.disabled = true;
-    if (i === q.correcta) b.className = 'w-full text-left px-5 py-3 rounded-xl border-2 border-green-500 bg-green-50 text-sm font-medium';
-    else if (i === opIdx) b.className = 'w-full text-left px-5 py-3 rounded-xl border-2 border-red-400 bg-red-50 text-sm';
-    else b.className = 'w-full text-left px-5 py-3 rounded-xl border border-[#E5E1DA] text-sm opacity-50';
-  });
-
-  exp.textContent = '💡 ' + q.explicacion;
-  exp.classList.remove('hidden');
-}
-
 function editarTarjeta(index) {
   if (!material || !material.flashcards) return;
   const tarjeta = material.flashcards[index];
@@ -360,209 +281,9 @@ function editarTarjeta(index) {
   cambiarTab('lista');
 }
 
-async function pedirMasMaterial() {
-  const btnMas = document.getElementById('btnMas');
-  const textoOriginal = localStorage.getItem('material');
-  
-  if (!textoOriginal || !material) return;
-
-  if (generacionesExtra >= 2) {
-    alert('Límite alcanzado: solo puedes generar material extra 2 veces por kit.');
-    if(btnMas) btnMas.style.display = 'none';
-    return;
-  }
-
-  if(btnMas) {
-    btnMas.innerHTML = '<div class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Generando...';
-    btnMas.disabled = true;
-  }
-
-  try {
-    const extra = await generarMasMaterial(textoOriginal, material.flashcards, material.quiz);
-    
-    if (extra.flashcards) {
-      material.flashcards = [...material.flashcards, ...extra.flashcards];
-      mazo = [...mazo, ...extra.flashcards].sort(() => Math.random() - 0.5);
-      stats.aprendiendo += extra.flashcards.length;
-    }
-    
-    if (extra.quiz) {
-      material.quiz = [...(material.quiz || []), ...extra.quiz];
-    }
-
-    localStorage.setItem('materialGenerado', JSON.stringify(material));
-    const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Kit';
-    let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
-    const kitIndex = historial.findIndex(k => k.nombre === nombreKit);
-    if (kitIndex !== -1) {
-      historial[kitIndex].material = material;
-      localStorage.setItem('historialKits', JSON.stringify(historial));
-    }
-
-    generacionesExtra++;
-    
-    if (generacionesExtra >= 2) {
-      if(btnMas) {
-        btnMas.innerHTML = '✨ Límite de generación alcanzado';
-        btnMas.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-        btnMas.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
-      }
-    } else {
-      if(btnMas) {
-        btnMas.innerHTML = '✨ Generar 8 tarjetas más con IA';
-        btnMas.disabled = false;
-      }
-    }
-
-    indiceActual = 0; 
-    actualizarUI();
-    
-    if (document.getElementById('listaContainer').classList.contains('hidden')) {
-      alert('¡Se han añadido 8 tarjetas y 4 preguntas nuevas a tu kit!');
-    } else {
-      cambiarTab('lista');
-    }
-
-  } catch (error) {
-    console.error(error);
-    alert('Hubo un error al generar más material. Por favor, recarga la página.');
-    if(btnMas) {
-      btnMas.innerHTML = '✨ Generar 8 tarjetas más con IA';
-      btnMas.disabled = false;
-    }
-  }
-}
-
-function imprimirGuia(tipo) {
-  if (!material || !material.guia) {
-    alert("Primero debes generar la guía de estudio.");
-    return;
-  }
-  
-  const ventana = window.open('', '_blank');
-  
-  const guiaHTML = material.guia
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
-    .replace(/\n/g, '<br>');
-
-  const nombreKit = localStorage.getItem('nombreMaterial') || 'Mi Guía';
-  const tituloDocumento = tipo === 'Word' ? 'Guia_AprendeYa_Word' : 'Guia_AprendeYa_PDF';
-
-  ventana.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>${tituloDocumento}</title>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 40px; max-width: 800px; margin: 0 auto; }
-        h1 { color: #1a1a1a; font-size: 28px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
-        h2 { color: #1a1a1a; font-size: 22px; margin-top: 30px; }
-        li { margin-bottom: 10px; }
-        strong { color: #000; }
-        .header { text-align: center; margin-bottom: 40px; color: #888; font-size: 14px; }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h3>Guía de Estudio generada por AprendeYa</h3>
-        <p>Kit: ${nombreKit}</p>
-      </div>
-      ${guiaHTML}
-    </body>
-    </html>
-  `);
-
-  ventana.document.close();
-  ventana.focus();
-  
-  setTimeout(() => {
-    ventana.print();
-  }, 500);
-}
-
-function leerTextoActual() {
-  if (!mazo || indiceActual >= mazo.length) return;
-  detenerLectura(); 
-  
-  const tarjeta = mazo[indiceActual];
-  const textoALeer = mostrandoRespuesta ? tarjeta.respuesta : tarjeta.pregunta;
-  
-  const utterance = new SpeechSynthesisUtterance(textoALeer);
-  utterance.lang = 'es-ES';
-  utterance.rate = 0.9;
-  
-  const btnDetener = document.getElementById('btnDetenerMazo');
-  if (btnDetener) btnDetener.classList.remove('hidden');
-  
-  utterance.onend = () => {
-    if (btnDetener) btnDetener.classList.add('hidden');
-  };
-  
-  sintetizador.speak(utterance);
-}
-
-function leerTarjetaLista(index) {
-  if (!material || !material.flashcards || !material.flashcards[index]) return;
-  detenerLectura();
-  
-  const tarjeta = material.flashcards[index];
-  const textoALeer = `Pregunta: ${tarjeta.pregunta}. Respuesta: ${tarjeta.respuesta}`;
-  
-  const utterance = new SpeechSynthesisUtterance(textoALeer);
-  utterance.lang = 'es-ES';
-  utterance.rate = 0.9;
-  
-  sintetizador.speak(utterance);
-}
-
-function leerGuiaCompleta() {
-  if (!material || !material.guia) return;
-  detenerLectura();
-  
-  const textoLimpio = material.guia
-    .replace(/[#*]/g, '')
-    .replace(/\n/g, ' ');
-  
-  const frases = textoLimpio.match(/[^.!?]+[.!?]+/g) || [textoLimpio];
-  
-  const btnDetener = document.getElementById('btnDetenerAudio');
-  if (btnDetener) btnDetener.classList.remove('hidden');
-
-  let i = 0;
-  function leerSiguienteFrase() {
-    if (i < frases.length) {
-      const utterance = new SpeechSynthesisUtterance(frases[i]);
-      utterance.lang = 'es-ES';
-      utterance.rate = 0.9;
-      utterance.onend = leerSiguienteFrase;
-      sintetizador.speak(utterance);
-      i++;
-    } else {
-      if (btnDetener) btnDetener.classList.add('hidden');
-    }
-  }
-
-  leerSiguienteFrase();
-}
-
-function detenerLectura() {
-  if (sintetizador.speaking) {
-    sintetizador.cancel();
-  }
-  const btnDetenerMazo = document.getElementById('btnDetenerMazo');
-  if (btnDetenerMazo) btnDetenerMazo.classList.add('hidden');
-  
-  const btnDetenerAudio = document.getElementById('btnDetenerAudio');
-  if (btnDetenerAudio) btnDetenerAudio.classList.add('hidden');
-}
-
 function iniciarJuegoCoincidencias() {
   if (!material || !material.flashcards || material.flashcards.length < 3) {
-    alert("Necesitas al menos 3 tarjetas para jugar. Genera más material.");
+    alert("Necesitas al menos 3 tarjetas para jugar.");
     return;
   }
 
@@ -602,14 +323,11 @@ function iniciarJuegoCoincidencias() {
 
 function voltearCartaJuego(index) {
   if (bloqueoTablero) return;
-  
   const cartaDiv = document.getElementById(`carta-${index}`);
-  
   if (cartaDiv.classList.contains('volteada')) return;
   if (primeraCarta === index) return;
 
   const carta = cartasJuego[index];
-  
   cartaDiv.classList.add('volteada', 'bg-blue-100', 'border-blue-500');
 
   if (!primeraCarta) {
@@ -625,7 +343,6 @@ function voltearCartaJuego(index) {
       
       document.getElementById(`carta-${primeraCarta}`).classList.remove('bg-blue-100', 'border-blue-500');
       document.getElementById(`carta-${primeraCarta}`).classList.add('bg-green-100', 'border-green-500');
-      
       document.getElementById(`carta-${segundaCarta}`).classList.remove('bg-blue-100', 'border-blue-500');
       document.getElementById(`carta-${segundaCarta}`).classList.add('bg-green-100', 'border-green-500');
       
@@ -634,13 +351,11 @@ function voltearCartaJuego(index) {
       if (puntosJuego === (cartasJuego.length / 2) * 10) {
         setTimeout(() => alert('¡Felicidades! Has completado el juego. 🎉'), 500);
       }
-
     } else {
       bloqueoTablero = true;
       setTimeout(() => {
         document.getElementById(`carta-${primeraCarta}`).classList.remove('volteada', 'bg-blue-100', 'border-blue-500');
         document.getElementById(`carta-${segundaCarta}`).classList.remove('volteada', 'bg-blue-100', 'border-blue-500');
-        
         bloqueoTablero = false;
         resetearSeleccion();
       }, 1000);
@@ -696,22 +411,18 @@ function cargarPreguntaApilador() {
   const pregunta = preguntasApilador[indicePreguntaApilador];
   document.getElementById('textoPreguntaApilador').textContent = pregunta.pregunta;
 
-  // Generamos 4 opciones (1 correcta y 3 falsas)
   let opciones = [pregunta.respuesta];
   
-  // Intentamos llenar con respuestas de otras tarjetas
   while (opciones.length < 4 && material.flashcards.length > 1) {
     const random = material.flashcards[Math.floor(Math.random() * material.flashcards.length)].respuesta;
     if (!opciones.includes(random)) {
       opciones.push(random);
     }
-    // Si se queda atascado porque hay muy pocas tarjetas, forzamos una salida
     if (opciones.length >= 2 && material.flashcards.length < 4) {
       break;
     }
   }
   
-  // Rellenamos con comodines si aún faltan
   const comodines = ["Ninguna de las anteriores", "Todas las anteriores", "No aplica", "Es un concepto diferente"];
   let cIndex = 0;
   while (opciones.length < 4) {
@@ -721,10 +432,8 @@ function cargarPreguntaApilador() {
     cIndex++;
   }
 
-  // Mezclamos las opciones
   opciones.sort(() => Math.random() - 0.5);
 
-  // Dibujamos los botones
   const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = opciones.map(op => `
     <button onclick="responderApilador('${op.replace(/'/g, "\\'")}', '${pregunta.respuesta.replace(/'/g, "\\'")}')" 
@@ -734,8 +443,6 @@ function cargarPreguntaApilador() {
   `).join('');
 }
 
-function responderApilador(opcionElegida, respuestaCorrecta) {
-  const contOpciones = document.getElementById('opcionesApilador');
 function responderApilador(opcionElegida, respuestaCorrecta) {
   const contOpciones = document.getElementById('opcionesApilador');
   contOpciones.innerHTML = ''; 
@@ -775,5 +482,3 @@ function salirJuego() {
   document.getElementById('menuJuegos').classList.remove('hidden');
   document.querySelector('#juegosContainer h2').classList.remove('hidden');
 }
-
- 
