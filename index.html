@@ -39,9 +39,14 @@
 
     <div class="p-4 flex-1 space-y-1 overflow-y-auto">
       <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-3 mt-2 px-3">Menú</p>
-      <a href="index.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition">
-        <span class="text-lg">🏠</span> Inicio
-      </a>
+      
+      <!-- EL BOTÓN DE INICIO SE CAMBIÓ POR EL DE REGISTRO -->
+      <div class="mt-2 mb-4">
+        <button id="btnSidebarUser" onclick="abrirModalLogin()" class="w-full bg-[#1A1A1A] text-white text-sm font-semibold px-4 py-3 rounded-xl hover:bg-opacity-80 transition shadow-md flex items-center justify-center gap-2">
+          <span class="text-lg">✨</span> Ingresar / Registrarse
+        </button>
+      </div>
+
       <a href="dashboard.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition">
         <span class="text-lg">📚</span> Mis Kits
       </a>
@@ -55,12 +60,6 @@
       <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">💡</span> Recomendaciones</button>
       <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">✉️</span> Contacto</button>
 
-      <!-- BOTÓN DE REGISTRO EN LA BARRA LATERAL -->
-      <div class="mt-6 pt-4 border-t border-[#E5E1DA]">
-        <button id="btnSidebarUser" onclick="abrirModalLogin()" class="w-full bg-[#1A1A1A] text-white text-sm font-semibold px-4 py-3 rounded-xl hover:bg-opacity-80 transition shadow-md flex items-center justify-center gap-2">
-          <span class="text-lg">✨</span> Ingresar / Registrarse
-        </button>
-      </div>
     </div>
   </aside>
 
