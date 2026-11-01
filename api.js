@@ -2,7 +2,6 @@
 // APPRENDEYA - CONEXIÓN CON LA IA (OPENROUTER)
 // ============================================
 
-// Tu clave de OpenRouter
 const OPENROUTER_KEY = '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';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
@@ -51,7 +50,7 @@ async function generarMaterial(texto) {
         'Authorization': `Bearer ${OPENROUTER_KEY}`
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-exp:free', // Modelo gratuito de OpenRouter
+        model: 'google/gemini-2.0-flash-exp:free',
         messages: [{ role: 'user', content: PROMPT + texto }],
         temperature: 0.7,
         response_format: { type: 'json_object' }
