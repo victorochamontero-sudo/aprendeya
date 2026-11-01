@@ -11,79 +11,97 @@
 <body class="bg-[#F7F5F2] min-h-screen p-6 md:p-12">
 
   <header class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-    <a href="index.html" class="flex items-center group">
-      <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center shadow-md z-10">
-        <span class="text-white font-extrabold text-base leading-none">A</span>
-      </div>
-      <span class="font-extrabold text-lg tracking-tighter text-[#1A1A1A] ml-0.5 z-0 group-hover:text-blue-600 transition-colors">
-        prendeYa
-      </span>
-    </a>
-    
-    <h1 class="text-2xl font-extrabold order-first md:order-none">Mi Perfil y Logros</h1>
-    
-    <div class="flex gap-2 w-full md:w-auto justify-center">
-      <button onclick="compartirProgreso()" class="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-blue-700 transition flex items-center gap-2">
-        Compartir Progreso
-      </button>
-      <button onclick="cerrarSesion()" class="text-sm font-semibold text-red-500 hover:text-red-700 bg-red-50 px-4 py-2 rounded-full transition">
-        Cerrar Sesión
-      </button>
+    <a href="index.html" class="text-sm font-medium hover:opacity-60 flex items-center gap-2 w-full md:w-auto">← Volver al inicio</a>
+    <div class="flex gap-2 bg-white border border-[#E5E1DA] p-1 rounded-full shadow-sm">
+      <button onclick="cambiarVista('perfil')" id="tab-perfil" class="px-6 py-2 rounded-full text-sm font-bold bg-[#1A1A1A] text-white transition">Perfil</button>
+      <button onclick="cambiarVista('logros')" id="tab-logros" class="px-6 py-2 rounded-full text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition">Logros</button>
     </div>
+    <button onclick="cerrarSesion()" class="text-sm font-semibold text-red-500 hover:text-red-700 bg-red-50 px-4 py-2 rounded-full transition w-full md:w-auto">Cerrar Sesión</button>
   </header>
 
-  <main class="max-w-4xl mx-auto space-y-6">
-    
-    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 text-white shadow-lg flex flex-col md:flex-row items-center gap-6">
-      <div class="relative group cursor-pointer" onclick="document.getElementById('fotoInput').click()">
-        <div id="fotoPerfil" class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-4xl overflow-hidden border-4 border-white shadow-inner">🧑‍🎓</div>
-        <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><span class="text-2xl">📷</span></div>
+  <main class="max-w-4xl mx-auto">
+    <div id="vistaPerfil">
+      <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 text-white shadow-lg flex flex-col md:flex-row items-center gap-6 mb-6">
+        <div class="relative group cursor-pointer" onclick="document.getElementById('fotoInput').click()">
+          <div id="fotoPerfil" class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-4xl overflow-hidden border-4 border-white shadow-inner">🧑‍🎓</div>
+          <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><span class="text-2xl">📷</span></div>
+        </div>
+        <input type="file" id="fotoInput" class="hidden" accept="image/*" onchange="cambiarFoto(event)" />
+        <div class="text-center md:text-left">
+          <h2 id="nombreUsuario" class="text-2xl font-bold">¡Hola, Estudiante!</h2>
+          <p class="text-white/80 text-sm">Sigue así, cada día estás más cerca de dominar tus materias.</p>
+        </div>
       </div>
-      <input type="file" id="fotoInput" class="hidden" accept="image/*" onchange="cambiarFoto(event)" />
-
-      <div class="text-center md:text-left">
-        <h2 id="nombreUsuario" class="text-2xl font-bold">¡Hola, Estudiante!</h2>
-        <p class="text-white/80 text-sm">Sigue así, cada día estás más cerca de dominar tus materias.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a href="dashboard.html" class="bg-white p-6 rounded-3xl shadow-sm border border-[#E5E1DA] text-center hover:shadow-md hover:border-blue-400 transition transform hover:-translate-y-1 cursor-pointer">
+          <p class="text-4xl mb-2">📚</p><p id="statKits" class="text-3xl font-extrabold text-[#1A1A1A]">0</p><p class="text-sm text-[#8A8580] font-medium">Kits de Estudio</p>
+        </a>
+        <a href="dashboard.html" class="bg-white p-6 rounded-3xl shadow-sm border border-[#E5E1DA] text-center hover:shadow-md hover:border-blue-400 transition transform hover:-translate-y-1 cursor-pointer">
+          <p class="text-4xl mb-2">🎯</p><p id="statTarjetas" class="text-3xl font-extrabold text-[#1A1A1A]">0</p><p class="text-sm text-[#8A8580] font-medium">Tarjetas Creadas</p>
+        </a>
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-[#E5E1DA] text-center">
+          <p class="text-4xl mb-2">🔥</p><p class="text-3xl font-extrabold text-[#1A1A1A]">1</p><p class="text-sm text-[#8A8580] font-medium">Días de racha</p>
+        </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <a href="dashboard.html" class="bg-white p-6 rounded-3xl shadow-sm border border-[#E5E1DA] text-center hover:shadow-md hover:border-blue-400 transition transform hover:-translate-y-1 cursor-pointer">
-        <p class="text-4xl mb-2">📚</p>
-        <p id="statKits" class="text-3xl font-extrabold text-[#1A1A1A]">0</p>
-        <p class="text-sm text-[#8A8580] font-medium">Kits de Estudio</p>
-      </a>
-      <a href="dashboard.html" class="bg-white p-6 rounded-3xl shadow-sm border border-[#E5E1DA] text-center hover:shadow-md hover:border-blue-400 transition transform hover:-translate-y-1 cursor-pointer">
-        <p class="text-4xl mb-2">🎯</p>
-        <p id="statTarjetas" class="text-3xl font-extrabold text-[#1A1A1A]">0</p>
-        <p class="text-sm text-[#8A8580] font-medium">Tarjetas Creadas</p>
-      </a>
+    <div id="vistaLogros" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-blue-200 relative">
+        <div class="flex items-center gap-2 mb-6"><h3 class="text-xl font-bold text-[#1A1A1A]">🎯 Desafíos diarios</h3><span class="text-xs text-[#8A8580]">(Se reinicia a medianoche)</span></div>
+        <div class="space-y-5">
+          <div>
+            <div class="flex justify-between text-sm font-semibold mb-1"><span>Responde preguntas correctamente</span><span id="progresoCorrectas">0 / 5</span></div>
+            <div class="w-full bg-[#F7F5F2] rounded-full h-3"><div id="barraCorrectas" class="bg-blue-500 h-3 rounded-full transition-all" style="width: 0%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-sm font-semibold mb-1"><span>Completa 3 tarjetas de un Mazo</span><span id="progresoTarjetas">0 / 3</span></div>
+            <div class="w-full bg-[#F7F5F2] rounded-full h-3"><div id="barraTarjetas" class="bg-green-500 h-3 rounded-full transition-all" style="width: 0%"></div></div>
+          </div>
+        </div>
+      </div>
       <div class="bg-white p-6 rounded-3xl shadow-sm border border-[#E5E1DA] text-center">
-        <p class="text-4xl mb-2">🔥</p>
-        <p class="text-3xl font-extrabold text-[#1A1A1A]">1</p>
-        <p class="text-sm text-[#8A8580] font-medium">Días de racha</p>
+        <h3 class="text-xl font-bold text-[#1A1A1A] mb-6">🏆 Recompensas de Nivel</h3>
+        <div class="flex justify-center items-center gap-4">
+          <div class="flex flex-col items-center"><div class="text-6xl drop-shadow-md">👑</div><p class="font-bold mt-2">Nivel 1</p><p class="text-xs text-green-600 font-semibold">Desbloqueado</p></div>
+          <div class="w-12 h-1 bg-gray-300 rounded-full"></div>
+          <div class="flex flex-col items-center opacity-40"><div class="text-6xl grayscale">🔒</div><p class="font-bold mt-2">Nivel 2</p><p class="text-xs text-gray-500">Responde 10</p></div>
+          <div class="w-12 h-1 bg-gray-300 rounded-full"></div>
+          <div class="flex flex-col items-center opacity-40"><div class="text-6xl grayscale">🔒</div><p class="font-bold mt-2">Nivel 3</p><p class="text-xs text-gray-500">Responde 50</p></div>
+        </div>
       </div>
     </div>
   </main>
 
   <script>
-    const usuario = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
-    if (usuario) {
-      document.getElementById('nombreUsuario').textContent = `¡Hola, ${usuario.nombre}!`;
+    function cambiarVista(vista) {
+      const tabPerfil = document.getElementById('tab-perfil');
+      const tabLogros = document.getElementById('tab-logros');
+      const divPerfil = document.getElementById('vistaPerfil');
+      const divLogros = document.getElementById('vistaLogros');
+      if (vista === 'perfil') {
+        tabPerfil.className = 'px-6 py-2 rounded-full text-sm font-bold bg-[#1A1A1A] text-white transition';
+        tabLogros.className = 'px-6 py-2 rounded-full text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition';
+        divPerfil.classList.remove('hidden'); divLogros.classList.add('hidden');
+      } else {
+        tabPerfil.className = 'px-6 py-2 rounded-full text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition';
+        tabLogros.className = 'px-6 py-2 rounded-full text-sm font-bold bg-[#1A1A1A] text-white transition';
+        divPerfil.classList.add('hidden'); divLogros.classList.remove('hidden');
+        cargarLogros();
+      }
     }
+
+    const usuario = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
+    if (usuario) { document.getElementById('nombreUsuario').textContent = `¡Hola, ${usuario.nombre}!`; }
 
     const historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
     let totalTarjetas = 0;
-    historial.forEach(kit => {
-      if (kit.material && kit.material.flashcards) totalTarjetas += kit.material.flashcards.length;
-    });
+    historial.forEach(kit => { if (kit.material && kit.material.flashcards) totalTarjetas += kit.material.flashcards.length; });
     document.getElementById('statKits').textContent = historial.length;
     document.getElementById('statTarjetas').textContent = totalTarjetas;
 
     const fotoGuardada = localStorage.getItem('fotoPerfil');
-    if (fotoGuardada) {
-      document.getElementById('fotoPerfil').innerHTML = `<img src="${fotoGuardada}" class="w-full h-full object-cover">`;
-    }
+    if (fotoGuardada) { document.getElementById('fotoPerfil').innerHTML = `<img src="${fotoGuardada}" class="w-full h-full object-cover">`; }
+    
     function cambiarFoto(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -96,23 +114,13 @@
       reader.readAsDataURL(file);
     }
 
-    function compartirProgreso() {
-      const texto = `¡Estoy estudiando con AprendeYa! 🚀 Ya he creado ${historial.length} kits y repasado ${totalTarjetas} tarjetas. ¡Únete!`;
-      const url = "https://victorochamontero-sudo.github.io/aprendeya/";
-      
-      if (navigator.share) {
-        navigator.share({ title: 'Mi progreso en AprendeYa', text: texto, url: url }).catch(console.error);
-      } else {
-        navigator.clipboard.writeText(`${texto} ${url}`);
-        alert('¡Texto copiado al portapapeles! Pégalo en tus redes sociales.');
-      }
-    }
-
     function cerrarSesion() {
       localStorage.removeItem('usuarioAprendeYa');
-      alert('Sesión cerrada. Vuelves a ser un usuario invitado.');
+      alert('Sesión cerrada.');
       window.location.href = 'index.html';
     }
-  </script>
-</body>
-</html>
+
+    function cargarLogros() {
+      let puntos = parseInt(localStorage.getItem('puntosAprendeYa') || '0');
+      let progreso1 = Math.min(puntos, 5);
+      document.getElementById('progresoCorrectas').textContent = `${progreso
