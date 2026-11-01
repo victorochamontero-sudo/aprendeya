@@ -5,62 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AprendeYa | Tu compañero de estudio</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Configuración para que Tailwind active el modo oscuro con una clase
+    tailwind.config = { darkMode: 'class' }
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
     .bg-pattern { background-color: #F7F5F2; background-image: radial-gradient(#E5E1DA 1px, transparent 1px); background-size: 20px 20px; }
+    .dark .bg-pattern { background-color: #121212; background-image: radial-gradient(#2A2A2A 1px, transparent 1px); }
+    
+    /* Ocultar la barra superior fea de Google Translate */
+    .goog-te-banner-frame { display: none !important; }
+    body { top: 0 !important; }
+    .goog-logo-link { display: none !important; }
+    .goog-te-gadget { color: transparent !important; }
+    .goog-te-gadget .goog-te-combo { color: #1A1A1A !important; background-color: #F7F5F2 !important; padding: 8px !important; border-radius: 8px !important; border: 1px solid #E5E1DA !important; font-family: 'Inter', sans-serif !important; font-size: 14px !important; width: 100%; }
   </style>
 </head>
-<body class="bg-pattern text-[#1A1A1A] min-h-screen flex">
+<body class="bg-[#F7F5F2] dark:bg-[#121212] text-[#1A1A1A] dark:text-white min-h-screen flex transition-colors duration-300">
 
-  <!-- SIDEBAR IZQUIERDO (PC) -->
-  <!-- ARREGLO: Añadido flex-col, h-screen y overflow-y-auto para que el menú pueda scrollear -->
-  <aside class="w-64 bg-white border-r border-[#E5E1DA] hidden md:flex flex-col h-screen fixed left-0 top-0 z-40">
-    
-    <!-- Logo (Fijo arriba) -->
-    <div class="p-5 flex items-center border-b border-[#E5E1DA] flex-shrink-0">
+  <aside class="w-64 bg-white dark:bg-[#1E1E1E] border-r border-[#E5E1DA] dark:border-[#333] hidden md:flex flex-col h-screen fixed left-0 top-0 z-40">
+    <div class="p-5 flex items-center border-b border-[#E5E1DA] dark:border-[#333] flex-shrink-0">
       <a href="index.html" class="flex items-center group">
-        <div class="w-9 h-9 rounded-xl bg-[#1A1A1A] flex items-center justify-center shadow-md z-10">
-          <span class="text-white font-extrabold text-xl leading-none">A</span>
+        <div class="w-9 h-9 rounded-xl bg-[#1A1A1A] dark:bg-white flex items-center justify-center shadow-md z-10">
+          <span class="text-white dark:text-black font-extrabold text-xl leading-none">A</span>
         </div>
-        <span class="font-extrabold text-xl tracking-tighter text-[#1A1A1A] ml-0.5 z-0 group-hover:text-blue-600 transition-colors">
+        <span class="font-extrabold text-xl tracking-tighter text-[#1A1A1A] dark:text-white ml-0.5 z-0 group-hover:text-blue-600 transition-colors">
           prendeYa
         </span>
       </a>
     </div>
     
-    <!-- Contenido scrolleable del sidebar -->
     <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-1">
       
-      <!-- FRASE DEL DÍA -->
-      <div class="p-4 mb-4 bg-[#F7F5F2] rounded-2xl border border-[#E5E1DA]">
+      <div class="p-4 mb-4 bg-[#F7F5F2] dark:bg-[#2A2A2A] rounded-2xl border border-[#E5E1DA] dark:border-[#444]">
         <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2">Frase del día</p>
-        <p id="fraseDiaria" class="text-sm font-medium text-[#1A1A1A] italic leading-relaxed mb-3">Cargando...</p>
-        <button onclick="compartirApp()" class="w-full flex items-center justify-center gap-2 bg-white border border-[#D6D1CA] text-[#1A1A1A] text-xs font-semibold px-3 py-2 rounded-lg hover:bg-[#E5E1DA] transition">🔗 Compartir App</button>
+        <p id="fraseDiaria" class="text-sm font-medium text-[#1A1A1A] dark:text-gray-200 italic leading-relaxed mb-3">Cargando...</p>
+        <button onclick="compartirApp()" class="w-full flex items-center justify-center gap-2 bg-white dark:bg-[#1E1E1E] border border-[#D6D1CA] dark:border-[#555] text-[#1A1A1A] dark:text-gray-200 text-xs font-semibold px-3 py-2 rounded-lg hover:bg-[#E5E1DA] dark:hover:bg-[#333] transition">🔗 Compartir App</button>
       </div>
 
       <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-3 mt-2 px-3">Menú</p>
       
-      <!-- BOTÓN REGISTRO -->
       <div class="mb-4">
-        <button id="btnSidebarUser" onclick="abrirModalLogin()" class="w-full bg-[#1A1A1A] text-white text-sm font-semibold px-4 py-3 rounded-xl hover:bg-opacity-80 transition shadow-md flex items-center justify-center gap-2">
+        <button id="btnSidebarUser" onclick="abrirModalLogin()" class="w-full bg-[#1A1A1A] dark:bg-white text-white dark:text-black text-sm font-semibold px-4 py-3 rounded-xl hover:bg-opacity-80 transition shadow-md flex items-center justify-center gap-2">
           <span class="text-lg">✨</span> Ingresar / Registrarse
         </button>
       </div>
 
-      <a href="dashboard.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">📚</span> Mis Kits</a>
-      <a href="perfil.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">🏆</span> Mi Perfil</a>
+      <a href="dashboard.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition"><span class="text-lg">📚</span> Mis Kits</a>
+      <a href="perfil.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition"><span class="text-lg">🏆</span> Mi Perfil</a>
       
-      <div class="h-px bg-[#E5E1DA] my-4"></div>
+      <!-- BOTÓN DE MODO OSCURO -->
+      <button onclick="toggleDarkMode()" id="btnDarkMode" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition">
+        <span class="text-lg" id="iconoDark">🌙</span> <span id="textoDark">Modo Oscuro</span>
+      </button>
+
+      <div class="h-px bg-[#E5E1DA] dark:bg-[#333] my-4"></div>
       
-      <button onclick="abrirModalInfo('sobre')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">ℹ️</span> Sobre nosotros</button>
-      <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">💡</span> Recomendaciones</button>
-      <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">✉️</span> Contacto</button>
+      <button onclick="abrirModalInfo('sobre')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition text-left"><span class="text-lg">ℹ️</span> Sobre nosotros</button>
+      <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition text-left"><span class="text-lg">💡</span> Recomendaciones</button>
+      <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition text-left"><span class="text-lg">✉️</span> Contacto</button>
 
       <!-- BOTÓN DE TRADUCCIÓN -->
-      <div class="mt-6 border-t border-[#E5E1DA] pt-4 pb-4">
+      <div class="mt-6 border-t border-[#E5E1DA] dark:border-[#333] pt-4 pb-4">
         <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2 px-3">Idioma</p>
         <div id="google_translate_element"></div>
       </div>
@@ -68,57 +78,56 @@
     </div>
   </aside>
 
-  <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 md:ml-64 flex flex-col relative pb-20 md:pb-0">
-    <header class="flex items-center justify-between px-5 py-4 bg-white border-b border-[#E5E1DA] md:hidden">
+    <header class="flex items-center justify-between px-5 py-4 bg-white dark:bg-[#1E1E1E] border-b border-[#E5E1DA] dark:border-[#333] md:hidden">
       <a href="index.html" class="flex items-center">
-        <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center shadow-md z-10">
-          <span class="text-white font-extrabold text-base leading-none">A</span>
+        <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] dark:bg-white flex items-center justify-center shadow-md z-10">
+          <span class="text-white dark:text-black font-extrabold text-base leading-none">A</span>
         </div>
-        <span class="font-extrabold text-lg tracking-tighter text-[#1A1A1A] ml-0.5 z-0">prendeYa</span>
+        <span class="font-extrabold text-lg tracking-tighter text-[#1A1A1A] dark:text-white ml-0.5 z-0">prendeYa</span>
       </a>
-      <button onclick="abrirModalLogin()" class="bg-[#1A1A1A] text-white text-xs font-semibold px-4 py-2 rounded-full">Ingresar</button>
+      <button onclick="abrirModalLogin()" class="bg-[#1A1A1A] dark:bg-white text-white dark:text-black text-xs font-semibold px-4 py-2 rounded-full">Ingresar</button>
     </header>
 
     <div class="flex-1 flex flex-col items-center justify-center text-center px-6 pt-8 pb-24 relative overflow-hidden">
       
-      <span class="inline-block bg-white text-xs font-bold tracking-widest uppercase text-[#8A8580] mb-6 px-4 py-1.5 rounded-full shadow-sm border border-[#E5E1DA]">✨ El compañero de estudio que necesitas</span>
+      <span class="inline-block bg-white dark:bg-[#1E1E1E] text-xs font-bold tracking-widest uppercase text-[#8A8580] mb-6 px-4 py-1.5 rounded-full shadow-sm border border-[#E5E1DA] dark:border-[#333]">✨ El compañero de estudio que necesitas</span>
       <h1 class="text-4xl md:text-6xl font-extrabold leading-tight max-w-4xl mb-6">Estudia menos.<br/>Aprende <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 italic">mucho más</span>.</h1>
       
-      <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-8 max-w-2xl">
-        <p class="text-sm text-blue-800 italic font-medium">"Todo el mundo es un genio. Pero si juzgas a un pez por su capacidad para trepar a un árbol, vivirá toda su vida creyendo que es estúpido." — Albert Einstein</p>
+      <div class="bg-blue-50 dark:bg-[#1E2A3A] border border-blue-200 dark:border-[#2A3F5A] rounded-2xl p-4 mb-8 max-w-2xl">
+        <p class="text-sm text-blue-800 dark:text-blue-200 italic font-medium">"Todo el mundo es un genio. Pero si juzgas a un pez por su capacidad para trepar a un árbol, vivirá toda su vida creyendo que es estúpido." — Albert Einstein</p>
       </div>
 
-      <div class="w-full max-w-3xl bg-white p-5 md:p-8 rounded-3xl shadow-xl border border-[#E5E1DA] text-left relative z-10">
-        <div class="flex gap-2 mb-4 border-b border-[#E5E1DA] pb-2 text-sm font-semibold text-[#8A8580]">
-          <button onclick="mostrarOpcion('texto')" id="tab-texto" class="text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition">Escribir Texto</button>
-          <button onclick="mostrarOpcion('youtube')" id="tab-youtube" class="hover:text-[#1A1A1A] pb-2 px-2 transition">Link de YouTube</button>
+      <div class="w-full max-w-3xl bg-white dark:bg-[#1E1E1E] p-5 md:p-8 rounded-3xl shadow-xl border border-[#E5E1DA] dark:border-[#333] text-left relative z-10">
+        <div class="flex gap-2 mb-4 border-b border-[#E5E1DA] dark:border-[#333] pb-2 text-sm font-semibold text-[#8A8580]">
+          <button onclick="mostrarOpcion('texto')" id="tab-texto" class="text-[#1A1A1A] dark:text-white border-b-2 border-[#1A1A1A] dark:border-white pb-2 px-2 transition">Escribir Texto</button>
+          <button onclick="mostrarOpcion('youtube')" id="tab-youtube" class="hover:text-[#1A1A1A] dark:hover:text-white pb-2 px-2 transition">Link de YouTube</button>
         </div>
 
         <div id="opcionTexto">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-            <label class="font-bold text-lg md:text-xl text-[#1A1A1A] flex items-center gap-2"><span class="text-2xl">📚</span> Crea tu kit</label>
+            <label class="font-bold text-lg md:text-xl text-[#1A1A1A] dark:text-white flex items-center gap-2"><span class="text-2xl">📚</span> Crea tu kit</label>
             <div>
               <input type="file" id="fileInput" accept=".pdf,.txt,.docx" class="hidden" onchange="handleFile(event)" />
-              <button onclick="document.getElementById('fileInput').click()" class="text-sm bg-white text-[#1A1A1A] border-2 border-[#1A1A1A] px-4 py-2 rounded-xl hover:bg-[#F7F5F2] transition font-semibold flex items-center gap-2">Subir Archivo (PDF/Word)</button>
+              <button onclick="document.getElementById('fileInput').click()" class="text-sm bg-white dark:bg-[#2A2A2A] text-[#1A1A1A] dark:text-white border-2 border-[#1A1A1A] dark:border-white px-4 py-2 rounded-xl hover:bg-[#F7F5F2] dark:hover:bg-[#333] transition font-semibold flex items-center gap-2">Subir Archivo (PDF/Word)</button>
             </div>
           </div>
-          <textarea id="textInput" rows="4" placeholder="O pega/escribe tu texto aquí..." class="w-full bg-[#F7F5F2] border border-[#E5E1DA] rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition resize-none mb-4"></textarea>
+          <textarea id="textInput" rows="4" placeholder="O pega/escribe tu texto aquí..." class="w-full bg-[#F7F5F2] dark:bg-[#2A2A2A] border border-[#E5E1DA] dark:border-[#444] text-[#1A1A1A] dark:text-white rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] dark:focus:ring-white transition resize-none mb-4"></textarea>
         </div>
 
         <div id="opcionYoutube" class="hidden">
-          <label class="font-bold text-lg md:text-xl text-[#1A1A1A] flex items-center gap-2 mb-4"><span class="text-2xl">📺</span> Pega el link de YouTube</label>
-          <input type="url" id="youtubeInput" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-[#F7F5F2] border border-[#E5E1DA] rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition mb-2">
+          <label class="font-bold text-lg md:text-xl text-[#1A1A1A] dark:text-white flex items-center gap-2 mb-4"><span class="text-2xl">📺</span> Pega el link de YouTube</label>
+          <input type="url" id="youtubeInput" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-[#F7F5F2] dark:bg-[#2A2A2A] border border-[#E5E1DA] dark:border-[#444] text-[#1A1A1A] dark:text-white rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition mb-2">
           <p class="text-xs text-[#8A8580] mb-4">La IA extraerá los subtítulos automáticos del video para crear tus tarjetas.</p>
         </div>
 
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
           <p id="status" class="text-sm font-medium text-[#8A8580] text-center sm:text-left w-full sm:w-auto"></p>
-          <button onclick="procesarEntrada()" id="btnGenerar" class="w-full sm:w-auto bg-gradient-to-r from-[#1A1A1A] to-[#333] text-white font-bold px-8 py-3 rounded-full hover:shadow-lg transition flex items-center justify-center gap-2">Generar con IA</button>
+          <button onclick="procesarEntrada()" id="btnGenerar" class="w-full sm:w-auto bg-gradient-to-r from-[#1A1A1A] to-[#333] dark:from-white dark:to-gray-200 text-white dark:text-black font-bold px-8 py-3 rounded-full hover:shadow-lg transition flex items-center justify-center gap-2">Generar con IA</button>
         </div>
 
-        <div class="mt-6 pt-4 border-t border-[#E5E1DA] flex justify-center">
-          <button onclick="compartirApp()" class="flex items-center gap-2 text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-full transition">
+        <div class="mt-6 pt-4 border-t border-[#E5E1DA] dark:border-[#333] flex justify-center">
+          <button onclick="compartirApp()" class="flex items-center gap-2 text-xs font-bold text-green-700 dark:text-green-400 bg-green-50 dark:bg-[#1E2A1E] hover:bg-green-100 dark:hover:bg-[#2A3A2A] px-4 py-2 rounded-full transition">
             <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>
             <span id="contadorUsuarios">1.204</span> visitas
           </button>
@@ -129,44 +138,43 @@
 
   <!-- MODAL INFO -->
   <div id="modalInfo" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 relative">
-      <button onclick="cerrarModalInfo()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black transition">×</button>
-      <h2 id="infoTitulo" class="text-2xl font-bold mb-4 text-[#1A1A1A]"></h2>
-      <div id="infoContenido" class="text-[#5A5550] text-sm leading-relaxed space-y-3"></div>
+    <div class="bg-white dark:bg-[#1E1E1E] rounded-3xl shadow-2xl w-full max-w-lg p-8 relative">
+      <button onclick="cerrarModalInfo()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black dark:hover:text-white transition">×</button>
+      <h2 id="infoTitulo" class="text-2xl font-bold mb-4 text-[#1A1A1A] dark:text-white"></h2>
+      <div id="infoContenido" class="text-[#5A5550] dark:text-gray-300 text-sm leading-relaxed space-y-3"></div>
     </div>
   </div>
 
   <!-- MODAL LOGIN -->
   <div id="modalLogin" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
-      <button onclick="cerrarModalLogin()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black transition">×</button>
-      <div class="flex border-b border-[#E5E1DA] mb-6">
-        <button onclick="cambiarAuthTab('login')" id="tab-login" class="flex-1 pb-3 text-sm font-bold text-[#1A1A1A] border-b-2 border-[#1A1A1A] transition">Ingresar</button>
-        <button onclick="cambiarAuthTab('registro')" id="tab-registro" class="flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition">Crear Cuenta</button>
+    <div class="bg-white dark:bg-[#1E1E1E] rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
+      <button onclick="cerrarModalLogin()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black dark:hover:text-white transition">×</button>
+      <div class="flex border-b border-[#E5E1DA] dark:border-[#333] mb-6">
+        <button onclick="cambiarAuthTab('login')" id="tab-login" class="flex-1 pb-3 text-sm font-bold text-[#1A1A1A] dark:text-white border-b-2 border-[#1A1A1A] dark:border-white transition">Ingresar</button>
+        <button onclick="cambiarAuthTab('registro')" id="tab-registro" class="flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] dark:hover:text-white transition">Crear Cuenta</button>
       </div>
       <form id="form-login" onsubmit="event.preventDefault(); iniciarSesion();">
-        <input type="email" id="loginEmail" placeholder="Correo electrónico" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
-        <input type="password" id="loginPassword" placeholder="Contraseña" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-2 text-sm focus:outline-none focus:border-[#1A1A1A]" />
-        <div class="text-right mb-4"><a href="#" onclick="recuperarPassword(event)" class="text-xs text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a></div>
-        <button type="submit" class="w-full bg-[#1A1A1A] text-white font-semibold py-3 rounded-xl hover:bg-opacity-80 transition">Ingresar</button>
+        <input type="email" id="loginEmail" placeholder="Correo electrónico" required class="w-full border border-[#E5E1DA] dark:border-[#444] bg-transparent text-[#1A1A1A] dark:text-white rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <input type="password" id="loginPassword" placeholder="Contraseña" required class="w-full border border-[#E5E1DA] dark:border-[#444] bg-transparent text-[#1A1A1A] dark:text-white rounded-xl px-4 py-3 mb-2 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <div class="text-right mb-4"><a href="#" onclick="recuperarPassword(event)" class="text-xs text-blue-600 dark:text-blue-400 hover:underline">¿Olvidaste tu contraseña?</a></div>
+        <button type="submit" class="w-full bg-[#1A1A1A] dark:bg-white text-white dark:text-black font-semibold py-3 rounded-xl hover:bg-opacity-80 transition">Ingresar</button>
       </form>
       <form id="form-registro" class="hidden" onsubmit="event.preventDefault(); registrarUsuario();">
-        <input type="text" id="regNombre" placeholder="Nombre completo" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
-        <input type="email" id="regEmail" placeholder="Correo electrónico" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
-        <input type="password" id="regPassword" placeholder="Contraseña" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-4 text-sm focus:outline-none focus:border-[#1A1A1A]" />
-        <button type="submit" class="w-full bg-[#1A1A1A] text-white font-semibold py-3 rounded-xl hover:bg-opacity-80 transition">Crear cuenta</button>
+        <input type="text" id="regNombre" placeholder="Nombre completo" required class="w-full border border-[#E5E1DA] dark:border-[#444] bg-transparent text-[#1A1A1A] dark:text-white rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <input type="email" id="regEmail" placeholder="Correo electrónico" required class="w-full border border-[#E5E1DA] dark:border-[#444] bg-transparent text-[#1A1A1A] dark:text-white rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <input type="password" id="regPassword" placeholder="Contraseña" required class="w-full border border-[#E5E1DA] dark:border-[#444] bg-transparent text-[#1A1A1A] dark:text-white rounded-xl px-4 py-3 mb-4 text-sm focus:outline-none focus:border-[#1A1A1A]" />
+        <button type="submit" class="w-full bg-[#1A1A1A] dark:bg-white text-white dark:text-black font-semibold py-3 rounded-xl hover:bg-opacity-80 transition">Crear cuenta</button>
       </form>
     </div>
   </div>
 
-  <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-[#E5E1DA] flex justify-around py-2 z-50">
-    <a href="index.html" class="flex flex-col items-center p-2 text-[#1A1A1A]"><span class="text-xl mb-1">🏠</span><span class="text-[10px] font-bold">Inicio</span></a>
-    <a href="dashboard.html" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📚</span><span class="text-[10px] font-medium">Kits</span></a>
-    <button onclick="compartirApp()" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">🔗</span><span class="text-[10px] font-medium">Compartir</span></button>
-    <a href="perfil.html" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">🏆</span><span class="text-[10px] font-medium">Perfil</span></a>
+  <nav class="md:hidden fixed bottom-0 w-full bg-white dark:bg-[#1E1E1E] border-t border-[#E5E1DA] dark:border-[#333] flex justify-around py-2 z-50">
+    <a href="index.html" class="flex flex-col items-center p-2 text-[#1A1A1A] dark:text-white"><span class="text-xl mb-1">🏠</span><span class="text-[10px] font-bold">Inicio</span></a>
+    <a href="dashboard.html" class="flex flex-col items-center p-2 text-[#8A8580] dark:text-gray-400"><span class="text-xl mb-1">📚</span><span class="text-[10px] font-medium">Kits</span></a>
+    <button onclick="compartirApp()" class="flex flex-col items-center p-2 text-[#8A8580] dark:text-gray-400"><span class="text-xl mb-1">🔗</span><span class="text-[10px] font-medium">Compartir</span></button>
+    <a href="perfil.html" class="flex flex-col items-center p-2 text-[#8A8580] dark:text-gray-400"><span class="text-xl mb-1">🏆</span><span class="text-[10px] font-medium">Perfil</span></a>
   </nav>
 
-  <!-- SCRIPT DE TRADUCCIÓN -->
   <script type="text/javascript">
     function googleTranslateElementInit() {
       new google.translate.TranslateElement({pageLanguage: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
@@ -203,8 +211,8 @@
       if (usuario && btnSidebar) {
         btnSidebar.textContent = `Hola, ${usuario.nombre.split(' ')[0]}`;
         btnSidebar.onclick = () => window.location.href = 'perfil.html';
-        btnSidebar.classList.remove('bg-[#1A1A1A]');
-        btnSidebar.classList.add('bg-blue-600');
+        btnSidebar.classList.remove('bg-[#1A1A1A]', 'dark:bg-white', 'text-white', 'dark:text-black');
+        btnSidebar.classList.add('bg-blue-600', 'text-white');
       }
     }
     actualizarInterfazUsuario();
@@ -215,13 +223,13 @@
       const formLogin = document.getElementById('form-login');
       const formRegistro = document.getElementById('form-registro');
       if (tab === 'login') {
-        tabLogin.className = 'flex-1 pb-3 text-sm font-bold text-[#1A1A1A] border-b-2 border-[#1A1A1A] transition';
-        tabRegistro.className = 'flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition';
+        tabLogin.className = 'flex-1 pb-3 text-sm font-bold text-[#1A1A1A] dark:text-white border-b-2 border-[#1A1A1A] dark:border-white transition';
+        tabRegistro.className = 'flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] dark:hover:text-white transition';
         formLogin.classList.remove('hidden');
         formRegistro.classList.add('hidden');
       } else {
-        tabLogin.className = 'flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition';
-        tabRegistro.className = 'flex-1 pb-3 text-sm font-bold text-[#1A1A1A] border-b-2 border-[#1A1A1A] transition';
+        tabLogin.className = 'flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] dark:hover:text-white transition';
+        tabRegistro.className = 'flex-1 pb-3 text-sm font-bold text-[#1A1A1A] dark:text-white border-b-2 border-[#1A1A1A] dark:border-white transition';
         formLogin.classList.add('hidden');
         formRegistro.classList.remove('hidden');
       }
@@ -288,13 +296,39 @@
       const opcionTexto = document.getElementById('opcionTexto');
       const opcionYoutube = document.getElementById('opcionYoutube');
       if (tipo === 'texto') {
-        tabTexto.className = 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition';
-        tabYoutube.className = 'hover:text-[#1A1A1A] pb-2 px-2 transition';
+        tabTexto.className = 'text-[#1A1A1A] dark:text-white border-b-2 border-[#1A1A1A] dark:border-white pb-2 px-2 transition';
+        tabYoutube.className = 'hover:text-[#1A1A1A] dark:hover:text-white pb-2 px-2 transition';
         opcionTexto.classList.remove('hidden'); opcionYoutube.classList.add('hidden');
       } else {
-        tabTexto.className = 'hover:text-[#1A1A1A] pb-2 px-2 transition';
-        tabYoutube.className = 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition';
+        tabTexto.className = 'hover:text-[#1A1A1A] dark:hover:text-white pb-2 px-2 transition';
+        tabYoutube.className = 'text-[#1A1A1A] dark:text-white border-b-2 border-[#1A1A1A] dark:border-white pb-2 px-2 transition';
         opcionTexto.classList.add('hidden'); opcionYoutube.classList.remove('hidden');
+      }
+    }
+
+    // --- LÓGICA DEL MODO OSCURO ---
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      
+      localStorage.setItem('modoOscuro', isDark ? 'true' : 'false');
+      
+      const icono = document.getElementById('iconoDark');
+      const texto = document.getElementById('textoDark');
+      if (icono && texto) {
+        icono.textContent = isDark ? '☀️' : '🌙';
+        texto.textContent = isDark ? 'Modo Claro' : 'Modo Oscuro';
+      }
+    }
+
+    // Verificar preferencia al cargar
+    if (localStorage.getItem('modoOscuro') === 'true') {
+      document.documentElement.classList.add('dark');
+      const icono = document.getElementById('iconoDark');
+      const texto = document.getElementById('textoDark');
+      if (icono && texto) {
+        icono.textContent = '☀️';
+        texto.textContent = 'Modo Claro';
       }
     }
   </script>
