@@ -16,7 +16,6 @@
 <body class="bg-pattern text-[#1A1A1A] min-h-screen flex">
 
   <!-- SIDEBAR IZQUIERDO (PC) -->
-  <!-- ARREGLO: Añadido flex-col, h-screen y overflow-y-auto para que el menú pueda scrollear -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] hidden md:flex flex-col h-screen fixed left-0 top-0 z-40">
     
     <!-- Logo (Fijo arriba) -->
@@ -59,10 +58,21 @@
       <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">💡</span> Recomendaciones</button>
       <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">✉️</span> Contacto</button>
 
-      <!-- BOTÓN DE TRADUCCIÓN -->
+      <!-- SELECTOR DE IDIOMA PERSONALIZADO -->
       <div class="mt-6 border-t border-[#E5E1DA] pt-4 pb-4">
         <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2 px-3">Idioma</p>
-        <div id="google_translate_element"></div>
+        <div class="relative">
+          <select onchange="cambiarIdioma(this.value)" class="w-full bg-[#F7F5F2] border border-[#E5E1DA] text-[#1A1A1A] text-sm font-semibold px-4 py-2.5 rounded-xl appearance-none focus:outline-none focus:border-[#1A1A1A] cursor-pointer">
+            <option value="es">🇪🇸 Español</option>
+            <option value="en">🇺🇸 English</option>
+            <option value="pt">🇧🇷 Português</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="it">🇮🇹 Italiano</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#8A8580]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -165,14 +175,6 @@
     <button onclick="compartirApp()" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">🔗</span><span class="text-[10px] font-medium">Compartir</span></button>
     <a href="perfil.html" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">🏆</span><span class="text-[10px] font-medium">Perfil</span></a>
   </nav>
-
-  <!-- SCRIPT DE TRADUCCIÓN -->
-  <script type="text/javascript">
-    function googleTranslateElementInit() {
-      new google.translate.TranslateElement({pageLanguage: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
-    }
-  </script>
-  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -296,6 +298,11 @@
         tabYoutube.className = 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] pb-2 px-2 transition';
         opcionTexto.classList.add('hidden'); opcionYoutube.classList.remove('hidden');
       }
+    }
+
+    function cambiarIdioma(idioma) {
+      const url = `https://translate.google.com/translate?sl=es&tl=${idioma}&u=${window.location.href}`;
+      window.location.href = url;
     }
   </script>
   <script src="app.js"></script>
