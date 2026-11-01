@@ -1,10 +1,10 @@
-// ⚠️ PEGA AQUÍ TU CLAVE DE OPENROUTER
+// ⚠️ PEGA AQUÍ TU NUEVA CLAVE DE OPENROUTER
 const OPENROUTER_KEY = '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';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
-A partir del siguiente texto, genera material de estudio de ALTA CALIDAD.
+A partir del texto, genera material de estudio de ALTA CALIDAD en ESPAÑOL.
 
-Devuelve SOLO un JSON válido con esta estructura exacta, sin markdown, sin texto extra:
+Devuelve SOLO un JSON válido, sin markdown, sin texto extra:
 {
   "flashcards": [
     { "pregunta": "...", "respuesta": "..." }
@@ -14,16 +14,15 @@ Devuelve SOLO un JSON válido con esta estructura exacta, sin markdown, sin text
       "pregunta": "...",
       "opciones": ["A", "B", "C", "D"],
       "correcta": 0,
-      "explicacion": "Por qué la correcta lo es y por qué las otras no."
+      "explicacion": "..."
     }
   ],
-  "guia": "Escribe aquí una guía de estudio completa basada en el texto. Usa títulos (con #, ##), viñetas, negritas y párrafos para estructurar los conceptos clave. Debe ser como un buen apunte de clase."
+  "guia": "Usa títulos (#, ##), viñetas, negritas y párrafos para estructurar los conceptos clave."
 }
 
 Reglas:
-- 4 flashcards y 3 preguntas de quiz.
-- Las preguntas deben evaluar comprensión, NO memorización literal.
-- La guía debe ser detallada y fácil de leer.
+- Genera 10 flashcards.
+- Genera 5 preguntas de quiz.
 - En español.
 
 TEXTO:
@@ -37,10 +36,8 @@ async function generarMaterial(texto) {
     try { return JSON.parse(cache); } catch (e) { }
   }
 
-  const url = 'https://openrouter.ai/api/v1/chat/completions';
-  
   try {
-    const res = await fetch(url, {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -58,11 +55,9 @@ async function generarMaterial(texto) {
     
     const data = await res.json();
     let jsonLimpio = data.choices[0].message.content.trim();
-    const primerLlave = jsonLimpio.indexOf('{');
-    const ultimaLlave = jsonLimpio.lastIndexOf('}');
-    if (primerLlave !== -1 && ultimaLlave !== -1) {
-        jsonLimpio = jsonLimpio.substring(primerLlave, ultimaLlave + 1);
-    }
+    const p1 = jsonLimpio.indexOf('{');
+    const p2 = jsonLimpio.lastIndexOf('}');
+    if (p1 !== -1 && p2 !== -1) jsonLimpio = jsonLimpio.substring(p1, p2 + 1);
     
     const material = JSON.parse(jsonLimpio);
     localStorage.setItem('materialGenerado', JSON.stringify(material));
@@ -71,34 +66,22 @@ async function generarMaterial(texto) {
     
   } catch (error) {
     console.error("Error generando material:", error);
-    alert('⚠️ La IA está fallando o la clave está bloqueada. Usando material de prueba completo.');
     return demoMaterial();
   }
 }
 
-// --- MATERIAL DE PRUEBA COMPLETO (Para que puedas ver la guía y juegos) ---
 function demoMaterial() {
   return {
     flashcards: [
-      { pregunta: '¿Qué es la inflación?', respuesta: 'El aumento generalizado de los precios en una economía.' },
-      { pregunta: '¿Qué es el PIB?', respuesta: 'Producto Interno Bruto, el valor de todos los bienes y servicios de un país.' },
-      { pregunta: '¿Qué es un activo?', respuesta: 'Un recurso con valor económico que posee una persona o empresa.' },
-      { pregunta: '¿Qué es un pasivo?', respuesta: 'Una deuda u obligación financiera.' }
+      { pregunta: '¿Qué es la inflación?', respuesta: 'El aumento generalizado de los precios.' },
+      { pregunta: '¿Qué es el PIB?', respuesta: 'Producto Interno Bruto.' },
+      { pregunta: '¿Qué es un activo?', respuesta: 'Un recurso con valor.' },
+      { pregunta: '¿Qué es un pasivo?', respuesta: 'Una deuda.' },
+      { pregunta: '¿Qué es el interés?', respuesta: 'El costo del dinero.' }
     ],
     quiz: [
-      {
-        pregunta: '¿Qué mide la inflación?',
-        opciones: ['El aumento de precios', 'El desempleo', 'Las exportaciones', 'La deuda pública'],
-        correcta: 0,
-        explicacion: 'La inflación mide la subida generalizada de los precios.'
-      },
-      {
-        pregunta: '¿Qué es el PIB?',
-        opciones: ['Una deuda', 'El valor de la producción de un país', 'Un impuesto', 'Un banco'],
-        correcta: 1,
-        explicacion: 'El PIB es el valor de todos los bienes y servicios finales producidos en un país.'
-      }
+      { pregunta: '¿Qué mide la inflación?', opciones: ['El aumento de precios', 'El desempleo', 'Las exportaciones', 'La deuda'], correcta: 0, explicacion: 'La inflación mide la subida de precios.' }
     ],
-    guia: "## Guía de Estudio de Finanzas Básicas\n\n- **Inflación:** Es el aumento generalizado de los precios. Hace que el dinero pierda valor con el tiempo.\n\n- **PIB:** Producto Interno Bruto. Es la suma de todo lo que produce un país en un año.\n\n- **Activos y Pasivos:** Un activo es lo que tienes (dinero, casas). Un pasivo es lo que debes (préstamos, tarjetas de crédito)."
+    guia: "# Guía de Finanzas\n\n## Conceptos Básicos\n\n- **Inflación:** Aumento generalizado de precios.\n- **PIB:** Valor de producción de un país.\n- **Activos:** Lo que posees.\n- **Pasivos:** Lo que debes."
   };
 }
