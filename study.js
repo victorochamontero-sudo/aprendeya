@@ -9,11 +9,14 @@ let synth = window.speechSynthesis;
 let cronometroInterval = null;
 let tiempoRestante = 0;
 
+// Variables para los juegos
 let juegoActual = '';
 let puntosJuego = 0;
 let intentosJuego = 0;
-let juegoCoincidenciasState = { seleccionados: [], pares: [], emparejados: 0 };
-let apiladorState = { altura: 0, fallos: 0, preguntaActual: 0 };
+let seleccionadosCoincidencias = [];
+let cartasCoincidencias = [];
+let apiladorAltura = 0;
+let apiladorFallos = 0;
 
 // --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', async () => {
@@ -21,9 +24,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const loadingText = document.getElementById('loadingText');
   const btnError = document.getElementById('btnError');
   
-  const texto = localStorage.getItem('material');
+  // Si venimos del historial, ya tenemos el material
+  const materialGuardado = localStorage.getItem('materialGenerado');
+  const nombreKit = localStorage.getItem('nombreMaterial');
   
-  if (!texto) {
+  if (materialGuardado && materialGuardado !== 'null') {
+    materialActual = JSON.parse(materialGuardado);
+    iniciarInterfaz();
+    return;
+  }
+
+  const texto = localStorage.getItem('material');
+  if (!texto || texto === 'cargado desde historial') {
     loadingText.textContent = "No hay material. Vuelve a la página de inicio.";
     document.getElementById('loadingSpinner').classList.add('hidden');
     btnError.classList.remove('hidden');
@@ -35,15 +47,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     loadingText.textContent = "🧠 La IA está creando tu material de estudio...";
     materialActual = await generarMaterial(texto);
-    guardarEnHistorial();
-
-    loading.classList.add('hidden');
-    document.getElementById('mazoContainer').classList.remove('hidden');
-    
-    mostrarTarjeta();
-    renderizarLista();
-    renderizarGuia();
-    
+    guardarEnHistorial(nombreKit || 'Mi Kit');
+    iniciarInterfaz();
   } catch (error) {
     console.error("Error crítico:", error);
     loadingText.textContent = "Hubo un error al generar el material.";
@@ -52,6 +57,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnError.onclick = () => window.location.reload();
   }
 });
+
+function iniciarInterfaz() {
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('mazoContainer').classList.remove('hidden');
+  mostrarTarjeta();
+  renderizarLista();
+  renderizarGuia();
+  iniciarQuizSetup();
+}
 
 // --- NAVEGACIÓN ---
 function cambiarTab(tab) {
@@ -142,19 +156,19 @@ function renderizarGuia() {
   if (!contenedor || !materialActual) return;
   
   let html = materialActual.guia || "Sin guía generada.";
-  html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
-  html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+  // Convertir Markdown a HTML simple
+  html = html.replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-4 mb-2 dark:text-white">$1</h1>');
+  html = html.replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold mt-3 mb-2 dark:text-white">$1</h2>');
   html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/^\* (.*$)/gm, '<li>$1</li>');
-  html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+  html = html.replace(/^\* (.*$)/gm, '<li class="ml-4 list-disc">$1</li>');
+  html = html.replace(/^- (.*$)/gm, '<li class="ml-4 list-disc">$1</li>');
+  html = html.replace(/\n/g, '<br>');
   
   contenedor.innerHTML = html;
 }
 
-function guardarEnHistorial() {
-  const nombre = localStorage.getItem('nombreMaterial') || 'Kit sin nombre';
+function guardarEnHistorial(nombre) {
   let historial = JSON.parse(localStorage.getItem('historialKits') || '[]');
-  
   const existe = historial.find(k => k.nombre === nombre);
   if (!existe) {
     historial.push({ id: Date.now(), nombre: nombre, material: materialActual });
@@ -215,20 +229,30 @@ function detenerCronometro() {
 }
 
 // --- PRUEBA (QUIZ) ---
+function iniciarQuizSetup() {
+  document.getElementById('quizSetup').classList.remove('hidden');
+  document.getElementById('preguntasQuiz').innerHTML = '';
+}
+
 function iniciarQuiz() {
   const cantidad = parseInt(document.getElementById('selectCantidad').value);
   const contenedor = document.getElementById('preguntasQuiz');
   document.getElementById('quizSetup').classList.add('hidden');
   
-  let preguntas = materialActual.quiz;
+  let preguntas = materialActual.quiz || [];
   if (preguntas.length > cantidad) preguntas = preguntas.slice(0, cantidad);
 
+  if (preguntas.length === 0) {
+    contenedor.innerHTML = '<p class="text-center dark:text-white">No hay preguntas disponibles.</p>';
+    return;
+  }
+
   contenedor.innerHTML = preguntas.map((p, index) => `
-    <div class="bg-white dark:bg-[#1E1E1E] p-6 rounded-2xl border border-[#E5E1DA] dark:border-[#333] shadow-sm">
+    <div class="bg-white dark:bg-[#1E1E1E] p-6 rounded-2xl border border-[#E5E1DA] dark:border-[#333] shadow-sm mb-4">
       <p class="font-bold mb-4 dark:text-white">${index + 1}. ${p.pregunta}</p>
-      <div class="space-y-2">
+      <div class="space-y-2" id="opciones-${index}">
         ${p.opciones.map((op, i) => `
-          <button onclick="responderQuiz(this, ${i}, ${p.correcta})" class="w-full text-left p-3 rounded-xl border border-[#E5E1DA] dark:border-[#444] hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition dark:text-gray-200">
+          <button onclick="responderQuiz(${index}, ${i}, ${p.correcta})" class="w-full text-left p-3 rounded-xl border border-[#E5E1DA] dark:border-[#444] hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition dark:text-gray-200">
             ${op}
           </button>
         `).join('')}
@@ -237,93 +261,88 @@ function iniciarQuiz() {
   `).join('');
 }
 
-function responderQuiz(btn, seleccionada, correcta) {
-  const botones = btn.parentElement.querySelectorAll('button');
+function responderQuiz(preguntaIdx, seleccionada, correcta) {
+  const contenedorOpciones = document.getElementById(`opciones-${preguntaIdx}`);
+  const botones = contenedorOpciones.querySelectorAll('button');
+  
+  if (botones[0].disabled) return;
   botones.forEach(b => b.disabled = true);
   
   if (seleccionada === correcta) {
-    btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+    botones[seleccionada].classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+    // Sumar puntos al perfil
+    let puntos = parseInt(localStorage.getItem('puntosAprendeYa') || '0');
+    localStorage.setItem('puntosAprendeYa', puntos + 1);
   } else {
-    btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+    botones[seleccionada].classList.add('bg-red-100', 'border-red-500', 'text-red-800');
     botones[correcta].classList.add('bg-green-100', 'border-green-500', 'text-green-800');
   }
 }
 
 // --- JUEGOS ---
 function iniciarJuegoCoincidencias() {
-  if (!materialActual || !materialActual.flashcards) return;
-  
-  juegoActual = 'coincidencias';
-  puntosJuego = 0;
-  intentosJuego = 0;
-  juegoCoincidenciasState = { seleccionados: [], pares: [], emparejados: 0 };
-  
   document.getElementById('menuJuegos').classList.add('hidden');
   document.getElementById('juegoActivo').classList.remove('hidden');
   document.getElementById('juegoApilador').classList.add('hidden');
   
+  puntosJuego = 0;
+  intentosJuego = 0;
+  seleccionadosCoincidencias = [];
   actualizarMarcadorJuego();
   
   const mazo = materialActual.flashcards.slice(0, 4);
-  let cartas = [];
+  cartasCoincidencias = [];
   mazo.forEach((t, index) => {
-    cartas.push({ id: index, texto: t.pregunta, tipo: 'pregunta' });
-    cartas.push({ id: index, texto: t.respuesta, tipo: 'respuesta' });
+    cartasCoincidencias.push({ id: index, texto: t.pregunta });
+    cartasCoincidencias.push({ id: index, texto: t.respuesta });
   });
+  cartasCoincidencias = cartasCoincidencias.sort(() => Math.random() - 0.5);
   
-  cartas = cartas.sort(() => Math.random() - 0.5);
-  juegoCoincidenciasState.pares = cartas;
-  
-  renderizarTableroCoincidencias();
-}
-
-function renderizarTableroCoincidencias() {
   const tablero = document.getElementById('tableroJuego');
-  tablero.innerHTML = juegoCoincidenciasState.pares.map((carta, index) => `
-    <button onclick="seleccionarCartaCoincidencia(${index})" id="carta-${index}" 
-      class="h-24 sm:h-32 bg-blue-500 text-white p-2 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-center text-center transition transform hover:scale-105 active:scale-95 shadow-md">
-      ${carta.texto}
+  tablero.className = 'grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4';
+  tablero.innerHTML = cartasCoincidencias.map((c, i) => `
+    <button onclick="seleccionarCoincidencia(${i})" id="carta-${i}" 
+      class="h-24 sm:h-32 bg-blue-500 text-white p-2 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-center text-center transition transform hover:scale-105 shadow-md overflow-hidden break-words">
+      ${c.texto}
     </button>
   `).join('');
 }
 
-function seleccionarCartaCoincidencia(index) {
-  const state = juegoCoincidenciasState;
+function seleccionarCoincidencia(index) {
+  if (seleccionadosCoincidencias.includes(index) || document.getElementById(`carta-${index}`).disabled) return;
+  
   const btn = document.getElementById(`carta-${index}`);
-  
-  if (state.seleccionados.includes(index) || btn.disabled) return;
-  
   btn.classList.replace('bg-blue-500', 'bg-blue-700');
-  state.seleccionados.push(index);
+  seleccionadosCoincidencias.push(index);
   
-  if (state.seleccionados.length === 2) {
+  if (seleccionadosCoincidencias.length === 2) {
     intentosJuego++;
     actualizarMarcadorJuego();
     
-    const idx1 = state.seleccionados[0];
-    const idx2 = state.seleccionados[1];
-    const carta1 = state.pares[idx1];
-    const carta2 = state.pares[idx2];
+    const [i1, i2] = seleccionadosCoincidencias;
+    const c1 = cartasCoincidencias[i1];
+    const c2 = cartasCoincidencias[i2];
     
-    if (carta1.id === carta2.id && carta1.tipo !== carta2.tipo) {
+    if (c1.id === c2.id && c1.texto !== c2.texto) {
+      // Acierto
       puntosJuego += 10;
       actualizarMarcadorJuego();
-      document.getElementById(`carta-${idx1}`).classList.replace('bg-blue-700', 'bg-green-500');
-      document.getElementById(`carta-${idx2}`).classList.replace('bg-blue-700', 'bg-green-500');
-      document.getElementById(`carta-${idx1}`).disabled = true;
-      document.getElementById(`carta-${idx2}`).disabled = true;
-      state.emparejados++;
+      document.getElementById(`carta-${i1}`).classList.replace('bg-blue-700', 'bg-green-500');
+      document.getElementById(`carta-${i2}`).classList.replace('bg-blue-700', 'bg-green-500');
+      document.getElementById(`carta-${i1}`).disabled = true;
+      document.getElementById(`carta-${i2}`).disabled = true;
       
-      if (state.emparejados === 4) {
-        setTimeout(() => alert('¡Felicidades! Has ganado el juego.'), 500);
+      if (puntosJuego === 40) {
+        setTimeout(() => alert('¡Felicidades! Has completado el juego.'), 300);
       }
     } else {
+      // Fallo
       setTimeout(() => {
-        document.getElementById(`carta-${idx1}`).classList.replace('bg-blue-700', 'bg-blue-500');
-        document.getElementById(`carta-${idx2}`).classList.replace('bg-blue-700', 'bg-blue-500');
+        document.getElementById(`carta-${i1}`).classList.replace('bg-blue-700', 'bg-blue-500');
+        document.getElementById(`carta-${i2}`).classList.replace('bg-blue-700', 'bg-blue-500');
       }, 800);
     }
-    state.seleccionados = [];
+    seleccionadosCoincidencias = [];
   }
 }
 
@@ -335,37 +354,24 @@ function iniciarJuegoApilador() {
 }
 
 function comenzarApilador() {
-  if (!materialActual || !materialActual.flashcards) return;
-  
   document.getElementById('instruccionesApilador').classList.add('hidden');
   document.getElementById('juegoApiladorActivo').classList.remove('hidden');
-  
-  apiladorState = { altura: 0, fallos: 0, preguntaActual: 0 };
+  apiladorAltura = 0;
+  apiladorFallos = 0;
   actualizarTorre();
   siguientePreguntaApilador();
 }
 
 function siguientePreguntaApilador() {
-  if (!materialActual || !materialActual.flashcards) return;
-  
-  if (apiladorState.preguntaActual >= materialActual.flashcards.length) {
-    apiladorState.preguntaActual = 0;
-  }
-  
-  const tarjeta = materialActual.flashcards[apiladorState.preguntaActual];
+  const tarjetas = materialActual.flashcards;
+  const tarjeta = tarjetas[Math.floor(Math.random() * tarjetas.length)];
   document.getElementById('textoPreguntaApilador').textContent = tarjeta.pregunta;
   
   let opciones = [tarjeta.respuesta];
-  materialActual.flashcards.forEach(t => {
-    if (t.respuesta !== tarjeta.respuesta && opciones.length < 4) {
-      opciones.push(t.respuesta);
-    }
+  tarjetas.forEach(t => {
+    if (t.respuesta !== tarjeta.respuesta && opciones.length < 4) opciones.push(t.respuesta);
   });
-  
-  while (opciones.length < 4) {
-    opciones.push('Opción incorrecta');
-  }
-  
+  while(opciones.length < 4) opciones.push('Otra respuesta');
   opciones = opciones.sort(() => Math.random() - 0.5);
   
   const contenedor = document.getElementById('opcionesApilador');
@@ -378,22 +384,19 @@ function siguientePreguntaApilador() {
 }
 
 function responderApilador(seleccion, correcta) {
-  if (seleccion === correcta) apiladorState.altura++;
-  else apiladorState.fallos++;
-  
-  apiladorState.preguntaActual++;
+  if (seleccion === correcta) apiladorAltura++;
+  else apiladorFallos++;
   actualizarTorre();
   siguientePreguntaApilador();
 }
 
 function actualizarTorre() {
-  document.getElementById('alturaTorre').textContent = apiladorState.altura;
-  document.getElementById('fallosTorre').textContent = apiladorState.fallos;
+  document.getElementById('alturaTorre').textContent = apiladorAltura;
+  document.getElementById('fallosTorre').textContent = apiladorFallos;
   
   const torre = document.getElementById('torreContainer');
   torre.innerHTML = '';
-  
-  for (let i = 0; i < apiladorState.altura; i++) {
+  for (let i = 0; i < apiladorAltura; i++) {
     const bloque = document.createElement('div');
     bloque.className = 'bloque-torre';
     if (i % 3 === 0) bloque.style.backgroundColor = '#3B82F6';
@@ -407,7 +410,6 @@ function salirJuego() {
   document.getElementById('juegoActivo').classList.add('hidden');
   document.getElementById('juegoApilador').classList.add('hidden');
   document.getElementById('menuJuegos').classList.remove('hidden');
-  juegoActual = '';
 }
 
 function actualizarMarcadorJuego() {
