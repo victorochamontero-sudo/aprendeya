@@ -1,4 +1,4 @@
-const OPENROUTER_KEY = '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';
+const OPENROUTER_KEY = 'sk-or-v1-d14c9c83bc9973228f7958486be4e59134be3157eb279667e4a904f9b0bc65ba8';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
 A partir del siguiente texto, genera material de estudio de ALTA CALIDAD en ESPAÑOL.
