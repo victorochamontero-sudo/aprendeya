@@ -2,6 +2,7 @@
 // APPRENDEYA - LÓGICA DE LA PÁGINA DE INICIO
 // ============================================
 
+// --- PROCESAR ENTRADA (BOTÓN GENERAR CON IA) ---
 function procesarEntrada() {
   const textarea = document.getElementById('textInput');
   const texto = textarea ? textarea.value.trim() : '';
@@ -27,6 +28,7 @@ function procesarEntrada() {
   }, 500);
 }
 
+// --- MODO OSCURO ---
 function toggleDarkMode() {
   const html = document.documentElement;
   const isDark = html.classList.toggle('dark');
@@ -40,13 +42,18 @@ function toggleDarkMode() {
   }
 }
 
-function cargarFraseDelDia() {
-  const el = document.getElementById('fraseDiaria');
-  if (el) el.textContent = '"El éxito es la suma de pequeños esfuerzos repetidos día tras día."';
+// --- TRADUCCIÓN GLOBAL ---
+function cambiarIdiomaGlobal(idioma) {
+  document.cookie = `googtrans=/es/${idioma}; path=/`;
+  document.cookie = `googtrans=/es/${idioma}; domain=${window.location.hostname}; path=/`;
+  location.reload(); 
 }
 
+// --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
-  cargarFraseDelDia();
+  const el = document.getElementById('fraseDiaria');
+  if (el) el.textContent = '"El éxito es la suma de pequeños esfuerzos repetidos día tras día."';
+
   if (localStorage.getItem('modoOscuro') === 'true') {
     document.documentElement.classList.add('dark');
     const icono = document.getElementById('iconoDark');
