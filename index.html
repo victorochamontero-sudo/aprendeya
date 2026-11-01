@@ -15,8 +15,12 @@
 </head>
 <body class="bg-pattern text-[#1A1A1A] min-h-screen flex">
 
-  <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
-    <div class="p-5 flex items-center border-b border-[#E5E1DA]">
+  <!-- SIDEBAR IZQUIERDO (PC) -->
+  <!-- ARREGLO: Añadido flex-col, h-screen y overflow-y-auto para que el menú pueda scrollear -->
+  <aside class="w-64 bg-white border-r border-[#E5E1DA] hidden md:flex flex-col h-screen fixed left-0 top-0 z-40">
+    
+    <!-- Logo (Fijo arriba) -->
+    <div class="p-5 flex items-center border-b border-[#E5E1DA] flex-shrink-0">
       <a href="index.html" class="flex items-center group">
         <div class="w-9 h-9 rounded-xl bg-[#1A1A1A] flex items-center justify-center shadow-md z-10">
           <span class="text-white font-extrabold text-xl leading-none">A</span>
@@ -27,16 +31,20 @@
       </a>
     </div>
     
-    <div class="p-4 mx-4 mt-3 mb-2 bg-[#F7F5F2] rounded-2xl border border-[#E5E1DA]">
-      <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2">Frase del día</p>
-      <p id="fraseDiaria" class="text-sm font-medium text-[#1A1A1A] italic leading-relaxed mb-3">Cargando...</p>
-      <button onclick="compartirApp()" class="w-full flex items-center justify-center gap-2 bg-white border border-[#D6D1CA] text-[#1A1A1A] text-xs font-semibold px-3 py-2 rounded-lg hover:bg-[#E5E1DA] transition">🔗 Compartir App</button>
-    </div>
+    <!-- Contenido scrolleable del sidebar -->
+    <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-1">
+      
+      <!-- FRASE DEL DÍA -->
+      <div class="p-4 mb-4 bg-[#F7F5F2] rounded-2xl border border-[#E5E1DA]">
+        <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2">Frase del día</p>
+        <p id="fraseDiaria" class="text-sm font-medium text-[#1A1A1A] italic leading-relaxed mb-3">Cargando...</p>
+        <button onclick="compartirApp()" class="w-full flex items-center justify-center gap-2 bg-white border border-[#D6D1CA] text-[#1A1A1A] text-xs font-semibold px-3 py-2 rounded-lg hover:bg-[#E5E1DA] transition">🔗 Compartir App</button>
+      </div>
 
-    <div class="p-4 flex-1 space-y-1 overflow-y-auto">
       <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-3 mt-2 px-3">Menú</p>
       
-      <div class="mt-2 mb-4">
+      <!-- BOTÓN REGISTRO -->
+      <div class="mb-4">
         <button id="btnSidebarUser" onclick="abrirModalLogin()" class="w-full bg-[#1A1A1A] text-white text-sm font-semibold px-4 py-3 rounded-xl hover:bg-opacity-80 transition shadow-md flex items-center justify-center gap-2">
           <span class="text-lg">✨</span> Ingresar / Registrarse
         </button>
@@ -52,7 +60,7 @@
       <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">✉️</span> Contacto</button>
 
       <!-- BOTÓN DE TRADUCCIÓN -->
-      <div class="mt-6 border-t border-[#E5E1DA] pt-4">
+      <div class="mt-6 border-t border-[#E5E1DA] pt-4 pb-4">
         <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2 px-3">Idioma</p>
         <div id="google_translate_element"></div>
       </div>
@@ -60,6 +68,7 @@
     </div>
   </aside>
 
+  <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 md:ml-64 flex flex-col relative pb-20 md:pb-0">
     <header class="flex items-center justify-between px-5 py-4 bg-white border-b border-[#E5E1DA] md:hidden">
       <a href="index.html" class="flex items-center">
