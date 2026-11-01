@@ -1,3 +1,7 @@
+// ============================================
+// APPRENDEYA - STUDY.JS
+// ============================================
+
 let materialActual = null;
 let tarjetaActual = 0;
 let estaVolteada = false;
@@ -20,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const texto = localStorage.getItem('material');
   if (!texto) {
-    loadingText.textContent = "No hay material. Vuelve a la página de inicio.";
+    loadingText.textContent = "No hay material. Vuelve al inicio.";
     document.getElementById('loadingSpinner').classList.add('hidden');
     btnError.classList.remove('hidden');
     btnError.onclick = () => window.location.href = 'index.html';
@@ -28,16 +32,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
-    loadingText.textContent = "🧠 La IA está creando tu material de estudio...";
+    loadingText.textContent = "🧠 La IA está creando tu material...";
     materialActual = await generarMaterial(texto);
     guardarEnHistorial(localStorage.getItem('nombreMaterial') || 'Mi Kit');
     iniciarInterfaz();
   } catch (error) {
-    console.error("Error crítico:", error);
-    loadingText.textContent = "Hubo un error al generar el material.";
+    loadingText.textContent = "Error al generar.";
     document.getElementById('loadingSpinner').classList.add('hidden');
     btnError.classList.remove('hidden');
-    btnError.onclick = () => window.location.reload();
   }
 });
 
@@ -63,7 +65,6 @@ function cambiarTab(tab) {
 }
 
 function mostrarTarjeta() {
-  if (!materialActual || !materialActual.flashcards) return;
   const mazo = materialActual.flashcards;
   if (tarjetaActual >= mazo.length) tarjetaActual = 0; 
   
@@ -73,7 +74,12 @@ function mostrarTarjeta() {
   estaVolteada = false;
   document.getElementById('tarjeta').classList.remove('flipped');
   document.getElementById('btnMostrar').textContent = 'Mostrar Respuesta';
+  // Ocultar caritas
   document.getElementById('botones-calificacion').classList.add('opacity-0', 'pointer-events-none');
+  
+  document.getElementById('stat-aprendiendo').textContent = mazo.length;
+  document.getElementById('stat-revisando').textContent = '0';
+  document.getElementById('stat-dominado').textContent = '0';
 }
 
 function voltearTarjeta() {
@@ -83,6 +89,7 @@ function voltearTarjeta() {
   if (estaVolteada) {
     el.classList.add('flipped');
     document.getElementById('btnMostrar').textContent = 'Ocultar Respuesta';
+    // Mostrar caritas debajo del mazo
     document.getElementById('botones-calificacion').classList.remove('opacity-0', 'pointer-events-none');
   } else {
     el.classList.remove('flipped');
@@ -98,20 +105,27 @@ function calificar(nivel) {
 
 function renderizarLista() {
   const contenedor = document.getElementById('listaTarjetas');
-  if (!contenedor || !materialActual) return;
-  contenedor.innerHTML = materialActual.flashcards.map(t => `
-    <div class="p-4 bg-[#F7F5F2] rounded-xl border border-[#E5E1DA]">
-      <p class="font-bold text-[#1A1A1A] mb-1">${t.pregunta}</p>
-      <p class="text-sm text-[#5A5550]">${t.respuesta}</p>
+  contenedor.innerHTML = materialActual.flashcards.map((t, i) => `
+    <div class="p-4 bg-[#F7F5F2] rounded-xl border border-[#E5E1DA] flex justify-between items-center">
+      <div>
+        <p class="font-bold text-[#1A1A1A] mb-1">${t.pregunta}</p>
+        <p class="text-sm text-[#5A5550]">${t.respuesta}</p>
+      </div>
+      <button onclick="escucharTexto('${t.pregunta}. Respuesta: ${t.respuesta}')" class="text-xl hover:scale-110 transition">🔊</button>
     </div>
   `).join('');
 }
 
 function renderizarGuia() {
   const contenedor = document.getElementById('guiaTexto');
-  if (!contenedor || !materialActual) return;
   let html = materialActual.guia || "Sin guía.";
-  html = html.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  html = html.replace(/^# (.*$)/gm, '<h1 style="font-size: 1.8rem; font-weight: bold; margin-top: 1.5rem;">$1</h1>');
+  html = html.replace(/^## (.*$)/gm, '<h2 style="font-size: 1.4rem; font-weight: bold; margin-top: 1.2rem;">$1</h2>');
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/^- (.*$)/gm, '<li style="margin-left: 1.5rem; list-style-type: disc;">$1</li>');
+  html = html.replace(/\n/g, '<br>');
+  
   contenedor.innerHTML = html;
 }
 
@@ -123,25 +137,28 @@ function guardarEnHistorial(nombre) {
   }
 }
 
-function leerTextoActual() {
-  if (!materialActual) return;
-  const tarjeta = materialActual.flashcards[tarjetaActual];
-  const texto = estaVolteada ? tarjeta.respuesta : tarjeta.pregunta;
+// --- AUDIO ---
+function escucharTexto(texto) {
   synth.cancel();
   const utterance = new SpeechSynthesisUtterance(texto);
   utterance.lang = 'es-ES';
   synth.speak(utterance);
 }
 
-function detenerLectura() { synth.cancel(); }
-function leerGuiaCompleta() {
-  if (!materialActual) return;
-  synth.cancel();
-  const utterance = new SpeechSynthesisUtterance(materialActual.guia);
-  utterance.lang = 'es-ES';
-  synth.speak(utterance);
+function leerTextoActual() {
+  const tarjeta = materialActual.flashcards[tarjetaActual];
+  const texto = estaVolteada ? tarjeta.respuesta : tarjeta.pregunta;
+  escucharTexto(texto);
 }
 
+function detenerLectura() { synth.cancel(); }
+
+function leerGuiaCompleta() {
+  let textoLimpio = materialActual.guia.replace(/[#*-]/g, '');
+  escucharTexto(textoLimpio);
+}
+
+// --- CRONÓMETRO ---
 function iniciarCronometro(minutos) {
   if (cronometroInterval) clearInterval(cronometroInterval);
   tiempoRestante = minutos * 60;
@@ -165,6 +182,7 @@ function detenerCronometro() {
   document.getElementById('btnDetenerCrono').classList.add('hidden');
 }
 
+// --- PRUEBA ---
 function iniciarQuiz() {
   const cantidad = parseInt(document.getElementById('selectCantidad').value);
   const contenedor = document.getElementById('preguntasQuiz');
@@ -183,7 +201,6 @@ function iniciarQuiz() {
     </div>
   `).join('');
 }
-
 function responderQuiz(btn, seleccionada, correcta) {
   const botones = btn.parentElement.querySelectorAll('button');
   botones.forEach(b => b.disabled = true);
@@ -191,6 +208,7 @@ function responderQuiz(btn, seleccionada, correcta) {
   else { btn.classList.add('bg-red-100', 'border-red-500'); botones[correcta].classList.add('bg-green-100', 'border-green-500'); }
 }
 
+// --- JUEGOS ---
 function iniciarJuegoCoincidencias() {
   document.getElementById('menuJuegos').classList.add('hidden');
   document.getElementById('juegoActivo').classList.remove('hidden');
