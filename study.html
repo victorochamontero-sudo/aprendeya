@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Estudiar | AprendeYa</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { darkMode: 'class' }
-  </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; }
@@ -15,83 +12,68 @@
     .card-inner { transition: transform 0.6s; transform-style: preserve-3d; }
     .card-inner.flipped { transform: rotateY(180deg); }
     .card-front, .card-back { backface-visibility: hidden; position: absolute; width: 100%; height: 100%; border-radius: 1.5rem; }
-    .card-front { background-color: #E8E6ED; border: 1px solid #D6D1CA; }
-    .dark .card-front { background-color: #2A2A2A; border-color: #444; }
     .card-back { transform: rotateY(180deg); background-color: #F7F5F2; border: 2px solid #1A1A1A; }
-    .dark .card-back { background-color: #1E1E1E; border-color: #555; }
     .guia-content h1 { font-size: 1.8rem; font-weight: 800; margin-top: 1.5rem; color: #1A1A1A; }
-    .dark .guia-content h1 { color: #F7F5F2; }
     .guia-content h2 { font-size: 1.4rem; font-weight: 700; margin-top: 1.2rem; color: #1A1A1A; }
-    .dark .guia-content h2 { color: #F7F5F2; }
     .guia-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
     .guia-content p { margin-bottom: 1rem; line-height: 1.6; }
     .bloque-torre { height: 24px; border-radius: 4px; margin-bottom: 2px; transition: all 0.3s; background-color: #3B82F6; width: 100%; }
   </style>
 </head>
-<body class="bg-[#F7F5F2] dark:bg-[#121212] text-[#1A1A1A] dark:text-white min-h-screen flex transition-colors duration-300">
+<body class="bg-[#F7F5F2] min-h-screen flex">
 
-  <aside class="w-64 bg-white dark:bg-[#1E1E1E] border-r border-[#E5E1DA] dark:border-[#333] flex-col hidden md:flex min-h-screen fixed">
-    <div class="p-5 flex items-center border-b border-[#E5E1DA] dark:border-[#333]">
+  <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
+    <div class="p-5 flex items-center border-b border-[#E5E1DA]">
       <a href="index.html" class="flex items-center group">
-        <div class="w-9 h-9 rounded-xl bg-[#1A1A1A] dark:bg-white flex items-center justify-center shadow-md z-10">
-          <span class="text-white dark:text-black font-extrabold text-xl leading-none">A</span>
-        </div>
-        <span class="font-extrabold text-xl tracking-tighter text-[#1A1A1A] dark:text-white ml-0.5 z-0 group-hover:text-blue-600 transition-colors">prendeYa</span>
+        <div class="w-9 h-9 rounded-xl bg-[#1A1A1A] flex items-center justify-center shadow-md z-10"><span class="text-white font-extrabold text-xl leading-none">A</span></div>
+        <span class="font-extrabold text-xl tracking-tighter text-[#1A1A1A] ml-0.5 z-0 group-hover:text-blue-600 transition-colors">prendeYa</span>
       </a>
     </div>
-    <div class="p-4 flex-1 overflow-y-auto space-y-1">
+    <div class="p-4 flex-1 space-y-1">
       <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-3 mt-2 px-3">Mi Kit</p>
-      <button onclick="cambiarTab('mazo')" id="nav-mazo" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] dark:bg-[#2A2A2A] text-[#1A1A1A] dark:text-white transition"><span class="text-lg">🗂️</span> Mazo</button>
-      <button onclick="cambiarTab('lista')" id="nav-lista" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition"><span class="text-lg">📄</span> Lista</button>
-      <button onclick="cambiarTab('guia')" id="nav-guia" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition"><span class="text-lg">📘</span> Guía</button>
-      <button onclick="cambiarTab('quiz')" id="nav-quiz" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition"><span class="text-lg">📝</span> Prueba</button>
-      <button onclick="cambiarTab('juegos')" id="nav-juegos" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition"><span class="text-lg">🎮</span> Juegos</button>
-      <button onclick="cambiarTab('cronometro')" id="nav-cronometro" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition"><span class="text-lg">⏱️</span> Cronómetro</button>
-      
-      <div class="h-px bg-[#E5E1DA] dark:bg-[#333] my-4"></div>
-      
-      <a href="perfil.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition"><span class="text-lg">🏆</span> Mi Perfil</a>
-      <a href="index.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition"><span class="text-lg">🏠</span> Inicio</a>
-      
-      <!-- BOTÓN DE MODO OSCURO EN STUDY -->
-      <button onclick="toggleDarkMode()" id="btnDarkMode" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition">
-        <span class="text-lg" id="iconoDark">🌙</span> <span id="textoDark">Modo Oscuro</span>
-      </button>
+      <button onclick="cambiarTab('mazo')" id="nav-mazo" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] text-[#1A1A1A] transition"><span class="text-lg">🗂️</span> Mazo</button>
+      <button onclick="cambiarTab('lista')" id="nav-lista" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">📄</span> Lista</button>
+      <button onclick="cambiarTab('guia')" id="nav-guia" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">📘</span> Guía</button>
+      <button onclick="cambiarTab('quiz')" id="nav-quiz" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">📝</span> Prueba</button>
+      <button onclick="cambiarTab('juegos')" id="nav-juegos" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">🎮</span> Juegos</button>
+      <button onclick="cambiarTab('cronometro')" id="nav-cronometro" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">⏱️</span> Cronómetro</button>
+      <div class="h-px bg-[#E5E1DA] my-4"></div>
+      <a href="perfil.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">🏆</span> Mi Perfil</a>
+      <a href="index.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">🏠</span> Inicio</a>
     </div>
   </aside>
 
   <main class="flex-1 md:ml-64 flex flex-col min-h-screen relative pb-20 md:pb-0">
-    <header class="bg-white dark:bg-[#1E1E1E] border-b border-[#E5E1DA] dark:border-[#333] px-4 py-3 flex items-center justify-between md:hidden sticky top-0 z-40">
-      <a href="index.html" class="flex items-center"><div class="w-8 h-8 rounded-lg bg-[#1A1A1A] dark:bg-white flex items-center justify-center shadow-md z-10"><span class="text-white dark:text-black font-extrabold text-base leading-none">A</span></div><span class="font-extrabold text-lg tracking-tighter text-[#1A1A1A] dark:text-white ml-0.5 z-0">prendeYa</span></a>
+    <header class="bg-white border-b border-[#E5E1DA] px-4 py-3 flex items-center justify-between md:hidden sticky top-0 z-40">
+      <a href="index.html" class="flex items-center"><div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center shadow-md z-10"><span class="text-white font-extrabold text-base leading-none">A</span></div><span class="font-extrabold text-lg tracking-tighter text-[#1A1A1A] ml-0.5 z-0">prendeYa</span></a>
       <a href="perfil.html" class="text-xl">🏆</a>
     </header>
-        <div class="flex-1 flex flex-col items-center justify-center p-4 md:p-6 relative">
+
+    <div class="flex-1 flex flex-col items-center justify-center p-4 md:p-6 relative">
       
-      <!-- LOADING -->
       <div id="loading" class="text-center py-24">
-        <div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] dark:border-white border-t-transparent rounded-full animate-spin mb-4" id="loadingSpinner"></div>
-        <p class="text-sm text-[#8A8580] dark:text-gray-400" id="loadingText">Preparando tu material...</p>
+        <div class="inline-block w-8 h-8 border-4 border-[#1A1A1A] border-t-transparent rounded-full animate-spin mb-4" id="loadingSpinner"></div>
+        <p class="text-sm text-[#8A8580]" id="loadingText">Preparando tu material...</p>
         <button onclick="window.location.reload()" id="btnError" class="hidden mt-4 bg-red-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-md hover:bg-red-600">Recargar Página</button>
       </div>
 
-      <!-- MAZO -->
       <div id="mazoContainer" class="hidden w-full max-w-3xl flex-col items-center">
-        <div class="w-full flex justify-between items-center mb-6 bg-white dark:bg-[#1E1E1E] px-4 md:px-6 py-3 rounded-2xl shadow-sm border border-[#E5E1DA] dark:border-[#333]">
+        <div class="w-full flex justify-between items-center mb-6 bg-white px-4 md:px-6 py-3 rounded-2xl shadow-sm border border-[#E5E1DA]">
           <div class="text-center"><p id="stat-aprendiendo" class="text-lg font-bold text-red-500">0</p><p class="text-[10px] md:text-xs text-[#8A8580]">Aprendiendo</p></div>
-          <div class="text-center border-l border-r border-[#E5E1DA] dark:border-[#333] px-4 md:px-8"><p id="stat-revisando" class="text-lg font-bold text-yellow-500">0</p><p class="text-[10px] md:text-xs text-[#8A8580]">Revisando</p></div>
+          <div class="text-center border-l border-r border-[#E5E1DA] px-4 md:px-8"><p id="stat-revisando" class="text-lg font-bold text-yellow-500">0</p><p class="text-[10px] md:text-xs text-[#8A8580]">Revisando</p></div>
           <div class="text-center"><p id="stat-dominado" class="text-lg font-bold text-green-500">0</p><p class="text-[10px] md:text-xs text-[#8A8580]">Dominado</p></div>
         </div>
         <div class="flex gap-2 mb-4">
-          <button onclick="leerTextoActual()" class="text-sm bg-[#E8E6ED] dark:bg-[#2A2A2A] text-[#1A1A1A] dark:text-white font-semibold px-4 py-2 rounded-full hover:bg-[#D6D1CA] dark:hover:bg-[#333] transition flex items-center gap-2">🔊 Escuchar</button>
-          <button onclick="detenerLectura()" id="btnDetenerMazo" class="text-sm bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 font-semibold px-4 py-2 rounded-full hover:bg-red-100 transition flex items-center gap-2 hidden">⏹️ Detener</button>
+          <button onclick="leerTextoActual()" class="text-sm bg-[#E8E6ED] text-[#1A1A1A] font-semibold px-4 py-2 rounded-full hover:bg-[#D6D1CA] transition flex items-center gap-2">🔊 Escuchar</button>
+          <button onclick="detenerLectura()" id="btnDetenerMazo" class="text-sm bg-red-50 text-red-600 border border-red-200 font-semibold px-4 py-2 rounded-full hover:bg-red-100 transition flex items-center gap-2 hidden">⏹️ Detener</button>
         </div>
         <div class="card-flip w-full h-[250px] md:h-[300px] cursor-pointer mb-6" onclick="voltearTarjeta()">
           <div id="tarjeta" class="card-inner w-full h-full relative">
-            <div class="card-front flex flex-col items-center justify-center p-6 md:p-8 text-center shadow-sm"><p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Pregunta</p><p id="texto-pregunta" class="text-xl md:text-3xl font-semibold text-[#1A1A1A] dark:text-white"></p></div>
-            <div class="card-back flex flex-col items-center justify-center p-6 md:p-8 text-center"><p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Respuesta</p><p id="texto-respuesta" class="text-lg md:text-2xl font-medium text-[#1A1A1A] dark:text-white"></p></div>
+            <div class="card-front bg-[#E8E6ED] flex flex-col items-center justify-center p-6 md:p-8 text-center shadow-sm border border-[#D6D1CA]"><p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Pregunta</p><p id="texto-pregunta" class="text-xl md:text-3xl font-semibold text-[#1A1A1A]"></p></div>
+            <div class="card-back flex flex-col items-center justify-center p-6 md:p-8 text-center"><p class="text-xs text-[#8A8580] uppercase tracking-widest mb-4">Respuesta</p><p id="texto-respuesta" class="text-lg md:text-2xl font-medium text-[#1A1A1A]"></p></div>
           </div>
         </div>
-        <button id="btnMostrar" onclick="voltearTarjeta()" class="w-full max-w-sm bg-[#1A1A1A] dark:bg-white text-white dark:text-black font-bold py-3 md:py-4 rounded-xl shadow-lg hover:bg-opacity-80 transition mb-2 text-base md:text-lg">Mostrar Respuesta</button>
+        <button id="btnMostrar" onclick="voltearTarjeta()" class="w-full max-w-sm bg-[#1A1A1A] text-white font-bold py-3 md:py-4 rounded-xl shadow-lg hover:bg-opacity-80 transition mb-2 text-base md:text-lg">Mostrar Respuesta</button>
         <button onclick="pedirMasMaterial()" id="btnMas" class="w-full max-w-sm mt-0 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm md:text-base">✨ Generar 8 tarjetas más con IA</button>
         <div id="botones-calificacion" class="flex gap-3 md:gap-4 items-center opacity-0 pointer-events-none transition-opacity duration-300 mt-6">
           <button onclick="calificar(0)" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center text-lg md:text-xl shadow-lg">😞</button>
@@ -100,138 +82,32 @@
         </div>
       </div>
 
-      <!-- LISTA -->
-      <div id="listaContainer" class="hidden w-full max-w-4xl bg-white dark:bg-[#1E1E1E] p-4 md:p-10 rounded-3xl shadow-sm border border-[#E5E1DA] dark:border-[#333]">
+      <div id="listaContainer" class="hidden w-full max-w-4xl bg-white p-4 md:p-10 rounded-3xl shadow-sm border border-[#E5E1DA]">
         <div class="flex justify-between items-center mb-4 md:mb-6">
-          <h2 class="text-xl md:text-2xl font-bold text-[#1A1A1A] dark:text-white">Tarjetas de memoria</h2>
-          <button onclick="pedirMasMaterial()" class="text-xs md:text-sm bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-blue-200 transition">+ Añadir más</button>
+          <h2 class="text-xl md:text-2xl font-bold text-[#1A1A1A]">Tarjetas de memoria</h2>
+          <button onclick="pedirMasMaterial()" class="text-xs md:text-sm bg-blue-100 text-blue-700 font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-blue-200 transition">+ Añadir más</button>
         </div>
         <div id="listaTarjetas" class="space-y-3"></div>
       </div>
-            <!-- GUÍA -->
-      <div id="guiaContainer" class="hidden w-full max-w-4xl bg-white dark:bg-[#1E1E1E] p-6 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA] dark:border-[#333]">
-        <div class="flex flex-wrap gap-2 mb-6 border-b border-[#E5E1DA] dark:border-[#333] pb-4">
-          <button onclick="imprimirGuia('Word')" class="text-sm bg-white dark:bg-[#2A2A2A] border border-[#D6D1CA] dark:border-[#444] text-[#1A1A1A] dark:text-white font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] dark:hover:bg-[#333] transition flex items-center gap-2">📄 Word</button>
-          <button onclick="imprimirGuia('PDF')" class="text-sm bg-white dark:bg-[#2A2A2A] border border-[#D6D1CA] dark:border-[#444] text-[#1A1A1A] dark:text-white font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] dark:hover:bg-[#333] transition flex items-center gap-2">🖨️ PDF</button>
-          <button onclick="leerGuiaCompleta()" class="text-sm bg-[#E8E6ED] dark:bg-[#2A2A2A] border border-[#D6D1CA] dark:border-[#444] text-[#1A1A1A] dark:text-white font-semibold px-4 py-2 rounded-lg hover:bg-[#D6D1CA] dark:hover:bg-[#333] transition flex items-center gap-2">🔊 Escuchar</button>
-          <button onclick="detenerLectura()" class="text-sm bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 font-semibold px-4 py-2 rounded-lg hover:bg-red-100 transition flex items-center gap-2 hidden" id="btnDetenerAudio">⏹️ Detener</button>
+
+      <div id="guiaContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA]">
+        <div class="flex flex-wrap gap-2 mb-6 border-b border-[#E5E1DA] pb-4">
+          <button onclick="imprimirGuia('Word')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">📄 Word</button>
+          <button onclick="imprimirGuia('PDF')" class="text-sm bg-white border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#F7F5F2] transition flex items-center gap-2">🖨️ PDF</button>
+          <button onclick="leerGuiaCompleta()" class="text-sm bg-[#E8E6ED] border border-[#D6D1CA] text-[#1A1A1A] font-semibold px-4 py-2 rounded-lg hover:bg-[#D6D1CA] transition flex items-center gap-2">🔊 Escuchar</button>
+          <button onclick="detenerLectura()" class="text-sm bg-red-50 text-red-600 border border-red-200 font-semibold px-4 py-2 rounded-lg hover:bg-red-100 transition flex items-center gap-2 hidden" id="btnDetenerAudio">⏹️ Detener</button>
         </div>
-        <div id="guiaTexto" class="guia-content text-[#5A5550] dark:text-gray-300"></div>
+        <div id="guiaTexto" class="guia-content text-[#5A5550]"></div>
       </div>
 
-      <!-- PRUEBA -->
       <div id="quizContainer" class="hidden w-full max-w-3xl">
-        <div id="quizSetup" class="bg-white dark:bg-[#1E1E1E] p-6 md:p-8 rounded-3xl shadow-sm border border-[#E5E1DA] dark:border-[#333] text-center mb-6">
-          <h2 class="text-xl md:text-2xl font-bold mb-2 dark:text-white">Crear prueba</h2>
-          <p class="text-xs md:text-sm text-[#8A8580] dark:text-gray-400 mb-6">Configura tu examen basado en este kit.</p>
+        <div id="quizSetup" class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-[#E5E1DA] text-center mb-6">
+          <h2 class="text-xl md:text-2xl font-bold mb-2">Crear prueba</h2>
+          <p class="text-xs md:text-sm text-[#8A8580] mb-6">Configura tu examen basado en este kit.</p>
           <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-            <label class="font-semibold text-xs md:text-sm text-[#1A1A1A] dark:text-white">Número de preguntas:</label>
-            <select id="selectCantidad" class="border border-[#D6D1CA] dark:border-[#444] bg-[#F7F5F2] dark:bg-[#2A2A2A] text-[#1A1A1A] dark:text-white rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-[#1A1A1A] dark:focus:border-white">
+            <label class="font-semibold text-xs md:text-sm text-[#1A1A1A]">Número de preguntas:</label>
+            <select id="selectCantidad" class="border border-[#D6D1CA] rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-[#1A1A1A] bg-[#F7F5F2]">
               <option value="5">5 preguntas</option><option value="10">10 preguntas</option><option value="15">15 preguntas</option><option value="20">20 preguntas</option><option value="25">25 preguntas</option>
             </select>
           </div>
-          <button onclick="iniciarQuiz()" class="bg-[#1A1A1A] dark:bg-white text-white dark:text-black px-6 md:px-8 py-2.5 md:py-3 rounded-full font-bold hover:bg-opacity-80 transition text-sm md:text-base">Comenzar Prueba</button>
-        </div>
-        <div id="preguntasQuiz" class="space-y-6"></div>
-      </div>
-
-      <!-- JUEGOS -->
-      <div id="juegosContainer" class="hidden w-full max-w-4xl bg-white dark:bg-[#1E1E1E] p-6 md:p-10 rounded-3xl shadow-sm border border-[#E5E1DA] dark:border-[#333]">
-        <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A] dark:text-white">Elige un juego</h2>
-        <div id="menuJuegos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button onclick="iniciarJuegoCoincidencias()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] dark:border-[#444] hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-[#2A2A2A] transition text-left">
-            <div class="text-4xl text-[#1A1A1A] dark:text-white">🧩</div>
-            <div><h3 class="font-bold text-[#1A1A1A] dark:text-white">Coincidencias</h3><p class="text-xs text-[#8A8580] dark:text-gray-400">Empareja el término con su definición.</p></div>
-          </button>
-          <button onclick="iniciarJuegoApilador()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] dark:border-[#444] hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-[#2A2A2A] transition text-left">
-            <div class="text-4xl text-[#1A1A1A] dark:text-white">🥞</div>
-            <div><h3 class="font-bold text-[#1A1A1A] dark:text-white">Apilador</h3><p class="text-xs text-[#8A8580] dark:text-gray-400">Responde bien para apilar bloques.</p></div>
-          </button>
-        </div>
-        <div id="juegoActivo" class="hidden mt-8">
-          <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700">← Volver a juegos</button>
-          <div class="flex justify-between items-center bg-[#F7F5F2] dark:bg-[#2A2A2A] p-4 rounded-xl mb-6">
-            <p class="font-bold text-[#1A1A1A] dark:text-white">Puntuación: <span id="puntosJuego" class="text-blue-600 dark:text-blue-400">0</span></p>
-            <p class="text-sm text-[#8A8580] dark:text-gray-400">Intentos: <span id="intentosJuego">0</span></p>
-          </div>
-          <div id="tableroJuego" class="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4"></div>
-        </div>
-        <div id="juegoApilador" class="hidden mt-8 flex-col w-full">
-          <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700 text-left">← Volver a juegos</button>
-          <div id="instruccionesApilador" class="bg-blue-50 dark:bg-[#1E2A3A] border border-blue-200 dark:border-[#2A3F5A] rounded-2xl p-6 mb-6 text-center">
-            <h3 class="font-bold text-xl text-blue-800 dark:text-blue-200 mb-2">¿Cómo jugar al Apilador?</h3>
-            <p class="text-sm text-blue-700 dark:text-blue-300 mb-4">Responde correctamente a la pregunta para apilar un bloque en la torre. ¡Si fallas, el bloque no sube!</p>
-            <button onclick="comenzarApilador()" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-full hover:bg-blue-700 transition">¡Entendido, a jugar!</button>
-          </div>
-          <div id="juegoApiladorActivo" class="hidden flex-col items-center w-full max-w-md mx-auto">
-            <div class="flex justify-between w-full bg-[#F7F5F2] dark:bg-[#2A2A2A] p-4 rounded-xl mb-6">
-              <p class="font-bold text-[#1A1A1A] dark:text-white">Altura: <span id="alturaTorre" class="text-blue-600 dark:text-blue-400">0</span></p>
-              <p class="text-sm text-[#8A8580] dark:text-gray-400">Fallos: <span id="fallosTorre">0</span></p>
-            </div>
-            <div id="torreContainer" class="w-full flex flex-col-reverse justify-start h-48 bg-[#E5E1DA] dark:bg-[#333] rounded-lg overflow-hidden border-2 border-[#D6D1CA] dark:border-[#444] mb-6 p-1"></div>
-            <div id="preguntaApilador" class="w-full text-center">
-              <h3 class="text-lg font-bold mb-4 text-[#1A1A1A] dark:text-white" id="textoPreguntaApilador"></h3>
-              <div class="space-y-2" id="opcionesApilador"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CRONÓMETRO -->
-      <div id="cronometroContainer" class="hidden w-full max-w-2xl bg-white dark:bg-[#1E1E1E] p-8 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA] dark:border-[#333] text-center">
-        <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A] dark:text-white">⏱️ Temporizador de Estudio</h2>
-        <p class="text-sm text-[#8A8580] dark:text-gray-400 mb-8">Selecciona un tiempo para obligarte a estudiar sin distracciones.</p>
-        <div class="flex flex-wrap justify-center gap-3 mb-8">
-          <button onclick="iniciarCronometro(5)" class="bg-[#F7F5F2] dark:bg-[#2A2A2A] hover:bg-[#E5E1DA] dark:hover:bg-[#333] border border-[#D6D1CA] dark:border-[#444] text-[#1A1A1A] dark:text-white font-bold py-2 px-6 rounded-full transition">5 min</button>
-          <button onclick="iniciarCronometro(10)" class="bg-[#F7F5F2] dark:bg-[#2A2A2A] hover:bg-[#E5E1DA] dark:hover:bg-[#333] border border-[#D6D1CA] dark:border-[#444] text-[#1A1A1A] dark:text-white font-bold py-2 px-6 rounded-full transition">10 min</button>
-          <button onclick="iniciarCronometro(15)" class="bg-[#F7F5F2] dark:bg-[#2A2A2A] hover:bg-[#E5E1DA] dark:hover:bg-[#333] border border-[#D6D1CA] dark:border-[#444] text-[#1A1A1A] dark:text-white font-bold py-2 px-6 rounded-full transition">15 min</button>
-          <button onclick="iniciarCronometro(20)" class="bg-[#F7F5F2] dark:bg-[#2A2A2A] hover:bg-[#E5E1DA] dark:hover:bg-[#333] border border-[#D6D1CA] dark:border-[#444] text-[#1A1A1A] dark:text-white font-bold py-2 px-6 rounded-full transition">20 min</button>
-          <button onclick="iniciarCronometro(25)" class="bg-[#F7F5F2] dark:bg-[#2A2A2A] hover:bg-[#E5E1DA] dark:hover:bg-[#333] border border-[#D6D1CA] dark:border-[#444] text-[#1A1A1A] dark:text-white font-bold py-2 px-6 rounded-full transition">25 min</button>
-          <button onclick="iniciarCronometro(30)" class="bg-[#F7F5F2] dark:bg-[#2A2A2A] hover:bg-[#E5E1DA] dark:hover:bg-[#333] border border-[#D6D1CA] dark:border-[#444] text-[#1A1A1A] dark:text-white font-bold py-2 px-6 rounded-full transition">30 min</button>
-        </div>
-        <div class="text-6xl md:text-8xl font-extrabold text-[#1A1A1A] dark:text-white mb-8" id="tiempoPantalla">00:00</div>
-        <button onclick="detenerCronometro()" id="btnDetenerCrono" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full transition">Detener y Reiniciar</button>
-      </div>
-
-    </div>
-  </main>
-
-  <!-- MENÚ MÓVIL -->
-  <nav class="md:hidden fixed bottom-0 w-full bg-white dark:bg-[#1E1E1E] border-t border-[#E5E1DA] dark:border-[#333] flex justify-around py-2 z-50">
-    <button onclick="cambiarTab('mazo')" id="mob-mazo" class="flex flex-col items-center p-2 text-[#1A1A1A] dark:text-white"><span class="text-xl mb-1">🗂️</span><span class="text-[10px] font-bold">Mazo</span></button>
-    <button onclick="cambiarTab('lista')" id="mob-lista" class="flex flex-col items-center p-2 text-[#8A8580] dark:text-gray-400"><span class="text-xl mb-1">📄</span><span class="text-[10px] font-medium">Lista</span></button>
-    <button onclick="cambiarTab('guia')" id="mob-guia" class="flex flex-col items-center p-2 text-[#8A8580] dark:text-gray-400"><span class="text-xl mb-1">📘</span><span class="text-[10px] font-medium">Guía</span></button>
-    <button onclick="cambiarTab('quiz')" id="mob-quiz" class="flex flex-col items-center p-2 text-[#8A8580] dark:text-gray-400"><span class="text-xl mb-1">📝</span><span class="text-[10px] font-medium">Prueba</span></button>
-    <button onclick="cambiarTab('juegos')" id="mob-juegos" class="flex flex-col items-center p-2 text-[#8A8580] dark:text-gray-400"><span class="text-xl mb-1">🎮</span><span class="text-[10px] font-medium">Juegos</span></button>
-    <button onclick="cambiarTab('cronometro')" id="mob-cronometro" class="flex flex-col items-center p-2 text-[#8A8580] dark:text-gray-400"><span class="text-xl mb-1">⏱️</span><span class="text-[10px] font-medium">Tiempo</span></button>
-  </nav>
-
-  <script src="api.js"></script>
-  <script src="study.js"></script>
-  <script>
-    // Lógica del Modo Oscuro para study.html
-    function toggleDarkMode() {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
-      localStorage.setItem('modoOscuro', isDark ? 'true' : 'false');
-      const icono = document.getElementById('iconoDark');
-      const texto = document.getElementById('textoDark');
-      if (icono && texto) {
-        icono.textContent = isDark ? '☀️' : '🌙';
-        texto.textContent = isDark ? 'Modo Claro' : 'Modo Oscuro';
-      }
-    }
-
-    // Verificar preferencia al cargar
-    if (localStorage.getItem('modoOscuro') === 'true') {
-      document.documentElement.classList.add('dark');
-      const icono = document.getElementById('iconoDark');
-      const texto = document.getElementById('textoDark');
-      if (icono && texto) {
-        icono.textContent = '☀️';
-        texto.textContent = 'Modo Claro';
-      }
-    }
-  </script>
-</body>
-</html>
+          <button onclick="iniciarQuiz()" class="bg-[#1A1A1A] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-full font-bold hover:bg-opacity-80 transition text-sm md:text-base">
