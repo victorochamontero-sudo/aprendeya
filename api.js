@@ -1,8 +1,7 @@
-// ⚠️ PEGA AQUÍ TU NUEVA CLAVE DE OPENROUTER
-const OPENROUTER_KEY = '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';
+const OPENROUTER_KEY = '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';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
-A partir del texto, genera material de estudio de ALTA CALIDAD en ESPAÑOL.
+A partir del siguiente texto, genera material de estudio de ALTA CALIDAD en ESPAÑOL.
 
 Devuelve SOLO un JSON válido, sin markdown, sin texto extra:
 {
@@ -66,22 +65,15 @@ async function generarMaterial(texto) {
     
   } catch (error) {
     console.error("Error generando material:", error);
+    alert('⚠️ La IA está fallando o la clave está bloqueada. Revisa tu clave en api.js.');
     return demoMaterial();
   }
 }
 
 function demoMaterial() {
   return {
-    flashcards: [
-      { pregunta: '¿Qué es la inflación?', respuesta: 'El aumento generalizado de los precios.' },
-      { pregunta: '¿Qué es el PIB?', respuesta: 'Producto Interno Bruto.' },
-      { pregunta: '¿Qué es un activo?', respuesta: 'Un recurso con valor.' },
-      { pregunta: '¿Qué es un pasivo?', respuesta: 'Una deuda.' },
-      { pregunta: '¿Qué es el interés?', respuesta: 'El costo del dinero.' }
-    ],
-    quiz: [
-      { pregunta: '¿Qué mide la inflación?', opciones: ['El aumento de precios', 'El desempleo', 'Las exportaciones', 'La deuda'], correcta: 0, explicacion: 'La inflación mide la subida de precios.' }
-    ],
-    guia: "# Guía de Finanzas\n\n## Conceptos Básicos\n\n- **Inflación:** Aumento generalizado de precios.\n- **PIB:** Valor de producción de un país.\n- **Activos:** Lo que posees.\n- **Pasivos:** Lo que debes."
+    flashcards: [{ pregunta: 'Error de IA', respuesta: 'No se pudo generar. Revisa tu clave.' }],
+    quiz: [],
+    guia: "## Error de conexión\n\nNo se pudo generar la guía porque la IA rechazó la petición."
   };
 }
