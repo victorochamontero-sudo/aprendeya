@@ -15,7 +15,6 @@
 </head>
 <body class="bg-pattern text-[#1A1A1A] min-h-screen flex">
 
-  <!-- SIDEBAR IZQUIERDO (PC) -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] flex-col hidden md:flex min-h-screen fixed">
     <div class="p-5 flex items-center border-b border-[#E5E1DA]">
       <a href="index.html" class="flex items-center group">
@@ -28,31 +27,23 @@
       </a>
     </div>
     
-    <!-- FRASE DEL DÍA -->
     <div class="p-4 mx-4 mt-3 mb-2 bg-[#F7F5F2] rounded-2xl border border-[#E5E1DA]">
       <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2">Frase del día</p>
       <p id="fraseDiaria" class="text-sm font-medium text-[#1A1A1A] italic leading-relaxed mb-3">Cargando...</p>
-      <button onclick="compartirApp()" class="w-full flex items-center justify-center gap-2 bg-white border border-[#D6D1CA] text-[#1A1A1A] text-xs font-semibold px-3 py-2 rounded-lg hover:bg-[#E5E1DA] transition">
-        🔗 Compartir App
-      </button>
+      <button onclick="compartirApp()" class="w-full flex items-center justify-center gap-2 bg-white border border-[#D6D1CA] text-[#1A1A1A] text-xs font-semibold px-3 py-2 rounded-lg hover:bg-[#E5E1DA] transition">🔗 Compartir App</button>
     </div>
 
     <div class="p-4 flex-1 space-y-1 overflow-y-auto">
       <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-3 mt-2 px-3">Menú</p>
       
-      <!-- EL BOTÓN DE INICIO SE CAMBIÓ POR EL DE REGISTRO -->
       <div class="mt-2 mb-4">
         <button id="btnSidebarUser" onclick="abrirModalLogin()" class="w-full bg-[#1A1A1A] text-white text-sm font-semibold px-4 py-3 rounded-xl hover:bg-opacity-80 transition shadow-md flex items-center justify-center gap-2">
           <span class="text-lg">✨</span> Ingresar / Registrarse
         </button>
       </div>
 
-      <a href="dashboard.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition">
-        <span class="text-lg">📚</span> Mis Kits
-      </a>
-      <a href="perfil.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition">
-        <span class="text-lg">🏆</span> Mi Perfil
-      </a>
+      <a href="dashboard.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">📚</span> Mis Kits</a>
+      <a href="perfil.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition"><span class="text-lg">🏆</span> Mi Perfil</a>
       
       <div class="h-px bg-[#E5E1DA] my-4"></div>
       
@@ -60,21 +51,22 @@
       <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">💡</span> Recomendaciones</button>
       <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">✉️</span> Contacto</button>
 
+      <!-- BOTÓN DE TRADUCCIÓN -->
+      <div class="mt-6 border-t border-[#E5E1DA] pt-4">
+        <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2 px-3">Idioma</p>
+        <div id="google_translate_element"></div>
+      </div>
+
     </div>
   </aside>
 
-  <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 md:ml-64 flex flex-col relative pb-20 md:pb-0">
-    
-    <!-- HEADER MÓVIL CON LOGO -->
     <header class="flex items-center justify-between px-5 py-4 bg-white border-b border-[#E5E1DA] md:hidden">
       <a href="index.html" class="flex items-center">
         <div class="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center shadow-md z-10">
           <span class="text-white font-extrabold text-base leading-none">A</span>
         </div>
-        <span class="font-extrabold text-lg tracking-tighter text-[#1A1A1A] ml-0.5 z-0">
-          prendeYa
-        </span>
+        <span class="font-extrabold text-lg tracking-tighter text-[#1A1A1A] ml-0.5 z-0">prendeYa</span>
       </a>
       <button onclick="abrirModalLogin()" class="bg-[#1A1A1A] text-white text-xs font-semibold px-4 py-2 rounded-full">Ingresar</button>
     </header>
@@ -116,13 +108,9 @@
           <button onclick="procesarEntrada()" id="btnGenerar" class="w-full sm:w-auto bg-gradient-to-r from-[#1A1A1A] to-[#333] text-white font-bold px-8 py-3 rounded-full hover:shadow-lg transition flex items-center justify-center gap-2">Generar con IA</button>
         </div>
 
-        <!-- CONTADOR DE VISITAS -->
         <div class="mt-6 pt-4 border-t border-[#E5E1DA] flex justify-center">
           <button onclick="compartirApp()" class="flex items-center gap-2 text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-full transition">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
+            <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>
             <span id="contadorUsuarios">1.204</span> visitas
           </button>
         </div>
@@ -130,7 +118,7 @@
     </div>
   </main>
 
-  <!-- MODAL DE INFORMACIÓN -->
+  <!-- MODAL INFO -->
   <div id="modalInfo" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 relative">
       <button onclick="cerrarModalInfo()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black transition">×</button>
@@ -139,25 +127,20 @@
     </div>
   </div>
 
-  <!-- MODAL DE LOGIN / REGISTRO -->
+  <!-- MODAL LOGIN -->
   <div id="modalLogin" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
       <button onclick="cerrarModalLogin()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black transition">×</button>
-
       <div class="flex border-b border-[#E5E1DA] mb-6">
         <button onclick="cambiarAuthTab('login')" id="tab-login" class="flex-1 pb-3 text-sm font-bold text-[#1A1A1A] border-b-2 border-[#1A1A1A] transition">Ingresar</button>
         <button onclick="cambiarAuthTab('registro')" id="tab-registro" class="flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition">Crear Cuenta</button>
       </div>
-
       <form id="form-login" onsubmit="event.preventDefault(); iniciarSesion();">
         <input type="email" id="loginEmail" placeholder="Correo electrónico" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
         <input type="password" id="loginPassword" placeholder="Contraseña" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-2 text-sm focus:outline-none focus:border-[#1A1A1A]" />
-        <div class="text-right mb-4">
-          <a href="#" onclick="recuperarPassword(event)" class="text-xs text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
-        </div>
+        <div class="text-right mb-4"><a href="#" onclick="recuperarPassword(event)" class="text-xs text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a></div>
         <button type="submit" class="w-full bg-[#1A1A1A] text-white font-semibold py-3 rounded-xl hover:bg-opacity-80 transition">Ingresar</button>
       </form>
-
       <form id="form-registro" class="hidden" onsubmit="event.preventDefault(); registrarUsuario();">
         <input type="text" id="regNombre" placeholder="Nombre completo" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
         <input type="email" id="regEmail" placeholder="Correo electrónico" required class="w-full border border-[#E5E1DA] rounded-xl px-4 py-3 mb-3 text-sm focus:outline-none focus:border-[#1A1A1A]" />
@@ -167,13 +150,20 @@
     </div>
   </div>
 
-  <!-- BARRA MÓVIL -->
   <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-[#E5E1DA] flex justify-around py-2 z-50">
     <a href="index.html" class="flex flex-col items-center p-2 text-[#1A1A1A]"><span class="text-xl mb-1">🏠</span><span class="text-[10px] font-bold">Inicio</span></a>
     <a href="dashboard.html" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📚</span><span class="text-[10px] font-medium">Kits</span></a>
     <button onclick="compartirApp()" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">🔗</span><span class="text-[10px] font-medium">Compartir</span></button>
     <a href="perfil.html" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">🏆</span><span class="text-[10px] font-medium">Perfil</span></a>
   </nav>
+
+  <!-- SCRIPT DE TRADUCCIÓN -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -198,11 +188,9 @@
     function actualizarInterfazUsuario() {
       const usuario = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
       const btnSidebar = document.getElementById('btnSidebarUser');
-      
       let contadorBase = 1204;
       if (usuario) contadorBase++;
       document.getElementById('contadorUsuarios').textContent = contadorBase;
-
       if (usuario && btnSidebar) {
         btnSidebar.textContent = `Hola, ${usuario.nombre.split(' ')[0]}`;
         btnSidebar.onclick = () => window.location.href = 'perfil.html';
@@ -217,7 +205,6 @@
       const tabRegistro = document.getElementById('tab-registro');
       const formLogin = document.getElementById('form-login');
       const formRegistro = document.getElementById('form-registro');
-
       if (tab === 'login') {
         tabLogin.className = 'flex-1 pb-3 text-sm font-bold text-[#1A1A1A] border-b-2 border-[#1A1A1A] transition';
         tabRegistro.className = 'flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] transition';
@@ -245,7 +232,6 @@
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
       const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
-
       if (usuarioGuardado && usuarioGuardado.email === email && usuarioGuardado.password === password) {
         alert(`¡Hola de nuevo, ${usuarioGuardado.nombre}!`);
         cerrarModalLogin();
