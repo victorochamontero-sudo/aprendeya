@@ -50,7 +50,7 @@ async function generarMaterial(texto) {
         'Authorization': `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'llama3-8b-8192', 
+        model: 'llama-3.1-8b-instant', 
         messages: [{ role: 'user', content: PROMPT + texto }],
         temperature: 0.5,
         response_format: { type: 'json_object' }
