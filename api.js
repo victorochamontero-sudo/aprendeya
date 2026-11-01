@@ -1,5 +1,5 @@
 // ⚠️ PEGA AQUÍ TU NUEVA CLAVE DE OPENROUTER
-const OPENROUTER_KEY = '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';
+const OPENROUTER_KEY = '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';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
 A partir del siguiente texto, genera material de estudio de ALTA CALIDAD.
