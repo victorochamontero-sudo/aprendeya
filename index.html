@@ -6,7 +6,6 @@
   <title>AprendeYa | Tu compañero de estudio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Configuración para que Tailwind active el modo oscuro con una clase
     tailwind.config = { darkMode: 'class' }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,12 +16,9 @@
     .bg-pattern { background-color: #F7F5F2; background-image: radial-gradient(#E5E1DA 1px, transparent 1px); background-size: 20px 20px; }
     .dark .bg-pattern { background-color: #121212; background-image: radial-gradient(#2A2A2A 1px, transparent 1px); }
     
-    /* Ocultar la barra superior fea de Google Translate */
+    /* Ocultar la barra fea de Google Translate */
     .goog-te-banner-frame { display: none !important; }
     body { top: 0 !important; }
-    .goog-logo-link { display: none !important; }
-    .goog-te-gadget { color: transparent !important; }
-    .goog-te-gadget .goog-te-combo { color: #1A1A1A !important; background-color: #F7F5F2 !important; padding: 8px !important; border-radius: 8px !important; border: 1px solid #E5E1DA !important; font-family: 'Inter', sans-serif !important; font-size: 14px !important; width: 100%; }
   </style>
 </head>
 <body class="bg-[#F7F5F2] dark:bg-[#121212] text-[#1A1A1A] dark:text-white min-h-screen flex transition-colors duration-300">
@@ -58,7 +54,6 @@
       <a href="dashboard.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition"><span class="text-lg">📚</span> Mis Kits</a>
       <a href="perfil.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition"><span class="text-lg">🏆</span> Mi Perfil</a>
       
-      <!-- BOTÓN DE MODO OSCURO -->
       <button onclick="toggleDarkMode()" id="btnDarkMode" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition">
         <span class="text-lg" id="iconoDark">🌙</span> <span id="textoDark">Modo Oscuro</span>
       </button>
@@ -69,10 +64,15 @@
       <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition text-left"><span class="text-lg">💡</span> Recomendaciones</button>
       <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition text-left"><span class="text-lg">✉️</span> Contacto</button>
 
-      <!-- BOTÓN DE TRADUCCIÓN -->
+      <!-- SELECTOR DE IDIOMA -->
       <div class="mt-6 border-t border-[#E5E1DA] dark:border-[#333] pt-4 pb-4">
         <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2 px-3">Idioma</p>
-        <div id="google_translate_element"></div>
+        <select onchange="cambiarIdiomaGlobal(this.value)" class="w-full bg-[#F7F5F2] dark:bg-[#2A2A2A] border border-[#E5E1DA] dark:border-[#444] text-[#1A1A1A] dark:text-white rounded-xl px-4 py-2 text-sm focus:outline-none">
+          <option value="es">🇪🇸 Español</option>
+          <option value="en">🇺🇸 English</option>
+          <option value="pt">🇧🇷 Português</option>
+          <option value="fr">🇫🇷 Français</option>
+        </select>
       </div>
 
     </div>
@@ -175,163 +175,6 @@
     <a href="perfil.html" class="flex flex-col items-center p-2 text-[#8A8580] dark:text-gray-400"><span class="text-xl mb-1">🏆</span><span class="text-[10px] font-medium">Perfil</span></a>
   </nav>
 
-  <script type="text/javascript">
-    function googleTranslateElementInit() {
-      new google.translate.TranslateElement({pageLanguage: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
-    }
-  </script>
-  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
-  <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    
-    const frases = [
-      "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
-      "No te preocupes por los fracasos, preocúpate por las oportunidades que pierdes cuando no lo intentas.",
-      "La disciplina es el puente entre las metas y los logros.",
-      "Cada experto fue una vez un principiante que no se rindió.",
-      "El mejor momento para plantar un árbol fue hace 20 años. El segundo mejor momento es ahora.",
-      "No tienes que ser grande para empezar, pero tienes que empezar para ser grande."
-    ];
-
-    function cargarFraseDelDia() {
-      const fecha = new Date();
-      const diaDelAnio = Math.floor((fecha - new Date(fecha.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-      const indiceFrase = diaDelAnio % frases.length;
-      document.getElementById('fraseDiaria').textContent = `"${frases[indiceFrase]}"`;
-    }
-    cargarFraseDelDia();
-
-    function actualizarInterfazUsuario() {
-      const usuario = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
-      const btnSidebar = document.getElementById('btnSidebarUser');
-      let contadorBase = 1204;
-      if (usuario) contadorBase++;
-      document.getElementById('contadorUsuarios').textContent = contadorBase;
-      if (usuario && btnSidebar) {
-        btnSidebar.textContent = `Hola, ${usuario.nombre.split(' ')[0]}`;
-        btnSidebar.onclick = () => window.location.href = 'perfil.html';
-        btnSidebar.classList.remove('bg-[#1A1A1A]', 'dark:bg-white', 'text-white', 'dark:text-black');
-        btnSidebar.classList.add('bg-blue-600', 'text-white');
-      }
-    }
-    actualizarInterfazUsuario();
-
-    function cambiarAuthTab(tab) {
-      const tabLogin = document.getElementById('tab-login');
-      const tabRegistro = document.getElementById('tab-registro');
-      const formLogin = document.getElementById('form-login');
-      const formRegistro = document.getElementById('form-registro');
-      if (tab === 'login') {
-        tabLogin.className = 'flex-1 pb-3 text-sm font-bold text-[#1A1A1A] dark:text-white border-b-2 border-[#1A1A1A] dark:border-white transition';
-        tabRegistro.className = 'flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] dark:hover:text-white transition';
-        formLogin.classList.remove('hidden');
-        formRegistro.classList.add('hidden');
-      } else {
-        tabLogin.className = 'flex-1 pb-3 text-sm font-bold text-[#8A8580] hover:text-[#1A1A1A] dark:hover:text-white transition';
-        tabRegistro.className = 'flex-1 pb-3 text-sm font-bold text-[#1A1A1A] dark:text-white border-b-2 border-[#1A1A1A] dark:border-white transition';
-        formLogin.classList.add('hidden');
-        formRegistro.classList.remove('hidden');
-      }
-    }
-
-    function registrarUsuario() {
-      const nombre = document.getElementById('regNombre').value;
-      const email = document.getElementById('regEmail').value;
-      const password = document.getElementById('regPassword').value;
-      localStorage.setItem('usuarioAprendeYa', JSON.stringify({ nombre, email, password }));
-      alert('¡Registro exitoso! Bienvenido a AprendeYa.');
-      cerrarModalLogin();
-      actualizarInterfazUsuario();
-    }
-
-    function iniciarSesion() {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
-      if (usuarioGuardado && usuarioGuardado.email === email && usuarioGuardado.password === password) {
-        alert(`¡Hola de nuevo, ${usuarioGuardado.nombre}!`);
-        cerrarModalLogin();
-        actualizarInterfazUsuario();
-      } else {
-        alert('Correo o contraseña incorrectos. Intenta de nuevo.');
-      }
-    }
-
-    function recuperarPassword(e) {
-      e.preventDefault();
-      const email = prompt("Ingresa el correo con el que te registraste:");
-      const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioAprendeYa') || 'null');
-      if (usuarioGuardado && usuarioGuardado.email === email) {
-        alert(`Tu contraseña es: ${usuarioGuardado.password}. (En producción se enviaría un correo).`);
-      } else {
-        alert('No encontramos ninguna cuenta con ese correo.');
-      }
-    }
-
-    function abrirModalLogin() { document.getElementById('modalLogin').classList.remove('hidden'); document.getElementById('modalLogin').classList.add('flex'); }
-    function cerrarModalLogin() { document.getElementById('modalLogin').classList.add('hidden'); document.getElementById('modalLogin').classList.remove('flex'); }
-    
-    function abrirModalInfo(tipo) {
-      const modal = document.getElementById('modalInfo');
-      const titulo = document.getElementById('infoTitulo');
-      const contenido = document.getElementById('infoContenido');
-      if (tipo === 'sobre') { titulo.textContent = 'Sobre AprendeYa 🚀'; contenido.innerHTML = '<p>Transformamos tus apuntes aburridos en herramientas dinámicas de aprendizaje. Nuestra misión es que apruebes con menos esfuerzo.</p>'; }
-      else if (tipo === 'recomendaciones') { titulo.textContent = 'Consejos de Estudio 💡'; contenido.innerHTML = '<ul class="list-disc pl-5 space-y-2"><li>Estudia en bloques de 25 minutos (Técnica Pomodoro).</li><li>Usa nuestras tarjetas a diario.</li><li>Explícale a alguien más lo que aprendiste (Técnica Feynman).</li></ul>'; }
-      else if (tipo === 'contacto') { titulo.textContent = 'Contacto ✉️'; contenido.innerHTML = '<p>Escríbenos a: <strong>soporte@aprendeya.com</strong></p>'; }
-      modal.classList.remove('hidden'); modal.classList.add('flex');
-    }
-    function cerrarModalInfo() { document.getElementById('modalInfo').classList.add('hidden'); document.getElementById('modalInfo').classList.remove('flex'); }
-
-    function compartirApp() {
-      const texto = "¡Estoy estudiando con AprendeYa! 🚀 Sube tus apuntes y deja que la IA te cree tarjetas y pruebas. Pruébalo gratis aquí:";
-      const url = "https://victorochamontero-sudo.github.io/aprendeya/";
-      if (navigator.share) { navigator.share({ title: 'AprendeYa', text: texto, url: url }).catch(console.error); } 
-      else { navigator.clipboard.writeText(`${texto} ${url}`); alert('¡Enlace copiado al portapapeles!'); }
-    }
-
-    function mostrarOpcion(tipo) {
-      const tabTexto = document.getElementById('tab-texto');
-      const tabYoutube = document.getElementById('tab-youtube');
-      const opcionTexto = document.getElementById('opcionTexto');
-      const opcionYoutube = document.getElementById('opcionYoutube');
-      if (tipo === 'texto') {
-        tabTexto.className = 'text-[#1A1A1A] dark:text-white border-b-2 border-[#1A1A1A] dark:border-white pb-2 px-2 transition';
-        tabYoutube.className = 'hover:text-[#1A1A1A] dark:hover:text-white pb-2 px-2 transition';
-        opcionTexto.classList.remove('hidden'); opcionYoutube.classList.add('hidden');
-      } else {
-        tabTexto.className = 'hover:text-[#1A1A1A] dark:hover:text-white pb-2 px-2 transition';
-        tabYoutube.className = 'text-[#1A1A1A] dark:text-white border-b-2 border-[#1A1A1A] dark:border-white pb-2 px-2 transition';
-        opcionTexto.classList.add('hidden'); opcionYoutube.classList.remove('hidden');
-      }
-    }
-
-    // --- LÓGICA DEL MODO OSCURO ---
-    function toggleDarkMode() {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
-      
-      localStorage.setItem('modoOscuro', isDark ? 'true' : 'false');
-      
-      const icono = document.getElementById('iconoDark');
-      const texto = document.getElementById('textoDark');
-      if (icono && texto) {
-        icono.textContent = isDark ? '☀️' : '🌙';
-        texto.textContent = isDark ? 'Modo Claro' : 'Modo Oscuro';
-      }
-    }
-
-    // Verificar preferencia al cargar
-    if (localStorage.getItem('modoOscuro') === 'true') {
-      document.documentElement.classList.add('dark');
-      const icono = document.getElementById('iconoDark');
-      const texto = document.getElementById('textoDark');
-      if (icono && texto) {
-        icono.textContent = '☀️';
-        texto.textContent = 'Modo Claro';
-      }
-    }
-  </script>
-<script src="app.js?v=3"></script>
+  <script src="app.js"></script>
 </body>
 </html>
