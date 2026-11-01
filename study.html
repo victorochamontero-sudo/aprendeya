@@ -111,3 +111,82 @@
             </select>
           </div>
           <button onclick="iniciarQuiz()" class="bg-[#1A1A1A] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-full font-bold hover:bg-opacity-80 transition text-sm md:text-base">
+                      <button onclick="iniciarQuiz()" class="bg-[#1A1A1A] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-full font-bold hover:bg-opacity-80 transition text-sm md:text-base">Comenzar Prueba</button>
+        </div>
+        <div id="preguntasQuiz" class="space-y-6"></div>
+      </div>
+
+      <!-- JUEGOS -->
+      <div id="juegosContainer" class="hidden w-full max-w-4xl bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-[#E5E1DA]">
+        <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A]">Elige un juego</h2>
+        <div id="menuJuegos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <button onclick="iniciarJuegoCoincidencias()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] hover:border-blue-400 hover:bg-blue-50 transition text-left">
+            <div class="text-4xl text-[#1A1A1A]">🧩</div>
+            <div><h3 class="font-bold text-[#1A1A1A]">Coincidencias</h3><p class="text-xs text-[#8A8580]">Empareja el término con su definición.</p></div>
+          </button>
+          <button onclick="iniciarJuegoApilador()" class="flex items-center gap-4 p-4 rounded-2xl border border-[#E5E1DA] hover:border-blue-400 hover:bg-blue-50 transition text-left">
+            <div class="text-4xl text-[#1A1A1A]">🥞</div>
+            <div><h3 class="font-bold text-[#1A1A1A]">Apilador</h3><p class="text-xs text-[#8A8580]">Responde bien para apilar bloques.</p></div>
+          </button>
+        </div>
+        <div id="juegoActivo" class="hidden mt-8">
+          <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700">← Volver a juegos</button>
+          <div class="flex justify-between items-center bg-[#F7F5F2] p-4 rounded-xl mb-6">
+            <p class="font-bold text-[#1A1A1A]">Puntuación: <span id="puntosJuego" class="text-blue-600">0</span></p>
+            <p class="text-sm text-[#8A8580]">Intentos: <span id="intentosJuego">0</span></p>
+          </div>
+          <div id="tableroJuego" class="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4"></div>
+        </div>
+        <div id="juegoApilador" class="hidden mt-8 flex-col w-full">
+          <button onclick="salirJuego()" class="mb-4 text-sm font-bold text-red-500 hover:text-red-700 text-left">← Volver a juegos</button>
+          <div id="instruccionesApilador" class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-6 text-center">
+            <h3 class="font-bold text-xl text-blue-800 mb-2">¿Cómo jugar al Apilador?</h3>
+            <p class="text-sm text-blue-700 mb-4">Responde correctamente a la pregunta para apilar un bloque en la torre. ¡Si fallas, el bloque no sube!</p>
+            <button onclick="comenzarApilador()" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-full hover:bg-blue-700 transition">¡Entendido, a jugar!</button>
+          </div>
+          <div id="juegoApiladorActivo" class="hidden flex-col items-center w-full max-w-md mx-auto">
+            <div class="flex justify-between w-full bg-[#F7F5F2] p-4 rounded-xl mb-6">
+              <p class="font-bold text-[#1A1A1A]">Altura: <span id="alturaTorre" class="text-blue-600">0</span></p>
+              <p class="text-sm text-[#8A8580]">Fallos: <span id="fallosTorre">0</span></p>
+            </div>
+            <div id="torreContainer" class="w-full flex flex-col-reverse justify-start h-48 bg-[#E5E1DA] rounded-lg overflow-hidden border-2 border-[#D6D1CA] mb-6 p-1"></div>
+            <div id="preguntaApilador" class="w-full text-center">
+              <h3 class="text-lg font-bold mb-4 text-[#1A1A1A]" id="textoPreguntaApilador"></h3>
+              <div class="space-y-2" id="opcionesApilador"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRONÓMETRO -->
+      <div id="cronometroContainer" class="hidden w-full max-w-2xl bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-[#E5E1DA] text-center">
+        <h2 class="text-2xl font-bold mb-6 text-[#1A1A1A]">⏱️ Temporizador de Estudio</h2>
+        <p class="text-sm text-[#8A8580] mb-8">Selecciona un tiempo para obligarte a estudiar sin distracciones.</p>
+        <div class="flex flex-wrap justify-center gap-3 mb-8">
+          <button onclick="iniciarCronometro(5)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">5 min</button>
+          <button onclick="iniciarCronometro(10)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">10 min</button>
+          <button onclick="iniciarCronometro(15)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">15 min</button>
+          <button onclick="iniciarCronometro(20)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">20 min</button>
+          <button onclick="iniciarCronometro(25)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">25 min</button>
+          <button onclick="iniciarCronometro(30)" class="bg-[#F7F5F2] hover:bg-[#E5E1DA] border border-[#D6D1CA] text-[#1A1A1A] font-bold py-2 px-6 rounded-full transition">30 min</button>
+        </div>
+        <div class="text-6xl md:text-8xl font-extrabold text-[#1A1A1A] mb-8" id="tiempoPantalla">00:00</div>
+        <button onclick="detenerCronometro()" id="btnDetenerCrono" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full transition">Detener y Reiniciar</button>
+      </div>
+
+    </div>
+  </main>
+
+  <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-[#E5E1DA] flex justify-around py-2 z-50">
+    <button onclick="cambiarTab('mazo')" id="mob-mazo" class="flex flex-col items-center p-2 text-[#1A1A1A]"><span class="text-xl mb-1">🗂️</span><span class="text-[10px] font-bold">Mazo</span></button>
+    <button onclick="cambiarTab('lista')" id="mob-lista" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📄</span><span class="text-[10px] font-medium">Lista</span></button>
+    <button onclick="cambiarTab('guia')" id="mob-guia" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📘</span><span class="text-[10px] font-medium">Guía</span></button>
+    <button onclick="cambiarTab('quiz')" id="mob-quiz" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">📝</span><span class="text-[10px] font-medium">Prueba</span></button>
+    <button onclick="cambiarTab('juegos')" id="mob-juegos" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">🎮</span><span class="text-[10px] font-medium">Juegos</span></button>
+    <button onclick="cambiarTab('cronometro')" id="mob-cronometro" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">⏱️</span><span class="text-[10px] font-medium">Tiempo</span></button>
+  </nav>
+
+  <script src="api.js"></script>
+  <script src="study.js"></script>
+</body>
+</html>
