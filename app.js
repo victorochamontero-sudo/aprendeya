@@ -1,5 +1,5 @@
 // ============================================
-// APPRENDEYA - LÓGICA DE LA PÁGINA DE INICIO
+// APPRENDEYA - LÓGICA DE LA PÁGINA DE INICIO (v2.0)
 // ============================================
 
 // --- CONFIGURACIÓN INICIAL ---
