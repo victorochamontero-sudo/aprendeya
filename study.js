@@ -10,7 +10,6 @@ let cronometroInterval = null;
 let tiempoRestante = 0;
 
 // Variables para los juegos
-let juegoActual = '';
 let puntosJuego = 0;
 let intentosJuego = 0;
 let seleccionadosCoincidencias = [];
@@ -24,7 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const loadingText = document.getElementById('loadingText');
   const btnError = document.getElementById('btnError');
   
-  // Si venimos del historial, ya tenemos el material
   const materialGuardado = localStorage.getItem('materialGenerado');
   const nombreKit = localStorage.getItem('nombreMaterial');
   
@@ -61,48 +59,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 function iniciarInterfaz() {
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('mazoContainer').classList.remove('hidden');
+  
+  // Asegurarnos de que el material tiene la estructura correcta
+  if (!materialActual.flashcards) materialActual.flashcards = [];
+  if (!materialActual.quiz) materialActual.quiz = [];
+  if (!materialActual.guia) materialActual.guia = "No se generó una guía.";
+
   mostrarTarjeta();
   renderizarLista();
   renderizarGuia();
-  iniciarQuizSetup();
-}
-
-// --- NAVEGACIÓN ---
-function cambiarTab(tab) {
-  document.querySelectorAll('[id$="Container"]').forEach(el => {
-    if(el.id !== 'loading') el.classList.add('hidden');
-  });
-  
-  if (tab === 'mazo') document.getElementById('mazoContainer').classList.remove('hidden');
-  if (tab === 'lista') document.getElementById('listaContainer').classList.remove('hidden');
-  if (tab === 'guia') document.getElementById('guiaContainer').classList.remove('hidden');
-  if (tab === 'quiz') document.getElementById('quizContainer').classList.remove('hidden');
-  if (tab === 'juegos') document.getElementById('juegosContainer').classList.remove('hidden');
-  if (tab === 'cronometro') document.getElementById('cronometroContainer').classList.remove('hidden');
-  
-  const botones = ['mazo', 'lista', 'guia', 'quiz', 'juegos', 'cronometro'];
-  botones.forEach(b => {
-    const btnPc = document.getElementById('nav-' + b);
-    const btnMob = document.getElementById('mob-' + b);
-    
-    if (btnPc) {
-      if (b === tab) btnPc.className = 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] dark:bg-[#2A2A2A] text-[#1A1A1A] dark:text-white transition';
-      else btnPc.className = 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition';
-    }
-    
-    if (btnMob) {
-      if (b === tab) btnMob.className = 'flex flex-col items-center p-2 text-[#1A1A1A] dark:text-white';
-      else btnMob.className = 'flex flex-col items-center p-2 text-[#8A8580] dark:text-gray-400';
-    }
-  });
 }
 
 // --- MAZO ---
 function mostrarTarjeta() {
-  if (!materialActual || !materialActual.flashcards) return;
   const mazo = materialActual.flashcards;
-  
   if (mazo.length === 0) return;
+  
   if (tarjetaActual >= mazo.length) tarjetaActual = 0; 
   
   const tarjeta = mazo[tarjetaActual];
@@ -142,9 +114,15 @@ function calificar(nivel) {
 // --- LISTA Y GUÍA ---
 function renderizarLista() {
   const contenedor = document.getElementById('listaTarjetas');
-  if (!contenedor || !materialActual) return;
+  if (!contenedor) return;
+  
+  if (materialActual.flashcards.length === 0) {
+    contenedor.innerHTML = '<p class="dark:text-white">No hay tarjetas generadas.</p>';
+    return;
+  }
+
   contenedor.innerHTML = materialActual.flashcards.map(t => `
-    <div class="p-4 bg-[#F7F5F2] dark:bg-[#2A2A2A] rounded-xl border border-[#E5E1DA] dark:border-[#444]">
+    <div class="p-4 bg-[#F7F5F2] dark:bg-[#2A2A2A] rounded-xl border border-[#E5E1DA] dark:border-[#444] mb-2">
       <p class="font-bold text-[#1A1A1A] dark:text-white mb-1">${t.pregunta}</p>
       <p class="text-sm text-[#5A5550] dark:text-gray-300">${t.respuesta}</p>
     </div>
@@ -153,16 +131,16 @@ function renderizarLista() {
 
 function renderizarGuia() {
   const contenedor = document.getElementById('guiaTexto');
-  if (!contenedor || !materialActual) return;
+  if (!contenedor) return;
   
-  let html = materialActual.guia || "Sin guía generada.";
-  // Convertir Markdown a HTML simple
-  html = html.replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-4 mb-2 dark:text-white">$1</h1>');
-  html = html.replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold mt-3 mb-2 dark:text-white">$1</h2>');
-  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/^\* (.*$)/gm, '<li class="ml-4 list-disc">$1</li>');
-  html = html.replace(/^- (.*$)/gm, '<li class="ml-4 list-disc">$1</li>');
+  let html = materialActual.guia;
+  
+  // Formatear texto plano a HTML con estilo
   html = html.replace(/\n/g, '<br>');
+  // Poner en negrita lo que esté entre ** **
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Formatear viñetas
+  html = html.replace(/- (.*?)(<br>|$)/g, '<li class="ml-4 list-disc">$1</li>');
   
   contenedor.innerHTML = html;
 }
@@ -178,7 +156,6 @@ function guardarEnHistorial(nombre) {
 
 // --- AUDIO ---
 function leerTextoActual() {
-  if (!materialActual) return;
   const tarjeta = materialActual.flashcards[tarjetaActual];
   const texto = estaVolteada ? tarjeta.respuesta : tarjeta.pregunta;
   synth.cancel();
@@ -190,50 +167,15 @@ function leerTextoActual() {
 function detenerLectura() { synth.cancel(); }
 
 function leerGuiaCompleta() {
-  if (!materialActual) return;
   synth.cancel();
-  const utterance = new SpeechSynthesisUtterance(materialActual.guia);
+  // Quitar asteriscos para que no los lea en voz alta
+  let textoLimpio = materialActual.guia.replace(/\*\*/g, '').replace(/#/g, '').replace(/-/g, '');
+  const utterance = new SpeechSynthesisUtterance(textoLimpio);
   utterance.lang = 'es-ES';
   synth.speak(utterance);
 }
 
-// --- CRONÓMETRO ---
-function iniciarCronometro(minutos) {
-  if (cronometroInterval) clearInterval(cronometroInterval);
-  tiempoRestante = minutos * 60;
-  document.getElementById('btnDetenerCrono').classList.remove('hidden');
-  actualizarPantallaCrono();
-
-  cronometroInterval = setInterval(() => {
-    tiempoRestante--;
-    actualizarPantallaCrono();
-    if (tiempoRestante <= 0) {
-      clearInterval(cronometroInterval);
-      alert('¡Tiempo completado! Tómate un descanso.');
-      detenerCronometro();
-    }
-  }, 1000);
-}
-
-function actualizarPantallaCrono() {
-  const min = Math.floor(tiempoRestante / 60);
-  const seg = tiempoRestante % 60;
-  document.getElementById('tiempoPantalla').textContent = `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
-}
-
-function detenerCronometro() {
-  clearInterval(cronometroInterval);
-  tiempoRestante = 0;
-  actualizarPantallaCrono();
-  document.getElementById('btnDetenerCrono').classList.add('hidden');
-}
-
 // --- PRUEBA (QUIZ) ---
-function iniciarQuizSetup() {
-  document.getElementById('quizSetup').classList.remove('hidden');
-  document.getElementById('preguntasQuiz').innerHTML = '';
-}
-
 function iniciarQuiz() {
   const cantidad = parseInt(document.getElementById('selectCantidad').value);
   const contenedor = document.getElementById('preguntasQuiz');
@@ -270,7 +212,6 @@ function responderQuiz(preguntaIdx, seleccionada, correcta) {
   
   if (seleccionada === correcta) {
     botones[seleccionada].classList.add('bg-green-100', 'border-green-500', 'text-green-800');
-    // Sumar puntos al perfil
     let puntos = parseInt(localStorage.getItem('puntosAprendeYa') || '0');
     localStorage.setItem('puntosAprendeYa', puntos + 1);
   } else {
@@ -291,6 +232,11 @@ function iniciarJuegoCoincidencias() {
   actualizarMarcadorJuego();
   
   const mazo = materialActual.flashcards.slice(0, 4);
+  if (mazo.length < 4) {
+    document.getElementById('tableroJuego').innerHTML = '<p class="dark:text-white col-span-full text-center">Necesitas al menos 4 tarjetas para jugar.</p>';
+    return;
+  }
+
   cartasCoincidencias = [];
   mazo.forEach((t, index) => {
     cartasCoincidencias.push({ id: index, texto: t.pregunta });
@@ -324,7 +270,6 @@ function seleccionarCoincidencia(index) {
     const c2 = cartasCoincidencias[i2];
     
     if (c1.id === c2.id && c1.texto !== c2.texto) {
-      // Acierto
       puntosJuego += 10;
       actualizarMarcadorJuego();
       document.getElementById(`carta-${i1}`).classList.replace('bg-blue-700', 'bg-green-500');
@@ -332,11 +277,8 @@ function seleccionarCoincidencia(index) {
       document.getElementById(`carta-${i1}`).disabled = true;
       document.getElementById(`carta-${i2}`).disabled = true;
       
-      if (puntosJuego === 40) {
-        setTimeout(() => alert('¡Felicidades! Has completado el juego.'), 300);
-      }
+      if (puntosJuego === 40) setTimeout(() => alert('¡Felicidades! Has completado el juego.'), 300);
     } else {
-      // Fallo
       setTimeout(() => {
         document.getElementById(`carta-${i1}`).classList.replace('bg-blue-700', 'bg-blue-500');
         document.getElementById(`carta-${i2}`).classList.replace('bg-blue-700', 'bg-blue-500');
@@ -364,6 +306,8 @@ function comenzarApilador() {
 
 function siguientePreguntaApilador() {
   const tarjetas = materialActual.flashcards;
+  if (tarjetas.length === 0) return;
+
   const tarjeta = tarjetas[Math.floor(Math.random() * tarjetas.length)];
   document.getElementById('textoPreguntaApilador').textContent = tarjeta.pregunta;
   
@@ -377,7 +321,7 @@ function siguientePreguntaApilador() {
   const contenedor = document.getElementById('opcionesApilador');
   contenedor.innerHTML = opciones.map(op => `
     <button onclick="responderApilador('${op.replace(/'/g, "\\'")}', '${tarjeta.respuesta.replace(/'/g, "\\'")}')" 
-      class="w-full text-left bg-white dark:bg-[#2A2A2A] border border-[#E5E1DA] dark:border-[#444] text-[#1A1A1A] dark:text-white p-3 rounded-xl hover:bg-[#F7F5F2] dark:hover:bg-[#333] transition text-sm font-medium">
+      class="w-full text-left bg-white dark:bg-[#2A2A2A] border border-[#E5E1DA] dark:border-[#444] text-[#1A1A1A] dark:text-white p-3 rounded-xl hover:bg-[#F7F5F2] dark:hover:bg-[#333] transition text-sm font-medium mb-2">
       ${op}
     </button>
   `).join('');
@@ -417,6 +361,67 @@ function actualizarMarcadorJuego() {
   const i = document.getElementById('intentosJuego');
   if (p) p.textContent = puntosJuego;
   if (i) i.textContent = intentosJuego;
+}
+
+// --- CRONÓMETRO ---
+function iniciarCronometro(minutos) {
+  if (cronometroInterval) clearInterval(cronometroInterval);
+  tiempoRestante = minutos * 60;
+  document.getElementById('btnDetenerCrono').classList.remove('hidden');
+  actualizarPantallaCrono();
+
+  cronometroInterval = setInterval(() => {
+    tiempoRestante--;
+    actualizarPantallaCrono();
+    if (tiempoRestante <= 0) {
+      clearInterval(cronometroInterval);
+      alert('¡Tiempo completado! Tómate un descanso.');
+      detenerCronometro();
+    }
+  }, 1000);
+}
+
+function actualizarPantallaCrono() {
+  const min = Math.floor(tiempoRestante / 60);
+  const seg = tiempoRestante % 60;
+  document.getElementById('tiempoPantalla').textContent = `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
+}
+
+function detenerCronometro() {
+  clearInterval(cronometroInterval);
+  tiempoRestante = 0;
+  actualizarPantallaCrono();
+  document.getElementById('btnDetenerCrono').classList.add('hidden');
+}
+
+// --- NAVEGACIÓN ---
+function cambiarTab(tab) {
+  document.querySelectorAll('[id$="Container"]').forEach(el => {
+    if(el.id !== 'loading') el.classList.add('hidden');
+  });
+  
+  if (tab === 'mazo') document.getElementById('mazoContainer').classList.remove('hidden');
+  if (tab === 'lista') document.getElementById('listaContainer').classList.remove('hidden');
+  if (tab === 'guia') document.getElementById('guiaContainer').classList.remove('hidden');
+  if (tab === 'quiz') document.getElementById('quizContainer').classList.remove('hidden');
+  if (tab === 'juegos') document.getElementById('juegosContainer').classList.remove('hidden');
+  if (tab === 'cronometro') document.getElementById('cronometroContainer').classList.remove('hidden');
+  
+  const botones = ['mazo', 'lista', 'guia', 'quiz', 'juegos', 'cronometro'];
+  botones.forEach(b => {
+    const btnPc = document.getElementById('nav-' + b);
+    const btnMob = document.getElementById('mob-' + b);
+    
+    if (btnPc) {
+      if (b === tab) btnPc.className = 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold bg-[#E8E6ED] dark:bg-[#2A2A2A] text-[#1A1A1A] dark:text-white transition';
+      else btnPc.className = 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition';
+    }
+    
+    if (btnMob) {
+      if (b === tab) btnMob.className = 'flex flex-col items-center p-2 text-[#1A1A1A] dark:text-white';
+      else btnMob.className = 'flex flex-col items-center p-2 text-[#8A8580] dark:text-gray-400';
+    }
+  });
 }
 
 function pedirMasMaterial() {
