@@ -1,9 +1,15 @@
-const OPENROUTER_KEY = 'sk-or-v1-d14c9c83bc9973228f7958486be4e59134be3157eb279667e4a904f9b0bc65ba8';
+// ============================================
+// APPRENDEYA - CONEXIÓN CON LA IA (GROQ)
+// ============================================
+
+// ⚠️ PEGA AQUÍ TU CLAVE DE GROQ (Empieza con gsk_)
+const GROQ_API_KEY = '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';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
-A partir del siguiente texto, genera material de estudio de ALTA CALIDAD en ESPAÑOL.
+A partir del texto, genera material de estudio en ESPAÑOL.
+Devuelve SOLO un objeto JSON. No uses markdown, no pongas texto antes ni después.
 
-Devuelve SOLO un JSON válido, sin markdown, sin texto extra:
+Estructura exacta:
 {
   "flashcards": [
     { "pregunta": "...", "respuesta": "..." }
@@ -16,13 +22,9 @@ Devuelve SOLO un JSON válido, sin markdown, sin texto extra:
       "explicacion": "..."
     }
   ],
-  "guia": "Usa títulos (#, ##), viñetas, negritas y párrafos para estructurar los conceptos clave."
+  "guia": "Escribe una guía de estudio usando saltos de línea (\\n) y viñetas."
 }
-
-Reglas:
-- Genera 10 flashcards.
-- Genera 5 preguntas de quiz.
-- En español.
+Genera 5 flashcards y 3 preguntas de quiz. Todo en español.
 
 TEXTO:
 `;
@@ -35,28 +37,37 @@ async function generarMaterial(texto) {
     try { return JSON.parse(cache); } catch (e) { }
   }
 
+  if (!GROQ_API_KEY || GROQ_API_KEY === 'AQUI_TU_CLAVE_DE_GROQ') {
+    alert('⚠️ Falta la clave de Groq en api.js.');
+    return demoMaterial();
+  }
+
   try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENROUTER_KEY}`
+        'Authorization': `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-exp:free',
+        model: 'llama3-8b-8192', 
         messages: [{ role: 'user', content: PROMPT + texto }],
-        temperature: 0.7,
+        temperature: 0.5,
         response_format: { type: 'json_object' }
       })
     });
 
-    if (!res.ok) throw new Error('Error API');
-    
+    if (!res.ok) throw new Error('Error API Groq: ' + await res.text());
+
     const data = await res.json();
-    let jsonLimpio = data.choices[0].message.content.trim();
-    const p1 = jsonLimpio.indexOf('{');
-    const p2 = jsonLimpio.lastIndexOf('}');
-    if (p1 !== -1 && p2 !== -1) jsonLimpio = jsonLimpio.substring(p1, p2 + 1);
+    const contenido = data.choices[0].message.content;
+    
+    let jsonLimpio = contenido.trim();
+    const primerLlave = jsonLimpio.indexOf('{');
+    const ultimaLlave = jsonLimpio.lastIndexOf('}');
+    if (primerLlave !== -1 && ultimaLlave !== -1) {
+        jsonLimpio = jsonLimpio.substring(primerLlave, ultimaLlave + 1);
+    }
     
     const material = JSON.parse(jsonLimpio);
     localStorage.setItem('materialGenerado', JSON.stringify(material));
@@ -65,14 +76,14 @@ async function generarMaterial(texto) {
     
   } catch (error) {
     console.error("Error generando material:", error);
-    alert('⚠️ La IA está fallando o la clave está bloqueada. Revisa tu clave en api.js.');
+    alert('❌ Error al conectar con Groq. Revisa que tu clave sea correcta.');
     return demoMaterial();
   }
 }
 
 function demoMaterial() {
   return {
-    flashcards: [{ pregunta: 'Error de IA', respuesta: 'No se pudo generar. Revisa tu clave.' }],
+    flashcards: [{ pregunta: 'Error de IA', respuesta: 'Revisa tu clave.' }],
     quiz: [],
     guia: "## Error de conexión\n\nNo se pudo generar la guía porque la IA rechazó la petición."
   };
