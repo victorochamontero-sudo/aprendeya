@@ -58,13 +58,10 @@
       <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">💡</span> Recomendaciones</button>
       <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">✉️</span> Contacto</button>
 
-      <!-- BOTÓN DE IDIOMA (LIMPIO) -->
+      <!-- BOTÓN DE TRADUCCIÓN (WIDGET GOOGLE) -->
       <div class="mt-6 border-t border-[#E5E1DA] pt-4 pb-4">
         <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2 px-3">Idioma</p>
-        <button onclick="abrirTraductor()" class="w-full flex items-center justify-between bg-[#F7F5F2] border border-[#E5E1DA] text-[#1A1A1A] text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-[#E5E1DA] transition">
-          <span>🌎 Traducir página</span>
-          <svg class="w-4 h-4 text-[#8A8580]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-        </button>
+        <div id="google_translate_element"></div>
       </div>
 
     </div>
@@ -168,16 +165,17 @@
     <a href="perfil.html" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">🏆</span><span class="text-[10px] font-medium">Perfil</span></a>
   </nav>
 
+  <!-- SCRIPT DE TRADUCCIÓN (WIDGET ORIGINAL) -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     
-    // --- LÓGICA DEL TRADUCTOR ---
-    function abrirTraductor() {
-      // Toma la URL actual y la envía al traductor de Google en una pestaña nueva
-      const urlActual = encodeURIComponent(window.location.href);
-      window.open(`https://translate.google.com/translate?sl=es&tl=en&u=${urlActual}`, '_blank');
-    }
-
     const frases = [
       "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
       "No te preocupes por los fracasos, preocúpate por las oportunidades que pierdes cuando no lo intentas.",
