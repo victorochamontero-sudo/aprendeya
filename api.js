@@ -1,15 +1,14 @@
 // ============================================
-// APPRENDEYA - CONEXIÓN CON LA IA (GROQ)
+// APPRENDEYA - CONEXIÓN CON LA IA (OPENROUTER)
 // ============================================
 
-// ⚠️ PEGA AQUÍ TU CLAVE DE GROQ (Empieza con gsk_)
-const GROQ_API_KEY = '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';
+// ⚠️ PEGA AQUÍ TU NUEVA CLAVE DE OPENROUTER
+const OPENROUTER_KEY = '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';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
-A partir del texto, genera material de estudio en ESPAÑOL.
-Devuelve SOLO un objeto JSON. No uses markdown, no pongas texto antes ni después.
+A partir del texto, genera material de estudio de ALTA CALIDAD en ESPAÑOL.
 
-Estructura exacta:
+Devuelve SOLO un JSON válido, sin markdown, sin texto extra:
 {
   "flashcards": [
     { "pregunta": "...", "respuesta": "..." }
@@ -19,12 +18,16 @@ Estructura exacta:
       "pregunta": "...",
       "opciones": ["A", "B", "C", "D"],
       "correcta": 0,
-      "explicacion": "..."
+      "explicacion": "Por qué la correcta lo es y por qué las otras no."
     }
   ],
-  "guia": "Escribe una guía de estudio usando saltos de línea (\\n) y viñetas."
+  "guia": "Escribe aquí una guía de estudio completa basada en el texto. Usa títulos (con #, ##), viñetas, negritas y párrafos para estructurar los conceptos clave."
 }
-Genera 5 flashcards y 3 preguntas de quiz. Todo en español.
+
+Reglas:
+- 10 flashcards.
+- 5 preguntas de quiz.
+- En español.
 
 TEXTO:
 `;
@@ -37,37 +40,33 @@ async function generarMaterial(texto) {
     try { return JSON.parse(cache); } catch (e) { }
   }
 
-  if (!GROQ_API_KEY || GROQ_API_KEY === 'AQUI_TU_CLAVE_DE_GROQ') {
-    alert('⚠️ Falta la clave de Groq en api.js.');
+  if (!OPENROUTER_KEY || OPENROUTER_KEY === 'TU_CLAVE_AQUI') {
+    alert('⚠️ Falta la clave de OpenRouter en api.js.');
     return demoMaterial();
   }
 
   try {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_API_KEY}`
+        'Authorization': `Bearer ${OPENROUTER_KEY}`
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant', 
+        model: 'google/gemini-2.0-flash-lite-001', // Modelo actualizado y rápido
         messages: [{ role: 'user', content: PROMPT + texto }],
-        temperature: 0.5,
+        temperature: 0.7,
         response_format: { type: 'json_object' }
       })
     });
 
-    if (!res.ok) throw new Error('Error API Groq: ' + await res.text());
-
-    const data = await res.json();
-    const contenido = data.choices[0].message.content;
+    if (!res.ok) throw new Error('Error API OpenRouter: ' + await res.text());
     
-    let jsonLimpio = contenido.trim();
-    const primerLlave = jsonLimpio.indexOf('{');
-    const ultimaLlave = jsonLimpio.lastIndexOf('}');
-    if (primerLlave !== -1 && ultimaLlave !== -1) {
-        jsonLimpio = jsonLimpio.substring(primerLlave, ultimaLlave + 1);
-    }
+    const data = await res.json();
+    let jsonLimpio = data.choices[0].message.content.trim();
+    const p1 = jsonLimpio.indexOf('{');
+    const p2 = jsonLimpio.lastIndexOf('}');
+    if (p1 !== -1 && p2 !== -1) jsonLimpio = jsonLimpio.substring(p1, p2 + 1);
     
     const material = JSON.parse(jsonLimpio);
     localStorage.setItem('materialGenerado', JSON.stringify(material));
@@ -76,7 +75,7 @@ async function generarMaterial(texto) {
     
   } catch (error) {
     console.error("Error generando material:", error);
-    alert('❌ Error al conectar con Groq. Revisa que tu clave sea correcta.');
+    alert('❌ Error al conectar con OpenRouter. Revisa que tu clave sea correcta.');
     return demoMaterial();
   }
 }
