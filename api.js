@@ -1,5 +1,5 @@
-// ⚠️ PEGA AQUÍ TU NUEVA CLAVE DE OPENROUTER
-const OPENROUTER_KEY = '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';
+// ⚠️ PEGA AQUÍ TU CLAVE DE OPENROUTER
+const OPENROUTER_KEY = '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';
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
 A partir del siguiente texto, genera material de estudio de ALTA CALIDAD.
@@ -37,11 +37,6 @@ async function generarMaterial(texto) {
     try { return JSON.parse(cache); } catch (e) { }
   }
 
-  if (!OPENROUTER_KEY || OPENROUTER_KEY === 'sk-or-v1-tu_clave_aqui') {
-    console.warn('Sin API key: usando modo demo.');
-    return demoMaterial();
-  }
-
   const url = 'https://openrouter.ai/api/v1/chat/completions';
   
   try {
@@ -59,14 +54,10 @@ async function generarMaterial(texto) {
       })
     });
 
-    if (!res.ok) {
-      throw new Error('Error API OpenRouter: ' + await res.text());
-    }
-
-    const data = await res.json();
-    const contenido = data.choices[0].message.content;
+    if (!res.ok) throw new Error('Error API');
     
-    let jsonLimpio = contenido.trim();
+    const data = await res.json();
+    let jsonLimpio = data.choices[0].message.content.trim();
     const primerLlave = jsonLimpio.indexOf('{');
     const ultimaLlave = jsonLimpio.lastIndexOf('}');
     if (primerLlave !== -1 && ultimaLlave !== -1) {
@@ -80,12 +71,12 @@ async function generarMaterial(texto) {
     
   } catch (error) {
     console.error("Error generando material:", error);
-    alert('⚠️ Tu clave de OpenRouter está bloqueada. Se usará material de prueba para que la app funcione.');
-    return demoMaterial(); // <--- ESTO ES LA RED DE SEGURIDAD
+    alert('⚠️ La IA está fallando o la clave está bloqueada. Usando material de prueba completo.');
+    return demoMaterial();
   }
 }
 
-// Material de prueba (Para que la app no se rompa si falla la clave)
+// --- MATERIAL DE PRUEBA COMPLETO (Para que puedas ver la guía y juegos) ---
 function demoMaterial() {
   return {
     flashcards: [
@@ -100,8 +91,14 @@ function demoMaterial() {
         opciones: ['El aumento de precios', 'El desempleo', 'Las exportaciones', 'La deuda pública'],
         correcta: 0,
         explicacion: 'La inflación mide la subida generalizada de los precios.'
+      },
+      {
+        pregunta: '¿Qué es el PIB?',
+        opciones: ['Una deuda', 'El valor de la producción de un país', 'Un impuesto', 'Un banco'],
+        correcta: 1,
+        explicacion: 'El PIB es el valor de todos los bienes y servicios finales producidos en un país.'
       }
     ],
-    guia: "## Guía de Estudio de Finanzas Básicas\n\n- **Inflación:** Es el aumento generalizado de los precios. Hace que el dinero pierda valor con el tiempo.\n\n- **PIB:** Producto Interno Bruto. Es la suma de todo lo que produce un país en un año."
+    guia: "## Guía de Estudio de Finanzas Básicas\n\n- **Inflación:** Es el aumento generalizado de los precios. Hace que el dinero pierda valor con el tiempo.\n\n- **PIB:** Producto Interno Bruto. Es la suma de todo lo que produce un país en un año.\n\n- **Activos y Pasivos:** Un activo es lo que tienes (dinero, casas). Un pasivo es lo que debes (préstamos, tarjetas de crédito)."
   };
 }
