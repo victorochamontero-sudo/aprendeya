@@ -15,8 +15,6 @@
     body { font-family: 'Inter', sans-serif; }
     .bg-pattern { background-color: #F7F5F2; background-image: radial-gradient(#E5E1DA 1px, transparent 1px); background-size: 20px 20px; }
     .dark .bg-pattern { background-color: #121212; background-image: radial-gradient(#2A2A2A 1px, transparent 1px); }
-    
-    /* Ocultar la barra fea de Google Translate */
     .goog-te-banner-frame { display: none !important; }
     body { top: 0 !important; }
   </style>
@@ -64,7 +62,6 @@
       <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition text-left"><span class="text-lg">💡</span> Recomendaciones</button>
       <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] dark:text-gray-300 hover:bg-[#F7F5F2] dark:hover:bg-[#2A2A2A] transition text-left"><span class="text-lg">✉️</span> Contacto</button>
 
-      <!-- SELECTOR DE IDIOMA -->
       <div class="mt-6 border-t border-[#E5E1DA] dark:border-[#333] pt-4 pb-4">
         <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2 px-3">Idioma</p>
         <select onchange="cambiarIdiomaGlobal(this.value)" class="w-full bg-[#F7F5F2] dark:bg-[#2A2A2A] border border-[#E5E1DA] dark:border-[#444] text-[#1A1A1A] dark:text-white rounded-xl px-4 py-2 text-sm focus:outline-none">
@@ -136,7 +133,6 @@
     </div>
   </main>
 
-  <!-- MODAL INFO -->
   <div id="modalInfo" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
     <div class="bg-white dark:bg-[#1E1E1E] rounded-3xl shadow-2xl w-full max-w-lg p-8 relative">
       <button onclick="cerrarModalInfo()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black dark:hover:text-white transition">×</button>
@@ -145,7 +141,6 @@
     </div>
   </div>
 
-  <!-- MODAL LOGIN -->
   <div id="modalLogin" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
     <div class="bg-white dark:bg-[#1E1E1E] rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
       <button onclick="cerrarModalLogin()" class="absolute top-5 right-5 text-2xl text-[#8A8580] hover:text-black dark:hover:text-white transition">×</button>
