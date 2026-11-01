@@ -16,6 +16,7 @@
 <body class="bg-pattern text-[#1A1A1A] min-h-screen flex">
 
   <!-- SIDEBAR IZQUIERDO (PC) -->
+  <!-- ARREGLO: Añadido flex-col, h-screen y overflow-y-auto para que el menú pueda scrollear -->
   <aside class="w-64 bg-white border-r border-[#E5E1DA] hidden md:flex flex-col h-screen fixed left-0 top-0 z-40">
     
     <!-- Logo (Fijo arriba) -->
@@ -58,7 +59,7 @@
       <button onclick="abrirModalInfo('recomendaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">💡</span> Recomendaciones</button>
       <button onclick="abrirModalInfo('contacto')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#5A5550] hover:bg-[#F7F5F2] transition text-left"><span class="text-lg">✉️</span> Contacto</button>
 
-      <!-- BOTÓN DE TRADUCCIÓN (WIDGET GOOGLE) -->
+      <!-- BOTÓN DE TRADUCCIÓN -->
       <div class="mt-6 border-t border-[#E5E1DA] pt-4 pb-4">
         <p class="text-xs font-bold text-[#8A8580] uppercase tracking-wider mb-2 px-3">Idioma</p>
         <div id="google_translate_element"></div>
@@ -165,7 +166,7 @@
     <a href="perfil.html" class="flex flex-col items-center p-2 text-[#8A8580]"><span class="text-xl mb-1">🏆</span><span class="text-[10px] font-medium">Perfil</span></a>
   </nav>
 
-  <!-- SCRIPT DE TRADUCCIÓN (WIDGET ORIGINAL) -->
+  <!-- SCRIPT DE TRADUCCIÓN -->
   <script type="text/javascript">
     function googleTranslateElementInit() {
       new google.translate.TranslateElement({pageLanguage: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
