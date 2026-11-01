@@ -115,6 +115,15 @@
     }
 
     function cerrarSesion() {
+            document.getElementById('progresoCorrectas').textContent = `${progreso1} / 5`;
+      document.getElementById('barraCorrectas').style.width = `${(progreso1 / 5) * 100}%`;
+      let progreso2 = Math.min(Math.floor(puntos / 2), 3);
+      document.getElementById('progresoTarjetas').textContent = `${progreso2} / 3`;
+      document.getElementById('barraTarjetas').style.width = `${(progreso2 / 3) * 100}%`;
+    }
+  </script>
+</body>
+</html>
       localStorage.removeItem('usuarioAprendeYa');
       alert('Sesión cerrada.');
       window.location.href = 'index.html';
