@@ -2,9 +2,6 @@
 // APPRENDEYA - CONEXIÓN CON LA IA (OPENROUTER)
 // ============================================
 
-// ⚠️ PEGA AQUÍ TU NUEVA CLAVE DE OPENROUTER
-const OPENROUTER_KEY = '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';
-
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
 A partir del texto, genera material de estudio de ALTA CALIDAD en ESPAÑOL.
 
@@ -21,7 +18,7 @@ Devuelve SOLO un JSON válido, sin markdown, sin texto extra:
       "explicacion": "Por qué la correcta lo es y por qué las otras no."
     }
   ],
-  "guia": "Escribe aquí una guía de estudio completa basada en el texto. Usa títulos (con #, ##), viñetas, negritas y párrafos para estructurar los conceptos clave."
+  "guia": "Escribe aquí una guía de estudio completa. Usa títulos (con #, ##), viñetas, negritas y párrafos."
 }
 
 Reglas:
@@ -40,8 +37,8 @@ async function generarMaterial(texto) {
     try { return JSON.parse(cache); } catch (e) { }
   }
 
-  if (!OPENROUTER_KEY || OPENROUTER_KEY === 'TU_CLAVE_AQUI') {
-    alert('⚠️ Falta la clave de OpenRouter en api.js.');
+  if (!MI_CLAVE_SECRETA || MI_CLAVE_SECRETA === 'sk-or-v1-TU_NUEVA_CLAVE_AQUI') {
+    alert('⚠️ Falta la clave en config.js. Revisa el archivo.');
     return demoMaterial();
   }
 
@@ -50,10 +47,10 @@ async function generarMaterial(texto) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENROUTER_KEY}`
+        'Authorization': `Bearer ${MI_CLAVE_SECRETA}`
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-lite-001', // Modelo actualizado y rápido
+        model: 'google/gemini-2.0-flash-lite-001', // Modelo rápido y gratuito
         messages: [{ role: 'user', content: PROMPT + texto }],
         temperature: 0.7,
         response_format: { type: 'json_object' }
@@ -75,14 +72,15 @@ async function generarMaterial(texto) {
     
   } catch (error) {
     console.error("Error generando material:", error);
-    alert('❌ Error al conectar con OpenRouter. Revisa que tu clave sea correcta.');
+    alert('❌ Error al conectar con OpenRouter. Revisa tu clave en config.js.');
     return demoMaterial();
   }
 }
 
+// Material de respaldo por si la IA falla
 function demoMaterial() {
   return {
-    flashcards: [{ pregunta: 'Error de IA', respuesta: 'Revisa tu clave.' }],
+    flashcards: [{ pregunta: 'Error de IA', respuesta: 'No se pudo generar el material. Revisa tu clave.' }],
     quiz: [],
     guia: "## Error de conexión\n\nNo se pudo generar la guía porque la IA rechazó la petición."
   };
