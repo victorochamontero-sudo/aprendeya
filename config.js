@@ -1,3 +1,1 @@
-const P1 = 'sk-or-v1-';
-const P2 = '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';
-const MI_CLAVE_SECRETA = P1 + P2;
+const MI_CLAVE_SECRETA = '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';
