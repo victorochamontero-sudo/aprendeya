@@ -1,5 +1,5 @@
 // =====================================================
-// APRENDEYA - study.js (VERSIÓN COMPLETA Y CONSOLIDADA)
+// APRENDEYA - study.js (VERSIÓN COMPLETA Y CORREGIDA)
 // =====================================================
 
 let material = null;
@@ -131,7 +131,6 @@ function calificar(nivel) {
   else if (nivel === 1) { stats.revisando++; }
   else if (nivel === 2) { stats.dominado++; }
 
-  // Puntos para logros (si existe el sistema)
   if (nivel === 2) {
     let puntos = parseInt(localStorage.getItem('puntosAprendeYa') || '0');
     localStorage.setItem('puntosAprendeYa', puntos + 1);
@@ -379,7 +378,6 @@ function responderQuiz(qIdx, opIdx) {
   exp.textContent = '💡 ' + q.explicacion;
   exp.classList.remove('hidden');
 
-  // Puntos para logros
   if (opIdx === q.correcta) {
     let puntos = parseInt(localStorage.getItem('puntosAprendeYa') || '0');
     localStorage.setItem('puntosAprendeYa', puntos + 1);
@@ -713,7 +711,9 @@ function cargarPreguntaApilador() {
     if (opciones.length >= 2 && material.flashcards.length < 4) {
       break;
     }
-   const comodines = ["Ninguna de las anteriores", "Todas las anteriores", "No aplica", "Es un concepto diferente"];
+  }
+
+  const comodines = ["Ninguna de las anteriores", "Todas las anteriores", "No aplica", "Es un concepto diferente"];
   let cIndex = 0;
   while (opciones.length < 4) {
     if (!opciones.includes(comodines[cIndex])) {
@@ -789,7 +789,6 @@ function iniciarCronometro(minutos) {
     if (tiempoRestante <= 0) {
       clearInterval(intervaloCronometro);
       intervaloCronometro = null;
-      // Sonido de alarma con Web Audio API
       try {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const oscillator = audioContext.createOscillator();
@@ -828,3 +827,4 @@ function detenerCronometro() {
   const btnDetenerCrono = document.getElementById('btnDetenerCrono');
   if (btnDetenerCrono) btnDetenerCrono.classList.add('hidden');
 }
+                    
