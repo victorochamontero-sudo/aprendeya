@@ -1,13 +1,14 @@
 // ============================================
-// APRENDEYA - CONEXIÓN CON LA IA (MODO PRUEBA)
+// APRENDEYA - MODO DE PRUEBA (SIN ERRORES)
 // ============================================
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.`;
 
 async function generarMaterial(texto) {
-  // Simulamos un pequeño retraso para que se vea la animación
+  // Simulamos un retraso de 1 segundo para que se vea la animación
   await new Promise(resolve => setTimeout(resolve, 1000));
   
+  // Devolvemos las tarjetas de prueba directamente
   return {
     flashcards: [
       { pregunta: '¿Qué es la fotosíntesis?', respuesta: 'El proceso de convertir luz en energía.' },
@@ -28,6 +29,7 @@ async function generarMaterial(texto) {
   };
 }
 
+// Funciones de respaldo para que study.js no marque error
 async function generarGuia(texto) {
   const material = await generarMaterial(texto);
   return material.guia;
