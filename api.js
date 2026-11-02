@@ -1,87 +1,50 @@
 // ============================================
-// APPRENDEYA - CONEXIÓN CON LA IA (OPENROUTER)
+// APRENDEYA - CONEXIÓN CON LA IA (MODO PRUEBA)
 // ============================================
 
-const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
-A partir del texto, genera material de estudio de ALTA CALIDAD en ESPAÑOL.
+const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.`;
 
-Devuelve SOLO un JSON válido, sin markdown, sin texto extra:
-{
-  "flashcards": [
-    { "pregunta": "...", "respuesta": "..." }
-  ],
-  "quiz": [
-    {
-      "pregunta": "...",
-      "opciones": ["A", "B", "C", "D"],
-      "correcta": 0,
-      "explicacion": "Por qué la correcta lo es y por qué las otras no."
-    }
-  ],
-  "guia": "Escribe aquí una guía de estudio completa. Usa títulos (con #, ##), viñetas, negritas y párrafos."
-}
-
-Reglas:
-- 10 flashcards.
-- 5 preguntas de quiz.
-- En español.
-
-TEXTO:
-`;
-
+// Esta función simula la IA para que puedas probar los juegos, mazos y cronómetro
 async function generarMaterial(texto) {
-  const cache = localStorage.getItem('materialGenerado');
-  const textoAnterior = localStorage.getItem('textoGenerado');
-
-  if (cache && textoAnterior === texto) {
-    try { return JSON.parse(cache); } catch (e) { }
-  }
-
-  if (!MI_CLAVE_SECRETA || MI_CLAVE_SECRETA === 'sk-or-v1-TU_NUEVA_CLAVE_AQUI') {
-    alert('⚠️ Falta la clave en config.js. Revisa el archivo.');
-    return demoMaterial();
-  }
-
-  try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${MI_CLAVE_SECRETA}`
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-lite-001', // Modelo rápido y gratuito
-        messages: [{ role: 'user', content: PROMPT + texto }],
-        temperature: 0.7,
-        response_format: { type: 'json_object' }
-      })
-    });
-
-    if (!res.ok) throw new Error('Error API OpenRouter: ' + await res.text());
-    
-    const data = await res.json();
-    let jsonLimpio = data.choices[0].message.content.trim();
-    const p1 = jsonLimpio.indexOf('{');
-    const p2 = jsonLimpio.lastIndexOf('}');
-    if (p1 !== -1 && p2 !== -1) jsonLimpio = jsonLimpio.substring(p1, p2 + 1);
-    
-    const material = JSON.parse(jsonLimpio);
-    localStorage.setItem('materialGenerado', JSON.stringify(material));
-    localStorage.setItem('textoGenerado', texto);
-    return material;
-    
-  } catch (error) {
-    console.error("Error generando material:", error);
-    alert('❌ Error al conectar con OpenRouter. Revisa tu clave en config.js.');
-    return demoMaterial();
-  }
+  // Simulamos un pequeño retraso para que se vea la animación de carga
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // Retornamos tarjetas de prueba
+  return {
+    flashcards: [
+      { pregunta: '¿Qué es la fotosíntesis?', respuesta: 'El proceso de convertir luz en energía.' },
+      { pregunta: '¿Dónde ocurre?', respuesta: 'En los cloroplastos.' },
+      { pregunta: '¿Qué pigmento usa?', respuesta: 'La clorofila.' },
+      { pregunta: '¿Qué produce?', respuesta: 'Glucosa y oxígeno.' },
+      { pregunta: '¿Quién realiza la fotosíntesis?', respuesta: 'Las plantas y algas.' },
+      { pregunta: '¿Qué gas necesitan?', respuesta: 'Dióxido de carbono (CO2).' },
+      { pregunta: '¿Qué gas liberan?', respuesta: 'Oxígeno (O2).' },
+      { pregunta: '¿Cuál es la fuente de energía?', respuesta: 'La luz solar.' }
+    ],
+    quiz: [
+      { pregunta: '¿Necesita luz la fotosíntesis?', opciones: ['Sí', 'No', 'A veces', 'Depende'], correcta: 0, explicacion: 'Necesita luz solar como fuente de energía.' },
+      { pregunta: '¿Dónde ocurre el proceso?', opciones: ['Núcleo', 'Cloroplastos', 'Mitocondria', 'Citoplasma'], correcta: 1, explicacion: 'Ocurre en los cloroplastos de las células vegetales.' },
+      { pregunta: '¿Qué libera al ambiente?', opciones: ['CO2', 'Oxígeno', 'Nitrógeno', 'Agua'], correcta: 1, explicacion: 'Libera oxígeno como subproducto.' }
+    ],
+    guia: "## Fotosíntesis\n\nLa fotosíntesis es el proceso por el cual las plantas convierten la luz solar en energía química.\n\n### ¿Dónde ocurre?\nEn los **cloroplastos**.\n\n### ¿Qué pigmento usa?\nLa **clorofila**."
+  };
 }
 
-// Material de respaldo por si la IA falla
-function demoMaterial() {
+// Mantenemos las funciones de respaldo para que study.js no marque error
+async function generarGuia(texto) {
+  const material = await generarMaterial(texto);
+  return material.guia;
+}
+
+async function generarPreguntasExtra(texto, cantidad) {
+  const material = await generarMaterial(texto);
+  return material.quiz.slice(0, cantidad);
+}
+
+async function generarMasMaterial(texto, flashcardsActuales, quizActual) {
+  const material = await generarMaterial(texto);
   return {
-    flashcards: [{ pregunta: 'Error de IA', respuesta: 'No se pudo generar el material. Revisa tu clave.' }],
-    quiz: [],
-    guia: "## Error de conexión\n\nNo se pudo generar la guía porque la IA rechazó la petición."
+    flashcards: material.flashcards,
+    quiz: material.quiz
   };
 }
