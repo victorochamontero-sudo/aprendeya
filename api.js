@@ -1,6 +1,7 @@
 const PROMPT = "Eres un experto en ciencias cognitivas del aprendizaje. A partir del texto, genera material de estudio en ESPAÑOL. Devuelve SOLO un JSON válido con esta estructura: { \"flashcards\": [{\"pregunta\": \"...\", \"respuesta\": \"...\"}], \"quiz\": [{\"pregunta\": \"...\", \"opciones\": [\"A\", \"B\", \"C\", \"D\"], \"correcta\": 0, \"explicacion\": \"...\"}], \"guia\": \"Guía de estudio completa\" }. Reglas: 8 flashcards y 5 preguntas de quiz. TEXTO: ";
 
 async function generarMaterial(texto) {
+  let MI_CLAVE_SECRETA = localStorage.getItem('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');
   if (typeof MI_CLAVE_SECRETA === 'undefined' || !MI_CLAVE_SECRETA) {
     alert('⚠️ Error: No se encontró tu clave. Revisa config.js');
     throw new Error('Falta la clave');
