@@ -1,2 +1,1 @@
-// Esta línea limpia los espacios y saltos de línea de la clave
-const MI_CLAVE_SECRETA = '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'.trim();
+const MI_CLAVE_SECRETA = 'sk-or-v1-447312822c9e4dda2955df7936f3d6509fb5e7989fd1436a2f23543f96e56c9ei';
