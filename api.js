@@ -4,12 +4,10 @@
 
 const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.`;
 
-// Esta función simula la IA para que puedas probar los juegos, mazos y cronómetro
 async function generarMaterial(texto) {
-  // Simulamos un pequeño retraso para que se vea la animación de carga
+  // Simulamos un pequeño retraso para que se vea la animación
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  // Retornamos tarjetas de prueba
   return {
     flashcards: [
       { pregunta: '¿Qué es la fotosíntesis?', respuesta: 'El proceso de convertir luz en energía.' },
@@ -30,7 +28,6 @@ async function generarMaterial(texto) {
   };
 }
 
-// Mantenemos las funciones de respaldo para que study.js no marque error
 async function generarGuia(texto) {
   const material = await generarMaterial(texto);
   return material.guia;
