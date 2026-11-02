@@ -1,19 +1,4 @@
-const PROMPT = `Eres un experto en ciencias cognitivas del aprendizaje.
-A partir del texto, genera material de estudio en ESPAÑOL.
-
-Devuelve SOLO un JSON válido con esta estructura:
-{
-  "flashcards": [{"pregunta": "...", "respuesta": "..."}],
-  "quiz": [{"pregunta": "...", "opciones": ["A", "B", "C", "D"], "correcta": 0, "explicacion": "..."}],
-  "guia": "Guía de estudio completa con títulos y viñetas."
-}
-
-Reglas:
-- 8 flashcards.
-- 5 preguntas de quiz.
-
-TEXTO:
-`;
+const PROMPT = "Eres un experto en ciencias cognitivas del aprendizaje. A partir del texto, genera material de estudio en ESPAÑOL. Devuelve SOLO un JSON válido con esta estructura: { \"flashcards\": [{\"pregunta\": \"...\", \"respuesta\": \"...\"}], \"quiz\": [{\"pregunta\": \"...\", \"opciones\": [\"A\", \"B\", \"C\", \"D\"], \"correcta\": 0, \"explicacion\": \"...\"}], \"guia\": \"Guía de estudio completa\" }. Reglas: 8 flashcards y 5 preguntas de quiz. TEXTO: ";
 
 async function generarMaterial(texto) {
   if (typeof MI_CLAVE_SECRETA === 'undefined' || !MI_CLAVE_SECRETA) {
@@ -45,7 +30,6 @@ async function generarMaterial(texto) {
     const data = await res.json();
     let contenido = data.choices[0].message.content.trim();
     
-    // Limpiamos el JSON por si la IA pone texto extra
     const primerLlave = contenido.indexOf('{');
     const ultimaLlave = contenido.lastIndexOf('}');
     if (primerLlave !== -1 && ultimaLlave !== -1) {
@@ -56,11 +40,10 @@ async function generarMaterial(texto) {
     
   } catch (error) {
     console.error("Error generando material:", error);
-    throw error; // Lanzamos el error para que app.js lo atrape
+    throw error; 
   }
 }
 
-// Funciones extra requeridas por study.js
 async function generarGuia(texto) {
   const material = await generarMaterial(texto);
   return material.guia;
